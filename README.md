@@ -79,4 +79,4 @@ The application follows **MVC + DAO** patterns:
 
 ## Team
 
-EECS 4413 — Winter 2026
+EECS 4413 TOM — Winter 2026
