@@ -80,3 +80,9 @@ The application follows **MVC + DAO** patterns:
 ## Team
 
 EECS 4413 TOM — Winter 2026
+Members: 
+Mohammad Omer Khan - 219189729, 
+Thor Laski -217279928,
+Mame Mor - 218666206,
+Amraj Randhawa - 219554963
+
