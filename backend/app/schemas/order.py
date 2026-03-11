@@ -1,55 +1,53 @@
 from __future__ import annotations
 
-# TODO: Import BaseModel from pydantic
-# TODO: Import datetime from datetime
-# TODO: Import ItemResponse from app.schemas.item
+from pydantic import BaseModel
+from datetime import datetime
+from app.schemas.item import ItemResponse
 
 
-class CheckoutRequest:
+class CheckoutRequest(BaseModel):
     """
     Request body for POST /api/orders/checkout.
     Credit card fields are passed to PaymentService (mock).
     """
 
-    # TODO: Declare fields
-    # shipping_address     — str | None = None  (if None, use saved address)
-    # credit_card_number   — str
-    # credit_card_expiry   — str  (e.g. "12/27")
-    # credit_card_cvv      — str  (e.g. "123")
-
-    pass
 
 
-class OrderItemResponse:
+    shipping_address: str | None = None
+    credit_card_number: str
+    credit_card_expiry: str
+    credit_card_cvv: str
+
+
+class OrderItemResponse(BaseModel):
     """
     A single product line within an OrderResponse.
     Stores the price at time of purchase, not the current Item price.
     Requires model_config = {"from_attributes": True}.
     """
 
-    # TODO: Declare fields
-    # id                  — int
-    # item_id             — int
-    # quantity            — int
-    # price_at_purchase   — float
-    # item                — ItemResponse  (nested)
+    id: int
+    item_id: int
+    quantity: int
+    price_at_purchase: float
+    item: ItemResponse
 
-    pass
+    model_config = {"from_attributes": True}#This tells Pydantic to convert the SQLAlchemy model to a Pydantic model. This makes reading the attributes of the sqlalchemy model easier.
+    #Pydantic can build OrderItemResponse from ORM objects (like SQLAlchemy model instances), not just dicts.
 
-
-class OrderResponse:
+class OrderResponse(BaseModel):
     """
     Full order representation returned after checkout and in order history.
     Requires model_config = {"from_attributes": True}.
     """
 
-    # TODO: Declare fields
-    # id               — int
-    # customer_id      — int
-    # total            — float
-    # status           — str
-    # shipping_address — str | None = None
-    # created_at       — datetime
-    # items            — list[OrderItemResponse], default []
+    id: int
+    customer_id: int
+    total: float
+    status: str
+    shipping_address: str | None = None
+    created_at: datetime
+    items: list[OrderItemResponse] = []
 
-    pass
+    model_config = {"from_attributes": True}#This tells Pydantic to convert the SQLAlchemy model to a Pydantic model. This makes reading the attributes of the sqlalchemy model easier.
+    #Pydantic can build OrderResponse from ORM objects (like SQLAlchemy model instances), not just dicts.

@@ -1,9 +1,9 @@
 from __future__ import annotations
 
-# TODO: Import BaseSettings from pydantic_settings
+from pydantic_settings import BaseSettings
 
 
-class Settings:
+class Settings(BaseSettings):
     """
     Application configuration loaded from environment variables / .env file.
     Uses pydantic-settings BaseSettings so all fields are validated on startup.
@@ -20,18 +20,16 @@ class Settings:
       settings.DATABASE_URL
     """
 
-    # TODO: Declare fields with types and defaults
-    # DATABASE_URL: str = "postgresql://estore_user:changeme@localhost:5432/estore"
-    # JWT_SECRET: str = "changeme-to-a-random-secret-key"
-    # JWT_ALGORITHM: str = "HS256"
-    # ACCESS_TOKEN_EXPIRE_MINUTES: int = 60
+    DATABASE_URL: str = "postgresql://estore_user:changeme@localhost:5432/estore"
 
-    # TODO: Add inner Config class to load from .env file
-    # class Config:
-    #     env_file = ".env"
+    JWT_SECRET: str = "changeme-to-a-random-secret-key"
+    JWT_ALGORITHM: str = "HS256"
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 60
 
-    pass
+    class Config:
+        env_file = ".env" #telling pydantic to load the environment variables from the .env file.
+
+    
 
 
-# TODO: Export a module-level singleton
-# settings = Settings()
+settings = Settings() #exporting a module-level singleton.

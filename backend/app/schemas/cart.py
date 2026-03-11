@@ -1,58 +1,51 @@
 from __future__ import annotations
 
-# TODO: Import BaseModel from pydantic
-# TODO: Import ItemResponse from app.schemas.item
+from pydantic import BaseModel
+from app.schemas.item import ItemResponse #importing ItemResponse from item.py to use in CartItemAdd and CartItemUpdate. Similar to an item object in java.
 
-
-class CartItemAdd:
+class CartItemAdd(BaseModel):
     """
     Request body for POST /api/cart/items.
     Adds a product to the current user's cart.
     """
 
-    # TODO: Declare fields
-    # item_id  — int
-    # quantity — int, default 1
-
-    pass
+    item_id: int
+    quantity: int = 1
 
 
-class CartItemUpdate:
+class CartItemUpdate(BaseModel):
     """
     Request body for PUT /api/cart/items/{item_id}.
     Set to 0 or less to remove the item entirely.
     """
 
-    # TODO: Declare fields
-    # quantity — int
-
-    pass
+    quantity: int
 
 
-class CartItemResponse:
+class CartItemResponse(BaseModel):
     """
     A single line item within a CartResponse.
     Nests the full ItemResponse for product details.
     Requires model_config = {"from_attributes": True}.
     """
 
-    # TODO: Declare fields
-    # id       — int
-    # item_id  — int
-    # quantity — int
-    # item     — ItemResponse  (nested)
+    id: int
+    item_id: int
+    quantity: int
+    item: ItemResponse #nested item response object to get the item details.
 
-    pass
+    model_config = {"from_attributes": True}#This tells Pydantic to convert the SQLAlchemy model to a Pydantic model. This makes reading the attributes of the sqlalchemy model easier.
+    #Pydantic can build CartItemResponse from ORM objects (like SQLAlchemy model instances), not just dicts.
 
 
-class CartResponse:
+class CartResponse(BaseModel):
     """
     Full cart representation returned from cart endpoints.
     Requires model_config = {"from_attributes": True}.
     """
 
-    # TODO: Declare fields
-    # id    — int
-    # items — list[CartItemResponse], default []
+    id: int
+    items: list[CartItemResponse] = [] #list of cart item responses.
 
-    pass
+    model_config = {"from_attributes": True}#This tells Pydantic to convert the SQLAlchemy model to a Pydantic model. This makes reading the attributes of the sqlalchemy model easier.
+    #Pydantic can build CartResponse from ORM objects (like SQLAlchemy model instances), not just dicts.

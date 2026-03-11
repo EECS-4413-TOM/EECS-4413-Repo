@@ -1,76 +1,64 @@
 from __future__ import annotations
 
-# TODO: Import BaseModel from pydantic
-# TODO: Import EmailStr from pydantic
+from pydantic import BaseModel, EmailStr #BaseModel allows for the creation of Pydantic models. EmailStr allows for the validation of email addresses.
 
 
-class UserCreate:
+class UserCreate(BaseModel):
     """
     Request body for POST /api/auth/register.
     All fields are required.
     """
 
-    # TODO: Declare fields
-    # email       — EmailStr, not null
-    # password    — str, not null  (plain text; will be hashed in AuthService)
-    # first_name  — str, not null
-    # last_name   — str, not null
-
-    pass
+    email: EmailStr
+    password: str
+    first_name: str
+    last_name: str
 
 
-class UserLogin:
+class UserLogin(BaseModel):
     """
     Request body for POST /api/auth/login.
     """
 
-    # TODO: Declare fields
-    # email    — EmailStr, not null
-    # password — str, not null
-
-    pass
+    email: EmailStr
+    password: str
 
 
-class UserUpdate:
+class UserUpdate(BaseModel):
     """
     Request body for PUT /api/users/me.
     All fields optional — only provided fields are updated.
     """
 
-    # TODO: Declare fields (all optional)
-    # first_name — str | None = None
-    # last_name  — str | None = None
-    # email      — EmailStr | None = None
-
-    pass
+    first_name: str | None = None 
+    last_name: str | None = None
+    email: EmailStr | None = None
 
 
-class UserResponse:
+class UserResponse(BaseModel):
     """
     Response body returned when a user is read.
     Never exposes hashed_password.
     Requires model_config = {"from_attributes": True} for ORM serialization.
     """
 
-    # TODO: Declare fields
-    # id        — int
-    # email     — str
-    # first_name — str
-    # last_name  — str
-    # is_admin  — bool
+    id: int
+    email: EmailStr
+    first_name: str
+    last_name: str
+    is_admin: bool
 
-    pass
+    model_config = {"from_attributes": True}#This tells Pydantic to convert the SQLAlchemy model to a Pydantic model. This makes reading the attributes of the sqlalchemy model easier.
+    #Pydantic can build UserResponse from ORM objects (like SQLAlchemy model instances), not just dicts.
 
 
-class Token:
+
+class Token(BaseModel):
     """
     Response body returned after a successful login.
     The client must store access_token and send it as
     'Authorization: Bearer <token>' on protected routes.
     """
 
-    # TODO: Declare fields
-    # access_token — str
-    # token_type   — str, default "bearer"
-
-    pass
+    access_token: str
+    token_type: str = "bearer"
