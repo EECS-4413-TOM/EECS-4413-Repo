@@ -4,6 +4,12 @@
 // TODO: Import CartSummary from "../components/cart/..."
 // TODO: Import { formatCurrency } from "../utils/formatters"
 
+import { useCart } from "../hooks/useCart";
+import { link } from "react-router-dom";
+import CartItemRow from "../components/cart/CartItemRow";
+import CartSummary from "../components/cart/CartSummary";
+import { formatCurrency } from "../utils/formatters";
+
 /**
  * CartPage
  *
@@ -22,5 +28,5 @@
  */
 export default function CartPage() {
   // TODO: Implement component
-  return null;
+  
 }

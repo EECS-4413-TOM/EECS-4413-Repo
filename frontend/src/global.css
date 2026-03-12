@@ -93,3 +93,7 @@ body {
   font-weight: bold;
   cursor: pointer;
 }
+
+.buttons {
+  border-radius: 4px;
+}

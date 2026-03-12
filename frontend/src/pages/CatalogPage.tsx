@@ -57,7 +57,7 @@ export default function CatalogPage() {
        <section className="hero">
         <h2>asdasdasdadadasdasdsa</h2>
         <p>hello test 123 hello</p>
-        <button>button</button>
+        <button className="buttons">button</button>
       </section>
 
       <div className="product-grid">
@@ -67,7 +67,7 @@ export default function CatalogPage() {
             <h3>{item.title}</h3>
             <p>${item.price}</p>
 
-            <button onClick={() => addToCart(item)}>
+            <button className="buttons" onClick={() => addToCart(item)}>
               Add to Cart
             </button>
           </div>
