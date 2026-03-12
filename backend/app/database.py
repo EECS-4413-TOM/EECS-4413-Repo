@@ -1,4 +1,23 @@
 from __future__ import annotations
+from dotenv import load_dotenv
+from supabase import create_client, Client
+import os
+
+
+load_dotenv()
+
+url: str = os.environ.get("SUPABASE_URL")
+key: str = os.environ.get("SUPABASE_KEY")
+supabase: Client = create_client(url, key)
+
+def get_users():
+    response = (
+        supabase.table("users")
+        .select("*")
+        .execute()
+    )
+    return response
+
 
 # TODO: Import create_engine from sqlalchemy
 # TODO: Import sessionmaker, DeclarativeBase from sqlalchemy.orm
@@ -21,3 +40,6 @@ from __future__ import annotations
 #     pass
 # - All ORM models must inherit from this Base
 # - Base.metadata is used by Alembic to detect table changes for migrations
+if __name__ == "__main__":
+    users = get_users()
+    print(users)
