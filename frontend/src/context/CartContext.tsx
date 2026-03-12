@@ -37,7 +37,40 @@
  * 5. addToCart, updateQuantity, removeItem: call API, then refreshCart()
  * 6. Return <CartContext.Provider value={{...}}>{children}</CartContext.Provider>
  */
-export function CartProvider({ children }: { children: unknown }) {
-  // TODO: Implement provider
-  return null;
+
+
+import React, { createContext, useState } from "react";
+
+interface CartItem {
+  id: number;
+  title: string;
+  price: number;
+  image: string;
+}
+
+interface CartContextType {
+  cart: CartItem[];
+  addToCart: (item: CartItem) => void;
+  removeFromCart: (id: number) => void;
+}
+
+export const CartContext = createContext<CartContextType | null>(null);
+
+export function CartProvider({ children }: { children: React.ReactNode }) {
+
+  const [cart, setCart] = useState<CartItem[]>([]);
+
+  function addToCart(item: CartItem) {
+    setCart(prev => [...prev, item]);
+  }
+
+  function removeFromCart(id: number) {
+    setCart(prev => prev.filter(i => i.id !== id));
+  }
+
+  return (
+    <CartContext.Provider value={{ cart, addToCart, removeFromCart }}>
+      {children}
+    </CartContext.Provider>
+  );
 }
