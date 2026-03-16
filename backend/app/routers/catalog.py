@@ -16,44 +16,53 @@ from app.services.catalog_service import CatalogService
 router = APIRouter()
 
 
+# Search for games from DB first, then IGDB
 @router.get("/search")
-async def search_games(q: str):
-    """
-    Search games from IGDB.
-    """
-
-    service = CatalogService(None)
+async def search_games(q: str, db: Session = Depends(get_db)):
+    service = CatalogService(db)
 
     return await service.search_games(q)
 
 
-@router.get("/{item_id}")
+# Get specific item id, so use get_item not list_items
+@router.get("/{item_id}", response_model=ItemResponse)
+def get_item(
+    item_id: int,
+    db: Session = Depends(get_db), #Get DB session
+):
+    service = CatalogService(db)
+
+    return service.get_item(item_id) # Return item of that specific ID
+
+
+# Default route should list multiple items,
+@router.get("/", response_model=list[ItemResponse])
 def list_items(
-    category: str | None = Query(None),
+    genre: str | None = Query(None),
     brand: str | None = Query(None),
     search: str | None = Query(None),
     sort_by: str | None = Query(None),
     order: str = Query("asc"),
     db: Session = Depends(get_db),
 ):
-
     service = CatalogService(db)
 
     return service.list_items(
-        category=category,
+        genre=genre,
         brand=brand,
         search=search,
         sort_by=sort_by,
         order=order,
     )
 
-
-@router.get("/")
-def get_item(
-    item_id: int,
+# Initial import of top games (change limit in catalog_services.py)
+@router.post("/admin/import-games")
+async def import_games(
     db: Session = Depends(get_db),
 ):
 
     service = CatalogService(db)
 
-    return service.get_item(item_id)
+    await service.import_top_games()
+
+    return {"message": "Top games imported"}

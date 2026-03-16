@@ -5,6 +5,10 @@ from sqlalchemy.orm import Session
 
 from app.repositories.item_repository import ItemRepository
 from app.utils.igdb_client import IGDBClient
+from app.models.item import Item
+from datetime import datetime
+
+
 
 # TODO: Import HTTPException, status from fastapi
 # TODO: Import Session from sqlalchemy.orm
@@ -21,17 +25,77 @@ class CatalogService:
     def __init__(self, db: Session | None):
         self.item_repo = ItemRepository(db) if db else None
 
+    async def import_top_games(self, limit: int = 10):
+        top_games = await igdb.get_top_games(limit=limit)
+
+        for game in top_games:
+
+            existing = self.item_repo.get_by_igdb_id(
+                game["id"]
+            )  # Avoid duplicate game items
+
+            if existing:
+                continue
+            release_date = None,
+            if timestamp:
+                release_date = datetime.fromtimestamp(timestamp).date()
+            timestamp = game.get("first_release_date"),
+            item = Item(
+                igdb_id=game["id"],
+                name=game["name"],
+                description=game.get("summary", ""),
+                genre="game",
+                brand="IGDB",
+                rating=game.get("rating"),
+                release_date=release_date,
+                price=0.0,
+                quantity=0,
+                image_url=game.get("cover_url"),
+            )
+
+            self.item_repo.create(item)
+
     async def search_games(self, query: str):
-        return await igdb.search_games(query)
+        local_results = self.item_repo.search(query)
+
+        if local_results:
+            return local_results
+
+        saved_items = []
+
+        igdb_results = await igdb.search_games(query)
+
+        for game in igdb_results:
+            existing = self.item_repo.get_by_igdb_id(game["id"])
+
+            if existing:
+                saved_items.append(existing)
+                continue
+
+            item = Item(
+                name=game["name"],
+                description=game.get("summary", ""),
+                genre="game",
+                brand="IGDB",
+                rating=game.get("rating"),
+                price=0.0,
+                quantity=0,
+                image_url=game.get("cover_url"),
+            )
+            saved_item = self.item_repo.create(item)
+
+            saved_items.append(saved_item)
+
+        return saved_items
 
     def list_items(
-        self, category=None, brand=None, search=None, sort_by=None, order="asc"
+        self, genre=None, brand=None, search=None, sort_by=None, order="asc"
     ):
 
         if search:
             items = self.item_repo.search(search)
-        elif category:
-            items = self.item_repo.get_by_category(category)
+        elif genre:
+            items = self.item_repo.get_by_genre(genre)
         elif brand:
             items = self.item_repo.get_by_brand(brand)
         else:

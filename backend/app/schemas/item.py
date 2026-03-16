@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from pydantic import BaseModel
+from datetime import datetime
 
 class ItemCreate(BaseModel):
     """
@@ -10,11 +11,13 @@ class ItemCreate(BaseModel):
 
     name: str
     description: str
-    category: str
+    genre: str
     brand: str
-    price: float
-    quantity: int
-    image_url: str | None = None
+    # price: float - ADD THIS WHEN WE FIND A WAY TO GET GAME PRICES
+    rating: float | None = None
+    release_date: datetime | None = None
+    quantity: int # Number of physical copies in stock
+    cover_url: str | None = None
 
 
 class ItemUpdate(BaseModel):
@@ -26,11 +29,13 @@ class ItemUpdate(BaseModel):
 
     name: str | None = None
     description: str | None = None
-    category: str | None = None
+    genre: str | None = None
     brand: str | None = None
-    price: float | None = None
+    # price: float - ADD THIS WHEN WE FIND A WAY TO GET GAME PRICES
+    rating: float | None = None
+    release_date: datetime | None = None
     quantity: int | None = None
-    image_url: str | None = None
+    cover_url: str | None = None
 
 
 class ItemResponse(BaseModel):
@@ -42,11 +47,15 @@ class ItemResponse(BaseModel):
     id: int
     name: str
     description: str
-    category: str
+    genre: str
     brand: str
-    price: float
+    # price: float - ADD THIS WHEN WE FIND A WAY TO GET GAME PRICES
+    rating: float | None = None
+    release_date: datetime | None = None
     quantity: int
-    image_url: str | None = None
+    cover_url: str | None = None
 
-    model_config = {"from_attributes": True}#This tells Pydantic to convert the SQLAlchemy model to a Pydantic model. This makes reading the attributes of the sqlalchemy model easier.
-    #Pydantic can build ItemResponse from ORM objects (like SQLAlchemy model instances), not just dicts.
+    model_config = {
+        "from_attributes": True
+    }  # This tells Pydantic to convert the SQLAlchemy model to a Pydantic model. This makes reading the attributes of the sqlalchemy model easier.
+    # Pydantic can build ItemResponse from ORM objects (like SQLAlchemy model instances), not just dicts.
