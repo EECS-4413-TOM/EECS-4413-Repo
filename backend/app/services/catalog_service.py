@@ -7,7 +7,7 @@ from app.repositories.item_repository import ItemRepository
 from app.utils.igdb_client import IGDBClient
 from app.models.item import Item
 from datetime import datetime
-
+from app.database import SessionLocal
 
 
 # TODO: Import HTTPException, status from fastapi
@@ -23,10 +23,11 @@ class CatalogService:
     Applies filtering, searching, and sorting on top of the repository layer.
     """
     def __init__(self, db: Session | None):
+        db = SessionLocal()
         self.item_repo = ItemRepository(db) if db else None
 
-    async def import_top_games(self, limit: int = 10):
-        top_games = await igdb.get_top_games(limit=limit)
+    async def import_top_games(self):
+        top_games = await igdb.get_top_games()
 
         for game in top_games:
 
@@ -37,20 +38,18 @@ class CatalogService:
             if existing:
                 continue
             release_date = None,
-            if timestamp:
-                release_date = datetime.fromtimestamp(timestamp).date()
-            timestamp = game.get("first_release_date"),
+            # if timestamp:
+            #     release_date = datetime.fromtimestamp(timestamp).date()
+            # timestamp = game.get("first_release_date")
             item = Item(
                 igdb_id=game["id"],
                 name=game["name"],
                 description=game.get("summary", ""),
-                genre="game",
+                genre=game.get("genres"),
                 brand="IGDB",
                 rating=game.get("rating"),
-                release_date=release_date,
-                price=0.0,
                 quantity=0,
-                image_url=game.get("cover_url"),
+                cover_url=game.get("cover.url"),
             )
 
             self.item_repo.create(item)
@@ -73,14 +72,14 @@ class CatalogService:
                 continue
 
             item = Item(
+                igdb_id=game["id"],
                 name=game["name"],
                 description=game.get("summary", ""),
-                genre="game",
+                genre=game.get("genres"),
                 brand="IGDB",
                 rating=game.get("rating"),
-                price=0.0,
                 quantity=0,
-                image_url=game.get("cover_url"),
+                cover_url=game.get("cover.url"),
             )
             saved_item = self.item_repo.create(item)
 

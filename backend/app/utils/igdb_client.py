@@ -36,6 +36,33 @@ class IGDBClient:
 
         self.access_token = data["access_token"]
 
+    async def get_top_games(self):
+        if not self.access_token:
+            await self.authenticate() ## wait for auth response, proceed if OK
+
+        headers = {
+            "Client-ID": self.client_id,
+            "Authorization": f"Bearer {self.access_token}",
+        }
+
+        body = f"""
+        fields name, summary, cover.url, genres, first_release_date;
+        sort popularity desc;
+        limit 10;
+        """
+        async with httpx.AsyncClient() as client:  ## Send query to IGDB api link
+            res = await client.post(
+                IGDB_URL,
+                headers=headers,
+                data=body,
+            )
+
+            res.raise_for_status()
+
+            games = res.json()  ## Get game as json response
+
+        return games
+
     async def search_games(self, query: str):
 
         if not self.access_token:

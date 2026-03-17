@@ -21,6 +21,7 @@ class ItemRepository(BaseRepository):
         """
         Call super().__init__(Item, db) to bind model and session.
         """
+        
         super().__init__(Item, db)
 
     def get_by_category(self, category: str):

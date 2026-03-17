@@ -3,7 +3,7 @@ from __future__ import annotations
 # TODO: Import Column types from sqlalchemy (Integer, String, Float, Text)
 # TODO: Import Base from app.database
 from sqlalchemy import Column, Integer, String, Date, Float
-from database import Base
+from app.database import Base
 
 
 class Item(Base):
