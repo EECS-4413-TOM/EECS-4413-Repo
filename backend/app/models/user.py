@@ -1,28 +1,26 @@
 from __future__ import annotations
 
-# TODO: Import Column types from sqlalchemy (Integer, String, Boolean, ForeignKey)
-# TODO: Import relationship from sqlalchemy.orm
-# TODO: Import Base from app.database
+from sqlalchemy import Column, Integer, String, Boolean, ForeignKey
+from sqlalchemy.orm import relationship
+from app.database import Base
 
 
-class User:
+class User(Base):
     """
     ORM model representing a registered customer or admin.
     Maps to the 'users' table in PostgreSQL.
     """
 
-    # TODO: Declare table columns
-    # id          — Integer, primary key, indexed
-    # email       — String, unique, indexed, not null
-    # hashed_password — String, not null
-    # first_name  — String, not null
-    # last_name   — String, not null
-    # is_admin    — Boolean, default False
-    # address_id  — Integer, ForeignKey("addresses.id"), nullable
+    __tablename__ = "users"
 
-    # TODO: Declare ORM relationships
-    # address  -> Address       (many-to-one,  back_populates="users")
-    # orders   -> PurchaseOrder (one-to-many,  back_populates="customer")
-    # cart     -> ShoppingCart  (one-to-one,   back_populates="user", uselist=False)
+    id = Column(Integer, primary_key = True, index = True)
+    email = Column(String, unique = True, index = True, not_null = True)
+    hashed_password = Column(String, not_null = True)
+    first_name = Column(String, not_null = True)
+    last_name = Column(String, not_null = True)
+    is_admin = Column(Boolean, default = False)
+    address_id = Column(Integer, ForeignKey("addresses.id"), nullable = True)
 
-    pass
+    relationship("Address", back_populates="users") #back_populates is a two way relationship. It allows us to access the user from the address and the address from the user.
+    relationship("PurchaseOrder", back_populates="customer")
+    relationship("ShoppingCart", back_populates="user", uselist=False) #uselist=False means that the user can only have one shopping cart.

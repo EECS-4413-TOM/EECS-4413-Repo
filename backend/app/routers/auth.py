@@ -1,16 +1,16 @@
 from __future__ import annotations
 
-# TODO: Import APIRouter from fastapi
-# TODO: Import Depends from fastapi
-# TODO: Import Session from sqlalchemy.orm
-# TODO: Import get_db from app.dependencies
-# TODO: Import UserCreate, UserLogin, UserResponse, Token from app.schemas.user
-# TODO: Import AuthService from app.services.auth_service
+from fastapi import APIRouter, Depends
+from sqlalchemy.orm import Session
 
-# router = APIRouter()
+from app.dependencies import get_db
+from app.schemas.user import UserCreate, UserLogin, UserResponse, Token
+from app.services.auth_service import AuthService
 
+router = APIRouter()
 
-def register(data, db):
+@router.post("/register, response_model = UserResponse")#response model is the schema that will be returned to the client
+def register(data: UserCreate, db: Session = Depends(get_db)):
     """
     POST /api/auth/register
 
@@ -18,10 +18,11 @@ def register(data, db):
     Delegates to AuthService.register().
     Returns the created user as UserResponse (HTTP 200).
     """
-    pass
+    service = AuthService(db)
+    return service.register(data)
 
-
-def login(data, db):
+@router.post("/login, responsee_model = Token")
+def login(data: UserLogin, db: Session = Depends(get_db)):
     """
     POST /api/auth/login
 
@@ -29,4 +30,5 @@ def login(data, db):
     Delegates to AuthService.login().
     Returns a Token (HTTP 200) containing the JWT access_token.
     """
-    pass
+    service = AuthService(db)
+    return service.login(data.email, data.password)

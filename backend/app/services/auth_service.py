@@ -1,10 +1,11 @@
 from __future__ import annotations
 
-# TODO: Import HTTPException, status from fastapi
-# TODO: Import Session from sqlalchemy.orm
-# TODO: Import UserRepository from app.repositories.user_repository
-# TODO: Import UserCreate, Token from app.schemas.user
-# TODO: Import hash_password, verify_password, create_access_token from app.utils.security
+from fastapi import HTTPException, status
+from sqlalchemy.orm import Session
+
+from app.repositories.user_repository import UserRepository   
+from app.schemas.user import UserCreate, Token 
+from app.utils.security import hash_password, verify_password, create_access_token 
 
 
 class AuthService:
@@ -18,7 +19,7 @@ class AuthService:
         Instantiate UserRepository with the provided DB session.
         Store it as self.user_repo for use across methods.
         """
-        pass
+        self.user_repo = UserRepository(db)
 
     def register(self, data):
         """
@@ -32,7 +33,24 @@ class AuthService:
         4. Save it via self.user_repo.create(user)
         5. Return the created User ORM object (router will serialize via UserResponse)
         """
-        pass
+        existing_user = self.user_repo.get_by_email(data.email)
+
+        if existing_user:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST
+                detail="Email already registered"
+            )
+
+
+        new_user = UserCreate(
+                email = data.email,
+                hashed_password = hash_password(data.password),
+                first_name = data.first_name,
+                last_name = data.last_name,
+
+            )
+
+        return self.user_repo.create(new_user)
 
     def login(self, email: str, password: str):
         """
@@ -46,4 +64,20 @@ class AuthService:
         4. Call create_access_token(payload) to get the signed token string
         5. Return a Token schema instance with the access_token
         """
-        pass
+        user = self.user_repo.get_by_email(email)
+
+        if not user:
+            raise HTTPException(
+                status_code = status.HTTP_401_UNAUTHORIZED,
+                detail = "Invalid email or password"
+            )
+
+        if not verify_password(password, user.hashed_password): #if unable to verify password, raise HTTP 401 error
+            raise HTTPException(
+                status_code = status.HTTP_401_UNAUTHORIZED,
+                detail = "Invalid email or password"
+            )    
+
+        token = create_access_token({"sub": str(user.id)})
+
+        return Token(access_token = token)

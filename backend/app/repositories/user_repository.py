@@ -1,21 +1,21 @@
 from __future__ import annotations
 
-# TODO: Import Session from sqlalchemy.orm
-# TODO: Import User from app.models.user
-# TODO: Import BaseRepository from app.repositories.base_repository
+from sqlalchemy.orm import Session
+from app.models.user import User
+from app.repositories.base_repository import BaseRepository
 
 
-class UserRepository:
+class UserRepository (BaseRepository[User]):
     """
     DAO for the User model.
     Inherits generic CRUD from BaseRepository[User].
     """
 
-    def __init__(self, db):
+    def __init__(self, db: Session):
         """
         Call super().__init__(User, db) to bind model and session.
         """
-        pass
+        super().__init__(User, db)
 
     def get_by_email(self, email: str):
         """
@@ -23,4 +23,4 @@ class UserRepository:
         Used during login and registration duplicate checks.
         Returns User if found, None otherwise.
         """
-        pass
+        return self.db.query(User).filter(User.email == email).first() #query the database for the user with the given email address. No sql injection because we are using the sqlalchemy query builder.
