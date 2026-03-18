@@ -5,6 +5,11 @@
 // TODO: Import ProductGrid from "../components/catalog/..."
 // TODO: Import FilterBar, SortControl, SearchBar from "../components/catalog/..."
 
+import React, { useState, useEffect } from "react"
+import { getItems } from "../api/catalog"
+import { useCart } from "../hooks/useCart"
+
+
 /**
  * CatalogPage
  *
@@ -28,6 +33,46 @@
  * 5. Show a loading spinner while fetching, empty state if no results
  */
 export default function CatalogPage() {
-  // TODO: Implement component
-  return null;
+  const [items, setItems] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const { addToCart } = useCart()
+
+  useEffect(() => {
+    async function loadItems(){
+        const data = await getItems();
+        setItems(data);
+        setLoading(false)
+      }
+
+    loadItems()
+  }, [])
+
+  if (loading) {
+    return <div>Loading...</div>
+  }
+
+  return (
+    <div>
+       <section className="hero">
+        <h2>Welcome to Our Store</h2>
+        <p>Discover the best games at unbeatable prices!</p>
+        <button className="buttons">button</button>
+      </section>
+
+      <div className="product-grid">
+        {items.map(item => (
+          <div key={item.id} className="product-card">
+            <img src={item.image} style={{ width: "100%" }} />
+            <h3>{item.title}</h3>
+            <p>${item.price}</p>
+
+            <button className="buttons" onClick={() => addToCart(item)}>
+              Add to Cart
+            </button>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 }
