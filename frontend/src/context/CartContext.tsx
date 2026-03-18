@@ -46,12 +46,15 @@ interface CartItem {
   title: string;
   price: number;
   image: string;
+  quantity: number;
 }
 
 interface CartContextType {
   cart: CartItem[];
-  addToCart: (item: CartItem) => void;
+  addToCart: (item: Omit<CartItem, "quantity">) => void;
+  updateQuantity: (id: number, quantity: number) => void;
   removeFromCart: (id: number) => void;
+  total: number;
 }
 
 export const CartContext = createContext<CartContextType | null>(null);
@@ -59,17 +62,48 @@ export const CartContext = createContext<CartContextType | null>(null);
 export function CartProvider({ children }: { children: React.ReactNode }) {
 
   const [cart, setCart] = useState<CartItem[]>([]);
+  function addToCart(item: Omit<CartItem, "quantity">) {
+    setCart(prev => {
+      const existing = prev.find(i => i.id === item.id);
 
-  function addToCart(item: CartItem) {
-    setCart(prev => [...prev, item]);
+      if (existing) {
+        return prev.map(i =>
+          i.id === item.id
+            ? { ...i, quantity: i.quantity + 1 }
+            : i
+        );
+      }
+
+      return [...prev, { ...item, quantity: 1 }];
+    });
   }
 
   function removeFromCart(id: number) {
     setCart(prev => prev.filter(i => i.id !== id));
   }
 
+  // update the quantity of the item 
+  function updateQuantity(id: number, quantity: number) {
+    if (quantity <= 0) {
+      removeFromCart(id);
+      return;
+    }
+
+    setCart(prev =>
+      prev.map(i =>
+        i.id === id
+          ? { ...i, quantity }
+          : i
+      )
+    );
+  }
+    
+  // total cost of items
+  const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+
+
   return (
-    <CartContext.Provider value={{ cart, addToCart, removeFromCart }}>
+    <CartContext.Provider value={{ cart, addToCart, removeFromCart, updateQuantity, total }}>
       {children}
     </CartContext.Provider>
   );

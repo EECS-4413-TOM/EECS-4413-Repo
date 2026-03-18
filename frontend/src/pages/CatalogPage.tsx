@@ -55,8 +55,8 @@ export default function CatalogPage() {
   return (
     <div>
        <section className="hero">
-        <h2>asdasdasdadadasdasdsa</h2>
-        <p>hello test 123 hello</p>
+        <h2>Welcome to Our Store</h2>
+        <p>Discover the best games at unbeatable prices!</p>
         <button className="buttons">button</button>
       </section>
 

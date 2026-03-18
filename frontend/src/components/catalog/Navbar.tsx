@@ -6,7 +6,7 @@ export default function Navbar() {
 
   return (
     <nav className="navbar">
-      <Link to="/" className="logo">Ripoff EBGames</Link>
+      <Link to="/" className="logo">Video Game Store</Link>
 
       <div className="nav-links">
         <Link to="/">Deals</Link>
