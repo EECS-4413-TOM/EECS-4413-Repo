@@ -1,4 +1,4 @@
-// TODO: Import Routes, Route from "react-router-dom"
+import { Routes, Route } from "react-router-dom";
 // TODO: Import AuthProvider from "./context/AuthContext"
 // TODO: Import CartProvider from "./context/CartContext"
 // TODO: Import all Page components from "./pages/..."
