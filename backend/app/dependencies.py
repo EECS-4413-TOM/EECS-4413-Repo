@@ -1,11 +1,11 @@
 from __future__ import annotations
 
-# TODO: Import Generator from typing
-# TODO: Import Session from sqlalchemy.orm
-# TODO: Import SessionLocal from app.database
+from typing import Generator
+from sqlalchemy.orm import Session
+from app.database import SessionLocal
 
 
-def get_db():
+def get_db() -> Generator[Session, None, None]:
     """
     FastAPI dependency that yields a database session per request.
 
@@ -18,4 +18,8 @@ def get_db():
       def my_route(db: Session = Depends(get_db)):
           ...
     """
-    pass
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()

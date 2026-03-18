@@ -1,37 +1,68 @@
 from __future__ import annotations
 
+from fastapi import APIRouter, Depends, Query
+from sqlalchemy.orm import Session
+
+from app.dependencies import get_db
+from app.schemas.item import ItemResponse
+from app.services.catalog_service import CatalogService
+
 # TODO: Import APIRouter, Depends, Query from fastapi
 # TODO: Import Session from sqlalchemy.orm
 # TODO: Import get_db from app.dependencies
 # TODO: Import ItemResponse from app.schemas.item
 # TODO: Import CatalogService from app.services.catalog_service
 
-# router = APIRouter()
+router = APIRouter()
 
 
-def list_items(category, brand, search, sort_by, order, db):
-    """
-    GET /api/catalog
+# Search for games from DB first, then IGDB
+@router.get("/search")
+async def search_games(q: str, db: Session = Depends(get_db)):
+    service = CatalogService(db)
 
-    Query parameters:
-      category — filter by category (optional)
-      brand    — filter by brand (optional)
-      search   — keyword search across name/description/brand (optional)
-      sort_by  — "price" or "name" (optional)
-      order    — "asc" (default) or "desc"
-
-    Delegates to CatalogService.list_items().
-    Returns a list of ItemResponse objects.
-    """
-    pass
+    return await service.search_games(q)
 
 
-def get_item(item_id: int, db):
-    """
-    GET /api/catalog/{item_id}
+# Get specific item id, so use get_item not list_items
+@router.get("/{item_id}", response_model=ItemResponse)
+def get_item(
+    item_id: int,
+    db: Session = Depends(get_db), #Get DB session
+):
+    service = CatalogService(db)
 
-    Path parameter: item_id — the product's ID
-    Delegates to CatalogService.get_item().
-    Returns a single ItemResponse, or HTTP 404 if not found.
-    """
-    pass
+    return service.get_item(item_id) # Return item of that specific ID
+
+
+# Default route should list multiple items,
+@router.get("/", response_model=list[ItemResponse])
+def list_items(
+    genre: str | None = Query(None),
+    brand: str | None = Query(None),
+    search: str | None = Query(None),
+    sort_by: str | None = Query(None),
+    order: str = Query("asc"),
+    db: Session = Depends(get_db),
+):
+    service = CatalogService(db)
+
+    return service.list_items(
+        genre=genre,
+        brand=brand,
+        search=search,
+        sort_by=sort_by,
+        order=order,
+    )
+
+# Initial import of top games (change limit in catalog_services.py)
+@router.post("/admin/import-games")
+async def import_games(
+    db: Session = Depends(get_db),
+):
+
+    service = CatalogService(db)
+
+    await service.import_top_games()
+
+    return {"message": "Top games imported"}

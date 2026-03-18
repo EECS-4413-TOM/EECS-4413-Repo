@@ -1,18 +1,18 @@
 from __future__ import annotations
 
-# TODO: Import datetime, timedelta, timezone from datetime
-# TODO: Import Depends, HTTPException, status from fastapi
-# TODO: Import OAuth2PasswordBearer from fastapi.security
-# TODO: Import JWTError, jwt from jose
-# TODO: Import CryptContext from passlib.context
-# TODO: Import Session from sqlalchemy.orm
-# TODO: Import settings from app.config
-# TODO: Import get_db from app.dependencies
-# TODO: Import User from app.models.user
-# TODO: Import UserRepository from app.repositories.user_repository
+from datetime import datetime, timedelta, timezone
 
-# pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-# oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login")
+from fastapi import Depends, HTTPException, status
+from fastapi.security import OAuth2PasswordBearer
+from jose import JWTError, jwt
+from passlib.context import CryptContext
+
+from app.config import settings
+from app.dependencies import get_db
+from app.repositories.user_repository import UserRepository
+
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login")
 
 
 def hash_password(password: str) -> str:
@@ -21,7 +21,7 @@ def hash_password(password: str) -> str:
     Uses pwd_context.hash(password).
     Returns the hashed string to store in the database.
     """
-    pass
+    return pwd_context.hash(password)
 
 
 def verify_password(plain: str, hashed: str) -> bool:
@@ -30,7 +30,7 @@ def verify_password(plain: str, hashed: str) -> bool:
     Uses pwd_context.verify(plain, hashed).
     Returns True if they match, False otherwise.
     """
-    pass
+    return pwd_context.verify(plain, hashed)
 
 
 def create_access_token(data: dict) -> str:
@@ -44,10 +44,13 @@ def create_access_token(data: dict) -> str:
     4. Encode with jwt.encode(to_encode, JWT_SECRET, algorithm=JWT_ALGORITHM)
     5. Return the token string
     """
-    pass
+    to_encode = data.copy()
+    expire = datetime.now(timezone.utc) + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES) #get expiry time by adding the access token expire minutes from the config to the current time
+    to_encode["exp"] = expire
+    return jwt.encode(to_encode, settings.JWT_SECRET, algorithm=settings.JWT_ALGORITHM)
 
 
-def get_current_user(token, db):
+def get_current_user(token: str = Depends(oauth2_scheme), db = Depends(get_db)):
     """
     FastAPI dependency — extracts and validates the JWT from the request header,
     then returns the corresponding User from the database.
@@ -62,4 +65,27 @@ def get_current_user(token, db):
 
     Used as: current_user: User = Depends(get_current_user)
     """
-    pass
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )#this is a custom exception that is raised when the credentials are not valid
+
+    try:
+        payload = jwt.decode(
+            token, 
+            settings.JWT_SECRET,
+            algorithms = [settings.JWT_ALGORITHM]
+        )#extract the token, decode it using the secret key and the algorithm. 
+        user_id = payload.get("sub")#extract the user id from the payload. sub is the subject of the token, which is the user id.
+        if user_id is None:
+            raise credentials_exception
+    except JWTError:
+        raise credentials_exception
+
+    user = UserRepository(db).get_by_id(int(user_id))
+    if user is None:
+        raise credentials_exception#if the user is not found, raise the custom exception
+        
+    return user
+
