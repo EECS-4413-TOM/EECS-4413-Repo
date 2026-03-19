@@ -46,9 +46,10 @@ class IGDBClient:
         }
 
         body = f"""
-        fields name, summary, cover.url, genres, first_release_date;
-        sort popularity desc;
-        limit 10;
+        fields name, summary, cover.url, genres, first_release_date, rating;
+        where rating > 70;
+        sort rating desc;
+        limit 40;
         """
         async with httpx.AsyncClient() as client:  ## Send query to IGDB api link
             res = await client.post(
