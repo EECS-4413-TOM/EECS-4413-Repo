@@ -44,7 +44,7 @@ def include_routers(app) -> None:
       users   → /api/users
       admin   → /api/admin
     """
-    ##app.include_router(auth.router, prefix="/api/auth", tags=["auth"]) #registering routers with their /api prefix. Adding tags for the routers for better organization.
+    app.include_router(auth.router, prefix="/api/auth", tags=["auth"]) #registering routers with their /api prefix. Adding tags for the routers for better organization.
     app.include_router(catalog.router, prefix="/api/catalog", tags=["catalog"])
     ##app.include_router(cart.router, prefix="/api/cart", tags=["cart"])
     ##app.include_router(orders.router, prefix="/api/orders", tags=["orders"])

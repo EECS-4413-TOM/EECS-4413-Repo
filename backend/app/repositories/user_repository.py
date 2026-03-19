@@ -5,7 +5,7 @@ from app.models.user import User
 from app.repositories.base_repository import BaseRepository
 
 
-class UserRepository (BaseRepository[User]):
+class UserRepository (BaseRepository):
     """
     DAO for the User model.
     Inherits generic CRUD from BaseRepository[User].
