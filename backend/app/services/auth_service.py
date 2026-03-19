@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 from app.repositories.user_repository import UserRepository   
 from app.schemas.user import UserCreate, Token 
 from app.utils.security import hash_password, verify_password, create_access_token 
+from app.models.user import User
 
 
 class AuthService:
@@ -37,12 +38,12 @@ class AuthService:
 
         if existing_user:
             raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST
+                status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Email already registered"
             )
 
 
-        new_user = UserCreate(
+        new_user = User(
                 email = data.email,
                 hashed_password = hash_password(data.password),
                 first_name = data.first_name,
