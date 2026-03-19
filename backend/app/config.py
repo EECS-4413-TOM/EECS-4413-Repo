@@ -28,6 +28,7 @@ class Settings(BaseSettings):
 
     class Config:
         env_file = ".env" #telling pydantic to load the environment variables from the .env file.
+        extra = "ignore" #telling pydantic to ignore any environment variables that are not defined in the Settings class.
 
     
 
