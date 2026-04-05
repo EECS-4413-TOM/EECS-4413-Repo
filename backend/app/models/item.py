@@ -32,3 +32,4 @@ class Item(Base):
     quantity = Column(Integer, default=0)
     cover_url = Column(String, nullable=True)
     rating = Column(Float,nullable=False)
+    price = Column(Float, nullable=False)

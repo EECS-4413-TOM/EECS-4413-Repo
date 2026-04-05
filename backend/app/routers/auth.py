@@ -9,7 +9,7 @@ from app.services.auth_service import AuthService
 
 router = APIRouter()
 
-@router.post("/register, response_model = UserResponse")#response model is the schema that will be returned to the client
+@router.post("/register", response_model = UserResponse)#response model is the schema that will be returned to the client
 def register(data: UserCreate, db: Session = Depends(get_db)):
     """
     POST /api/auth/register
@@ -21,7 +21,7 @@ def register(data: UserCreate, db: Session = Depends(get_db)):
     service = AuthService(db)
     return service.register(data)
 
-@router.post("/login, responsee_model = Token")
+@router.post("/login", response_model = Token)
 def login(data: UserLogin, db: Session = Depends(get_db)):
     """
     POST /api/auth/login

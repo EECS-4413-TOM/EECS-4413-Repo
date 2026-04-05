@@ -22,5 +22,5 @@ class User(Base):
     address_id = Column(Integer, nullable=True)  # Add "ForeignKey("addresses.id")" when table ready
 
     relationship("Address", back_populates="users") #back_populates is a two way relationship. It allows us to access the user from the address and the address from the user.
-    relationship("PurchaseOrder", back_populates="customer")
-    relationship("ShoppingCart", back_populates="user", uselist=False) #uselist=False means that the user can only have one shopping cart.
+    orders = relationship("PurchaseOrder", back_populates="customer")
+    #cart = relationship("ShoppingCart", back_populates="user", uselist=False) #uselist=False means that the user can only have one shopping cart.
