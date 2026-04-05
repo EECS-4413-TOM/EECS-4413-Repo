@@ -6,6 +6,7 @@ from app.repositories.order_repository import OrderRepository
 from app.repositories.cart_repository import CartRepository
 from app.repositories.item_repository import ItemRepository
 from app.services.payment_service import PaymentService
+from app.models.cart import ShoppingCart
 from app.models.order import PurchaseOrder, OrderItem
 
 
@@ -21,7 +22,7 @@ class OrderService:
         Store as self.order_repo, self.cart_repo, self.item_repo, self.payment_service.
         """
         self.order_repo = OrderRepository(db)
-        self.cart_repo = CartRepository(db)
+        self.cart_repo = CartRepository(ShoppingCart, db)
         self.item_repo = ItemRepository(db)
         self.payment_service = PaymentService()
 
