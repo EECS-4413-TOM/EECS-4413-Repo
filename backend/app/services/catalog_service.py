@@ -7,21 +7,14 @@ from app.repositories.item_repository import ItemRepository
 from app.utils.igdb_client import IGDBClient
 from app.models.item import Item
 from datetime import datetime
+from datetime import date
 from app.database import SessionLocal
-
-
-# TODO: Import HTTPException, status from fastapi
-# TODO: Import Session from sqlalchemy.orm
-# TODO: Import ItemRepository from app.repositories.item_repository
 
 igdb = IGDBClient()
 
 
 class CatalogService:
-    """
-    Handles business logic for browsing the product catalog.
-    Applies filtering, searching, and sorting on top of the repository layer.
-    """
+
     def __init__(self, db: Session | None):
         db = SessionLocal()
         self.item_repo = ItemRepository(db) if db else None
@@ -37,10 +30,12 @@ class CatalogService:
 
             if existing:
                 continue
-            release_date = None,
+            
+            # release_date = None
             # if timestamp:
-            #     release_date = datetime.fromtimestamp(timestamp).date()
-            # timestamp = game.get("first_release_date")
+            #     timestamp = game.get("first_release_date")
+            # release_date =  date(timestamp * 1000)
+            
             item = Item(
                 igdb_id=game["id"],
                 name=game["name"],
@@ -48,7 +43,9 @@ class CatalogService:
                 genre=game.get("genres"),
                 brand="IGDB",
                 rating=game.get("rating"),
+                price="79.99",
                 quantity=0,
+                release_date=None,
                 cover_url=game.get("cover.url"),
             )
 
@@ -70,6 +67,11 @@ class CatalogService:
             if existing:
                 saved_items.append(existing)
                 continue
+            
+            # release_date = None
+            # if timestamp:
+            #     timestamp = game.get("first_release_date")
+            # release_date =  date(timestamp * 1000)
 
             item = Item(
                 igdb_id=game["id"],
@@ -78,6 +80,8 @@ class CatalogService:
                 genre=game.get("genres"),
                 brand="IGDB",
                 rating=game.get("rating"),
+                release_date=None,
+                price="79.99",
                 quantity=0,
                 cover_url=game.get("cover.url"),
             )
@@ -87,6 +91,7 @@ class CatalogService:
 
         return saved_items
 
+    ## Use for listing items or filtering by genre, brand, price (not yet), release date, etc.
     def list_items(
         self, genre=None, brand=None, search=None, sort_by=None, order="asc"
     ):
