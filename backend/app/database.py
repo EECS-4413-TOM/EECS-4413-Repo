@@ -26,7 +26,7 @@ load_dotenv()
 
 
 # - This establishes the connection pool to PostgreSQL. Supabase used through SQLALCHEMY Engine. Best for FastAPI, doesn't use supabase API
-DB_DIR_URL = os.environ.get("SUPABASE_DIRECT_URL")
+DB_DIR_URL = os.environ.get("DATABASE_URL")
 engine = create_engine(
     DB_DIR_URL,
 )
