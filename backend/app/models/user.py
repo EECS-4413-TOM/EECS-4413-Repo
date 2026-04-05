@@ -6,10 +6,6 @@ from app.database import Base
 
 
 class User(Base):
-    """
-    ORM model representing a registered customer or admin.
-    Maps to the 'users' table in PostgreSQL.
-    """
 
     __tablename__ = "users"
 
@@ -23,4 +19,6 @@ class User(Base):
 
     relationship("Address", back_populates="users") #back_populates is a two way relationship. It allows us to access the user from the address and the address from the user.
     orders = relationship("PurchaseOrder", back_populates="customer")
-    #cart = relationship("ShoppingCart", back_populates="user", uselist=False) #uselist=False means that the user can only have one shopping cart.
+    relationship("PurchaseOrder", back_populates="customer")
+    relationship("ShoppingCart", back_populates="user", uselist=False) #uselist=False means that the user can only have one shopping cart.
+    cart = relationship("ShoppingCart", back_populates="user", uselist=False)

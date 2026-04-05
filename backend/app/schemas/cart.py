@@ -11,6 +11,7 @@ class CartItemAdd(BaseModel):
 
     item_id: int
     quantity: int = 1
+    price: float
 
 
 class CartItemUpdate(BaseModel):
@@ -32,6 +33,7 @@ class CartItemResponse(BaseModel):
     id: int
     item_id: int
     quantity: int
+    price: float
     item: ItemResponse #nested item response object to get the item details.
 
     model_config = {"from_attributes": True}#This tells Pydantic to convert the SQLAlchemy model to a Pydantic model. This makes reading the attributes of the sqlalchemy model easier.
@@ -46,6 +48,6 @@ class CartResponse(BaseModel):
 
     id: int
     items: list[CartItemResponse] = [] #list of cart item responses.
-
+    total_price: float;
     model_config = {"from_attributes": True}#This tells Pydantic to convert the SQLAlchemy model to a Pydantic model. This makes reading the attributes of the sqlalchemy model easier.
     #Pydantic can build CartResponse from ORM objects (like SQLAlchemy model instances), not just dicts.
