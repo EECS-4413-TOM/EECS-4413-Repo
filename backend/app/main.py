@@ -6,6 +6,9 @@ from fastapi.testclient import TestClient
 from app.models.user import User
 from app.utils.security import get_current_user
 
+from fastapi.testclient import TestClient
+from app.models.user import User
+from app.utils.security import get_current_user
 from app.routers import (
     auth,
     catalog,
@@ -55,9 +58,9 @@ def include_routers(app) -> None:
     app.include_router(auth.router, prefix="/api/auth", tags=["auth"]) #registering routers with their /api prefix. Adding tags for the routers for better organization.
     app.include_router(catalog.router, prefix="/api/catalog", tags=["catalog"])
     app.include_router(cart.router, prefix="/api/cart", tags=["cart"])
-    ##app.include_router(orders.router, prefix="/api/orders", tags=["orders"])
-    ##app.include_router(users.router, prefix="/api/users", tags=["users"])
-    ##app.include_router(admin.router, prefix="/api/admin", tags=["admin"])
+    app.include_router(orders.router, prefix="/api/orders", tags=["orders"])
+    app.include_router(users.router, prefix="/api/users", tags=["users"])
+    app.include_router(admin.router, prefix="/api/admin", tags=["admin"])
 
 
 @app.get("/api/health")

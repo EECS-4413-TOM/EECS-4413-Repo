@@ -1,12 +1,12 @@
 from __future__ import annotations
 
-# TODO: Import HTTPException, status from fastapi
-# TODO: Import Session from sqlalchemy.orm
-# TODO: Import OrderRepository from app.repositories.order_repository
-# TODO: Import CartRepository from app.repositories.cart_repository
-# TODO: Import ItemRepository from app.repositories.item_repository
-# TODO: Import PaymentService from app.services.payment_service
-# TODO: Import PurchaseOrder, OrderItem from app.models.order
+from fastapi import HTTPException, status
+from sqlalchemy.orm import Session
+from app.repositories.order_repository import OrderRepository
+from app.repositories.cart_repository import CartRepository
+from app.repositories.item_repository import ItemRepository
+from app.services.payment_service import PaymentService
+from app.models.order import PurchaseOrder, OrderItem
 
 
 class OrderService:
@@ -20,7 +20,10 @@ class OrderService:
         Instantiate OrderRepository, CartRepository, ItemRepository, and PaymentService.
         Store as self.order_repo, self.cart_repo, self.item_repo, self.payment_service.
         """
-        pass
+        self.order_repo = OrderRepository(db)
+        self.cart_repo = CartRepository(db)
+        self.item_repo = ItemRepository(db)
+        self.payment_service = PaymentService()
 
     def checkout(self, user_id: int, shipping_address, credit_card_number: str):
         """
@@ -40,18 +43,64 @@ class OrderService:
         7. Clear the cart via self.cart_repo.clear_cart(cart)
         8. Return the created PurchaseOrder
         """
-        pass
+        cart = self.cart_repo.get_by_user_id(user_id)
+
+        if not cart or not cart.items:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Cart is empty")
+
+        for cartItem in cart.items:
+            product = self.item_repo.get_by_id(cartItem.item_id)
+            if product.quantity < cartItem.quantity:
+                raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Insufficient inventory for {product.name}")
+
+        total = 0
+        for cartItems in cart.items:
+            item  = self.item_repo.get_by_id(cartItems.item_id)
+            total += item.price * cartItems.quantity
+
+        if not self.payment_service.process_payment(credit_card_number, total):
+            raise HTTPException(status_code=status.HTTP_402_PAYMENT_REQUIRED, detail="Credit Card Authorization Failed.")
+
+        for cartItem in cart.items:#decrement inventory
+            product = self.item_repo.get_by_id(cartItem.item_id)
+            product.quantity -= cartItem.quantity
+            self.item_repo.update(product)
+
+        items = []
+        for ci in cart.items:
+            item = self.item_repo.get_by_id(ci.item_id)
+            items.append(
+                OrderItem(
+                    item_id=ci.item_id,
+                    quantity=ci.quantity,
+                    price_at_purchase=item.price,
+                )
+            )
+
+        order = PurchaseOrder(
+            customer_id=user_id,
+            total=total,
+            shipping_address=shipping_address,
+            items=items
+        )
+        self.order_repo.create(order)
+        self.cart_repo.clear_cart(cart)
+        return order
+        
+        
+
 
     def get_orders(self, user_id: int):
         """
         Return the purchase history for a single customer.
         Delegates to self.order_repo.get_by_customer_id(user_id).
         """
-        pass
+        return self.order_repo.get_by_customer_id(user_id)
+
 
     def get_all_orders(self):
         """
         Return all orders across all customers (admin use only).
         Delegates to self.order_repo.get_all().
         """
-        pass
+        return self.order_repo.get_all()
