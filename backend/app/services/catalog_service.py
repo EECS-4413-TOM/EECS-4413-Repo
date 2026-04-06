@@ -44,7 +44,7 @@ class CatalogService:
                 brand="IGDB",
                 rating=game.get("rating"),
                 price="79.99",
-                quantity=0,
+                quantity=1,
                 release_date=None,
                 cover_url=game.get("cover.url"),
             )
@@ -82,7 +82,7 @@ class CatalogService:
                 rating=game.get("rating"),
                 release_date=None,
                 price="79.99",
-                quantity=0,
+                quantity=1,
                 cover_url=game.get("cover.url"),
             )
             saved_item = self.item_repo.create(item)

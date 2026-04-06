@@ -36,7 +36,5 @@ class CartRepository(BaseRepository):
         self.db.commit()
 
     def clear_cart(self, cart) -> None:
-        items = self.db.query(CartItem).filter(CartItem.cart_id == cart.id).first()
-        for item in items:
-            self.db.delete(item)
+        self.db.delete(cart)
         self.db.commit()
