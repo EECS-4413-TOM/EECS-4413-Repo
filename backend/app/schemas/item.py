@@ -4,6 +4,7 @@ from pydantic import BaseModel
 from datetime import date
 
 class ItemCreate(BaseModel):
+    igdb_id: int
     name: str
     description: str
     genre: str
