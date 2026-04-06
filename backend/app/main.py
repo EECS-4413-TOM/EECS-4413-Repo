@@ -83,9 +83,12 @@ include_routers(app)
 
 def fake_current_user() -> User:
     return User(
-        email="test@example.com",
+        email="user@example.com",
         hashed_password="haha_123",
-        id = 2
+        id = 2,
+        first_name="string",
+        last_name="string",
+        is_admin="True"
     )
 
 
