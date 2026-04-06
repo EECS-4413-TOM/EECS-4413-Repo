@@ -37,11 +37,13 @@ def update_profile(data: UserUpdate, current_user: User = Depends(get_current_us
     """
     repo = UserRepository(db)
 
+    user = repo.get_by_id(current_user.id)
+
     if data.first_name is not None:
-        current_user.first_name = data.first_name
+        user.first_name = data.first_name
     if data.last_name is not None:
-        current_user.last_name = data.last_name
+        user.last_name = data.last_name
     if data.email is not None:
-        current_user.email = data.email
-    repo.update(current_user)
-    return current_user
+        user.email = data.email
+    repo.update(user)
+    return user

@@ -13,8 +13,7 @@ class Address:
     Shared by User (billing/shipping) tables.
     Maps to the 'addresses' table in PostgreSQL.
     """
-    
-    
+
     # TODO: Declare table columns
     # id       — Integer, primary key, indexed
     # street   — String, not null
@@ -27,7 +26,6 @@ class Address:
     # TODO: Declare ORM relationships
     # users -> User (one-to-many, back_populates="address")
 
-
     __tablename__ = "addresses"
     id = Column(Integer, primary_key=True, index=True)
     street = Column(String, nullable=False)
@@ -36,5 +34,5 @@ class Address:
     country = Column(String, nullable=False)
     zip = Column(String, nullable=False)
     phone = Column(String, nullable=True)
-    
+
     users = relationship("User", back_populates="address")
