@@ -81,7 +81,7 @@ include_routers(app)
 ## TEST USER PLEASE DELETE WHEN WE DEPLOY
 
 
-def fake_current_user() -> User:
+"""def fake_current_user() -> User:
     return User(
         email="user@example.com",
         hashed_password="haha_123",
@@ -94,4 +94,4 @@ def fake_current_user() -> User:
 
 app.dependency_overrides[get_current_user] = fake_current_user
 
-client = TestClient(app)
+client = TestClient(app)"""
