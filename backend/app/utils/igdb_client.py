@@ -23,6 +23,7 @@ class IGDBClient:
         Request OAuth token from Twitch.
         """
 
+     
         params = {
             "client_id": self.client_id,
             "client_secret": self.client_secret,
@@ -30,7 +31,10 @@ class IGDBClient:
         }
 
         async with httpx.AsyncClient() as client:
-            res = await client.post(TWITCH_TOKEN_URL, params=params) 
+            res = await client.post(
+     TWITCH_TOKEN_URL,
+    data=params
+)
             res.raise_for_status()
             data = res.json()
 
@@ -39,6 +43,9 @@ class IGDBClient:
     async def get_top_games(self):
         if not self.access_token:
             await self.authenticate() ## wait for auth response, proceed if OK
+
+        if not self.client_id or not self.client_secret:
+            raise ValueError("Missing TWITCH_CLIENT_ID or TWITCH_CLIENT_SECRET in .env")
 
         headers = {
             "Client-ID": self.client_id,
