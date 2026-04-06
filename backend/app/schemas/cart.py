@@ -11,7 +11,7 @@ class CartItemAdd(BaseModel):
 
     item_id: int
     quantity: int = 1
-    price: float
+    price: float | None = None
 
 
 class CartItemUpdate(BaseModel):
@@ -33,7 +33,7 @@ class CartItemResponse(BaseModel):
     id: int
     item_id: int
     quantity: int
-    price: float
+    price: float | None = None
     item: ItemResponse #nested item response object to get the item details.
 
     model_config = {"from_attributes": True}#This tells Pydantic to convert the SQLAlchemy model to a Pydantic model. This makes reading the attributes of the sqlalchemy model easier.

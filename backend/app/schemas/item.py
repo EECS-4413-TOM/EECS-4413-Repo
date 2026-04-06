@@ -20,7 +20,7 @@ class ItemUpdate(BaseModel):
     description: str | None = None
     genre: str | None = None
     brand: str | None = None
-    price: float # ADD THIS WHEN WE FIND A WAY TO GET GAME PRICES
+    price: float | None = None # ADD THIS WHEN WE FIND A WAY TO GET GAME PRICES
     rating: float | None = None
     release_date: date | None = None
     quantity: int | None = None
@@ -33,7 +33,7 @@ class ItemResponse(BaseModel):
     description: str
     genre: str
     brand: str
-    price: float # ADD THIS WHEN WE FIND A WAY TO GET GAME PRICES
+    price: float | None = None # ADD THIS WHEN WE FIND A WAY TO GET GAME PRICES
     rating: float | None = None
     release_date: date | None = None
     quantity: int

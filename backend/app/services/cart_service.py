@@ -102,13 +102,16 @@ class CartService:
         return self.get_or_create_cart(user_id)
 
     def clear(self, user_id: int) -> None:
+
+        cart = self.cart_repo.get_by_user_id(user_id)
+
         valid_items = [ci for ci in cart.items if ci.item.price is not None]
 
         cart.total_price = sum(
             (ci.quantity or 0) * (ci.item.price or 0) for ci in valid_items
         )
 
-        cart = self.cart_repo.get_by_user_id(user_id)
+       
 
         if not cart:
             return

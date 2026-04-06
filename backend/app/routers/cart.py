@@ -39,7 +39,6 @@ def get_cart(
     }
 
 
-router = APIRouter()
 
 
 @router.post("/items", response_model=CartResponse)
