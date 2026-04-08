@@ -1,6 +1,9 @@
 from __future__ import annotations
 
 from pydantic_settings import BaseSettings
+from pathlib import Path
+
+_ROOT = Path(__file__).parent.parent.parent
 
 
 class Settings(BaseSettings):
@@ -20,6 +23,7 @@ class Settings(BaseSettings):
       settings.DATABASE_URL
     """
 
+
     DATABASE_URL: str = "postgresql://estore_user:changeme@localhost:5432/estore"
 
     JWT_SECRET: str = "changeme-to-a-random-secret-key"
@@ -27,7 +31,7 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60
 
     class Config:
-        env_file = ".env" #telling pydantic to load the environment variables from the .env file.
+        env_file = str(_ROOT / ".env") #telling pydantic to load the environment variables from the .env file.
         extra = "ignore" #telling pydantic to ignore any environment variables that are not defined in the Settings class.
 
     
