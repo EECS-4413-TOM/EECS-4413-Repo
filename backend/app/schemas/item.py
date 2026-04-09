@@ -47,7 +47,7 @@ class ItemResponse(BaseModel):
     id: int
     name: str
     description: str
-    genre: str
+    genre: str | None = None
     brand: str
     # price: float - ADD THIS WHEN WE FIND A WAY TO GET GAME PRICES
     rating: float | None = None
