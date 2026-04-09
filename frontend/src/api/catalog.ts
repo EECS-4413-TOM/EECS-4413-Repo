@@ -10,7 +10,7 @@
  * @param params - Optional filters: { category?, brand?, search?, sort_by?, order? }
  * @returns Promise<Item[]>
  */
-export async function getItems(params?: unknown): Promise<unknown[]> {
+export async function getItems(_params?: unknown): Promise<unknown[]> {
   return [
      {
       id: 1, title: "Cyberpunk 2077", price: 59.99, image: "https://cdn.cloudflare.steamstatic.com/steam/apps/1091500/header.jpg"
@@ -51,7 +51,7 @@ export async function getItems(params?: unknown): Promise<unknown[]> {
  * @param id - The product's numeric ID
  * @returns Promise<Item>
  */
-export async function getItem(id: number): Promise<unknown> {
+export async function getItem(_id: number): Promise<unknown> {
   // TODO: return (await apiClient.get(`/catalog/${id}`)).data
   throw new Error("Not implemented");
 }

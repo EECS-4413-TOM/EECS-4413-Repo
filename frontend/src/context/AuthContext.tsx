@@ -35,7 +35,9 @@
  * 5. register(data): call authApi.register(data), then call login(data)
  * 6. Return <AuthContext.Provider value={{...}}>{children}</AuthContext.Provider>
  */
-export function AuthProvider({ children }: { children: unknown }) {
-  // TODO: Implement provider
-  return null;
+import type { ReactNode } from "react";
+
+export function AuthProvider({ children }: { children: ReactNode }) {
+  // TODO: Implement provider (user state, login, logout)
+  return <>{children}</>;
 }

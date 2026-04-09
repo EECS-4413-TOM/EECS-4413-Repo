@@ -10,7 +10,7 @@
  * @param data - { email, password, first_name, last_name }
  * @returns Promise<User>
  */
-export async function register(data: unknown): Promise<unknown> {
+export async function register(_data: unknown): Promise<unknown> {
   // TODO: return (await apiClient.post("/auth/register", data)).data
   throw new Error("Not implemented");
 }
@@ -25,7 +25,7 @@ export async function register(data: unknown): Promise<unknown> {
  * @param data - { email, password }
  * @returns Promise<Token>
  */
-export async function login(data: unknown): Promise<unknown> {
+export async function login(_data: unknown): Promise<unknown> {
   // TODO: return (await apiClient.post("/auth/login", data)).data
   throw new Error("Not implemented");
 }
@@ -52,7 +52,7 @@ export async function getProfile(): Promise<unknown> {
  * @param data - Partial<{ first_name, last_name, email }>
  * @returns Promise<User>
  */
-export async function updateProfile(data: unknown): Promise<unknown> {
+export async function updateProfile(_data: unknown): Promise<unknown> {
   // TODO: return (await apiClient.put("/users/me", data)).data
   throw new Error("Not implemented");
 }

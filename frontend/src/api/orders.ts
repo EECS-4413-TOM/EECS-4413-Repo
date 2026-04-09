@@ -11,7 +11,7 @@
  * @param data - { shipping_address?, credit_card_number, credit_card_expiry, credit_card_cvv }
  * @returns Promise<Order>
  */
-export async function checkout(data: unknown): Promise<unknown> {
+export async function checkout(_data: unknown): Promise<unknown> {
   // TODO: return (await apiClient.post("/orders/checkout", data)).data
   throw new Error("Not implemented");
 }
