@@ -77,7 +77,6 @@ def health_check():
 configure_cors(app)
 include_routers(app)
 
-
 ## TEST USER PLEASE DELETE WHEN WE DEPLOY
 
 
@@ -95,3 +94,4 @@ include_routers(app)
 app.dependency_overrides[get_current_user] = fake_current_user
 
 client = TestClient(app)"""
+

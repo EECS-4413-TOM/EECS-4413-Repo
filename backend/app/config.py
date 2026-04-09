@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from pydantic_settings import BaseSettings
 from pathlib import Path
-import os
 
 _ROOT = Path(__file__).parent.parent.parent
 
@@ -27,20 +26,19 @@ class Settings(BaseSettings):
     """
 
 
-    DATABASE_URL: str = "postgresql://estore_user:changeme@localhost:5432/estore"
+    DATABASE_URL: str = ""
+    SUPABASE_DIRECT_URL: str = ""
 
-    JWT_SECRET: str = "changeme-to-a-random-secret-key"
+    JWT_SECRET: str = ""
     JWT_ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60
     TWITCH_CLIENT_ID: str = ""
     TWITCH_CLIENT_SECRET: str = ""
 
     class Config:
-        env_file = str(_ROOT / ".env") #telling pydantic to load the environment variables from the .env file.
-        extra = "ignore" #telling pydantic to ignore any environment variables that are not defined in the Settings class.
-        
-
-    
+        env_file = str(_ROOT / ".env")
+        env_file_encoding = "utf-8"
+        extra = "ignore"
 
 
-settings = Settings() #exporting a module-level singleton.
+settings = Settings()

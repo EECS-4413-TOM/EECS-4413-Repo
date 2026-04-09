@@ -1,8 +1,5 @@
 from __future__ import annotations
-from dotenv import load_dotenv
-import os
 import httpx
-from pathlib import Path
 from app.config import settings
 
 #_ROOT = Path(__file__).resolve().parent.parent.parent.parent  # backend/app/utils -> repo root
@@ -26,6 +23,12 @@ class IGDBClient:
         self.client_id = settings.TWITCH_CLIENT_ID
         self.client_secret = settings.TWITCH_CLIENT_SECRET
         self.access_token: str | None = None
+
+    def _ensure_twitch_config(self) -> None:
+        if not self.client_id or not self.client_secret:
+            raise ValueError(
+                "Missing TWITCH_CLIENT_ID or TWITCH_CLIENT_SECRET in environment / .env"
+            )
 
     async def authenticate(self) -> None:
         """
