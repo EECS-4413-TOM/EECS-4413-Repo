@@ -2,8 +2,11 @@ from __future__ import annotations
 
 from pydantic_settings import BaseSettings
 from pathlib import Path
+import os
 
 _ROOT = Path(__file__).parent.parent.parent
+
+
 
 
 class Settings(BaseSettings):
@@ -29,10 +32,13 @@ class Settings(BaseSettings):
     JWT_SECRET: str = "changeme-to-a-random-secret-key"
     JWT_ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60
+    TWITCH_CLIENT_ID: str = ""
+    TWITCH_CLIENT_SECRET: str = ""
 
     class Config:
         env_file = str(_ROOT / ".env") #telling pydantic to load the environment variables from the .env file.
         extra = "ignore" #telling pydantic to ignore any environment variables that are not defined in the Settings class.
+        
 
     
 

@@ -2,11 +2,18 @@ from __future__ import annotations
 from dotenv import load_dotenv
 import os
 import httpx
+from pathlib import Path
+from app.config import settings
+
+#_ROOT = Path(__file__).resolve().parent.parent.parent.parent  # backend/app/utils -> repo root
+#load_dotenv(_ROOT / ".env")
+
 
 TWITCH_TOKEN_URL = "https://id.twitch.tv/oauth2/token"
 IGDB_URL = "https://api.igdb.com/v4/games"
 
-load_dotenv()
+
+#load_dotenv()
 
 
 class IGDBClient:
@@ -16,8 +23,8 @@ class IGDBClient:
 
     ## FIrst step, authenticate Twitch account
     def __init__(self):
-        self.client_id = os.environ.get("TWITCH_CLIENT_ID")
-        self.client_secret = os.environ.get("TWITCH_CLIENT_SECRET")
+        self.client_id = settings.TWITCH_CLIENT_ID
+        self.client_secret = settings.TWITCH_CLIENT_SECRET
         self.access_token: str | None = None
 
     async def authenticate(self) -> None:
@@ -32,7 +39,7 @@ class IGDBClient:
         }
 
         async with httpx.AsyncClient() as client:
-            res = await client.post(TWITCH_TOKEN_URL, params=params)
+            res = await client.post(TWITCH_TOKEN_URL, data=params)
             res.raise_for_status()
             data = res.json()
 
