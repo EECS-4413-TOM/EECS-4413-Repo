@@ -1,13 +1,15 @@
 from __future__ import annotations
 import os
+from pathlib import Path
 
 from dotenv import load_dotenv
 from supabase import create_client, Client
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, DeclarativeBase
 
-
-load_dotenv()
+# Always load backend/.env (same folder as `app/`), not cwd — so it works from any terminal directory.
+_BACKEND_ROOT = Path(__file__).resolve().parent.parent
+load_dotenv(_BACKEND_ROOT / ".env")
 
 
 # url: str = os.environ.get("SUPABASE_URL")
@@ -26,10 +28,12 @@ load_dotenv()
 
 
 # - This establishes the connection pool to PostgreSQL. Supabase used through SQLALCHEMY Engine. Best for FastAPI, doesn't use supabase API
-DB_DIR_URL = os.environ.get("SUPABASE_DIRECT_URL")
-engine = create_engine(
-    DB_DIR_URL,
-)
+DB_DIR_URL = os.environ.get("SUPABASE_DIRECT_URL") or os.environ.get("DATABASE_URL")
+if not DB_DIR_URL:
+    raise RuntimeError(
+        f"Missing database URL. Add SUPABASE_DIRECT_URL or DATABASE_URL to {_BACKEND_ROOT / '.env'}"
+    )
+engine = create_engine(DB_DIR_URL)
 
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)

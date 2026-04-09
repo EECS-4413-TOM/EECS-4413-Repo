@@ -3,17 +3,13 @@
 
 // TODO: Define the following interfaces:
 
-/**
- * User
- * Mirrors UserResponse from backend.
- */
-// export interface User {
-//   id: number;
-//   email: string;
-//   first_name: string;
-//   last_name: string;
-//   is_admin: boolean;
-// }
+export interface User {
+  id: number;
+  email: string;
+  first_name: string;
+  last_name: string;
+  is_admin: boolean;
+}
 
 /**
  * Item
@@ -77,11 +73,7 @@
 //   items: OrderItem[];
 // }
 
-/**
- * Token
- * Mirrors Token from backend — returned on successful login.
- */
-// export interface Token {
-//   access_token: string;
-//   token_type: string;
-// }
+export interface Token {
+  access_token: string;
+  token_type: string;
+}
