@@ -5,9 +5,10 @@ psycopg2-binary
 pydantic[email]
 pydantic-settings
 python-jose[cryptography]
-passlib[bcrypt]
+passlib[bcrypt]==1.7.4
 python-multipart
 httpx
 pytest
-bcrypt
+# bcrypt 4.1+ breaks passlib 1.7.4 (AttributeError: __about__, login 500s)
+bcrypt==4.0.1
 supabase
