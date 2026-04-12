@@ -23,6 +23,13 @@ type GetItemsParams = {
   page?: number
 }
 
+// we gotta have it so that we search game either in db or api 
+
+export async function searchItems(query: string): Promise<Item[]> {
+  const res = await apiClient.get(`/catalog/search?q=${query}`)
+  return res.data
+}
+
 export async function getItems(params: GetItemsParams = {}): Promise<Item[]> {
   const query = new URLSearchParams()
 

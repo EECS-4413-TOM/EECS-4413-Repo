@@ -97,3 +97,28 @@ body {
 .buttons {
   border-radius: 4px;
 }
+
+/* cleaning up the search bar so it matches the site design */
+.search-bar {
+  max-width: 600px;
+  margin: 30px auto;
+  padding: 0 5%;
+}
+
+.search-bar input {
+  width: 100%;
+  padding: 12px 16px;
+  font-size: 16px;
+
+  border: 2px solid #7ae759;
+  border-radius: 6px;
+
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+/* focus effect */
+.search-bar input:focus {
+  border-color: black;
+  box-shadow: 0 0 0 2px rgba(122, 231, 89, 0.3);
+}
