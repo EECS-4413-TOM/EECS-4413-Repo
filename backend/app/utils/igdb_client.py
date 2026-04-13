@@ -35,7 +35,6 @@ class IGDBClient:
         Request OAuth token from Twitch.
         """
 
-     
         params = {
             "client_id": self.client_id,
             "client_secret": self.client_secret,
@@ -62,7 +61,7 @@ class IGDBClient:
         }
 
         body = f"""
-        fields name, summary, cover.image_id, genres, first_release_date, rating;
+        fields name, summary, cover.image_id, genres, first_release_date, total_rating, age_ratings, artworks, screenshots, similar_games, videos, involved_companies, game_type, dlcs, collections;
         where rating > 70;
         sort rating desc;
         limit 40;
@@ -93,7 +92,7 @@ class IGDBClient:
         ## IGDB return values. Change later, currently showing the first 10 games that match the query, gives name, summary, and cover
         body = f"""
         search "{query}";
-        fields name, summary, cover.image_id, genres, first_release_date;
+        fields name, summary, cover.image_id, genres, first_release_date, total_rating, age_ratings, artworks, screenshots, similar_games, videos, involved_companies, game_type, dlcs, collections;
         limit 10;
         """
 

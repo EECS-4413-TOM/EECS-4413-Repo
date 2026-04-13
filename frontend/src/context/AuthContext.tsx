@@ -1,43 +1,80 @@
-// TODO: Import createContext, useContext, useState, useEffect, ReactNode from "react"
-// TODO: Import * as authApi from "../api/auth"
-// TODO: Import User, Token types from "../types"
+import { createContext, useEffect, useState } from "react";
+import * as authApi from "../api/auth";
+import { tokenStorageKey } from "../api/client";
+import type { User } from "../types";
 
-/**
- * AuthContext
- *
- * Provides global authentication state to the entire app.
- * Wrap the app root with <AuthProvider> in main.tsx or App.tsx.
- *
- * Context value shape:
- *   user         — the logged-in User object, or null if not authenticated
- *   isAuthenticated — boolean derived from whether user is non-null
- *   isAdmin      — boolean, true when user.is_admin === true
- *   login(data)  — calls authApi.login(), stores token in localStorage, loads user
- *   logout()     — clears token from localStorage, sets user to null
- *   register(data) — calls authApi.register(), then auto-logs in
- */
+export type AuthContextType = {
+  user: User | null;
+  isAuthenticated: boolean;
+  isAdmin: boolean;
+  login: (data: { email: string; password: string }) => Promise<void>;
+  logout: () => void;
+  register: (data: authApi.RegisterBody) => Promise<void>;
+};
 
-// TODO: Define AuthContextType interface with the shape above
+export const AuthContext = createContext<AuthContextType | null>(null);
 
-// TODO: const AuthContext = createContext<AuthContextType | null>(null)
+export function AuthProvider({ children }: { children: React.ReactNode }) {
+  const [user, setUser] = useState<User | null>(null);
 
+  useEffect(() => {
+    const token = localStorage.getItem(tokenStorageKey);
+    if (!token) {
+      return;
+    }
 
-/**
- * AuthProvider
- *
- * Steps to implement:
- * 1. useState for user (User | null), initialized to null
- * 2. useEffect on mount: read token from localStorage, call authApi.getProfile()
- *    to restore session, set user state
- * 3. login(data): call authApi.login(data), store token in localStorage,
- *    call authApi.getProfile() to get user object, set user state
- * 4. logout(): remove token from localStorage, set user to null
- * 5. register(data): call authApi.register(data), then call login(data)
- * 6. Return <AuthContext.Provider value={{...}}>{children}</AuthContext.Provider>
- */
-import type { ReactNode } from "react";
+    let cancelled = false;
 
-export function AuthProvider({ children }: { children: ReactNode }) {
-  // TODO: Implement provider (user state, login, logout)
-  return <>{children}</>;
+    async function restoreSession() {
+      try {
+        const me = await authApi.getProfile();
+        if (!cancelled) {
+          setUser(me);
+        }
+      } catch {
+        localStorage.removeItem(tokenStorageKey);
+        if (!cancelled) {
+          setUser(null);
+        }
+      }
+    }
+
+    restoreSession();
+
+    return function cleanup() {
+      cancelled = true;
+    };
+  }, []);
+
+  async function login(data: { email: string; password: string }) {
+    const token = await authApi.login(data);
+    localStorage.setItem(tokenStorageKey, token.access_token);
+    const me = await authApi.getProfile();
+    setUser(me);
+  }
+
+  function logout() {
+    localStorage.removeItem(tokenStorageKey);
+    setUser(null);
+  }
+
+  async function register(data: authApi.RegisterBody) {
+    await authApi.register(data);
+    await login({ email: data.email, password: data.password });
+  }
+
+  return (
+    <AuthContext.Provider
+      value={{
+        user,
+        isAuthenticated: user !== null,
+        isAdmin: user?.is_admin === true,
+        login,
+        logout,
+        register,
+      }}
+    >
+      {children}
+    </AuthContext.Provider>
+  );
 }
