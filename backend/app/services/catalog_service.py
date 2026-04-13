@@ -47,8 +47,7 @@ class CatalogService:
                 price="79.99",
                 quantity=1,
                 release_date=None,
-                cover_url=game.get("cover.url"),
-                price = 0.00 # placeholder price done by Amraj 
+                cover_url=game.get("cover.url")
             )
 
             self.item_repo.create(item)
