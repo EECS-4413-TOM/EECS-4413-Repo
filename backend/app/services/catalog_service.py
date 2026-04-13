@@ -26,26 +26,39 @@ class CatalogService:
 
         for game in top_games:
 
-            
             existing = self.item_repo.get_by_igdb_id(
                 game["id"]
             )  # Avoid duplicate game items
 
             if existing:
                 continue
-            
+
             r_date = datetime.fromtimestamp(game.get("first_release_date"), tz=timezone.utc)if game.get("first_release_date")else None
-            
+            cover = game.get("cover")
             item = Item(
                 igdb_id=game["id"],
                 name=game["name"],
                 description=game.get("summary", ""),
                 genre=game.get("genres"),
                 brand="IGDB",
+                rating=game.get("total_rating"),
+                age_rating=game.get("age_ratings"),
+                artworks=game.get("artworks"),
+                screenshots=game.get("screenshots"),
+                similar_games=game.get("similar_games"),
+                videos=game.get("videos"),
+                involved_companies=game.get("involved_companies"),
+                game_type=game.get("game_type"),
+                dlcs=game.get("dlcs"),
+                collections=game.get("collections"),
                 release_date=r_date,
-                price=f"{self.randomPriceGenerator(r_date)}.99",
+                price=f"{self.randomPriceGenerator(r_date)}.99" if r_date else "79.99",
                 quantity=1,
-                cover_url=f"https://images.igdb.com/igdb/image/upload/t_cover_big/{game.get("cover.image_id")}.jpg",
+                cover_url=(
+                    f"https://images.igdb.com/igdb/image/upload/t_cover_big/{cover['image_id']}.jpg"
+                    if cover
+                    else None
+                ),
             )
 
             self.item_repo.create(item)
@@ -64,22 +77,36 @@ class CatalogService:
             existing = self.item_repo.get_by_igdb_id(game["id"])
 
             if existing:
-                saved_items.append(existing)
                 continue
             r_date = datetime.fromtimestamp(game.get("first_release_date"), tz=timezone.utc)if game.get("first_release_date")else None
-            
+            cover=game.get("cover")
             item = Item(
                 igdb_id=game["id"],
                 name=game["name"],
                 description=game.get("summary", ""),
                 genre=game.get("genres"),
                 brand="IGDB",
-                rating=game.get("rating"),
+                rating=game.get("total_rating"),
+                age_rating=game.get("age_ratings"),
+                artworks=game.get("artworks"),
+                screenshots=game.get("screenshots"),
+                similar_games=game.get("similar_games"),
+                videos=game.get("videos"),
+                involved_companies=game.get("involved_companies"),
+                game_type=game.get("game_type"),
+                dlcs=game.get("dlcs"),
+                collections=game.get("collections"),
                 release_date=r_date,
-                price=f"{self.randomPriceGenerator(r_date)}.99",
+                price=f"{self.randomPriceGenerator(r_date)}.99" if r_date else "79.99",
                 quantity=1,
-                cover_url=f"https://images.igdb.com/igdb/image/upload/t_cover_big/{game.get("cover.image_id")}.jpg",
+                cover_url=(
+                    f"https://images.igdb.com/igdb/image/upload/t_cover_big/{cover['image_id']}.jpg"
+                    if cover
+                    else None
+                ),
             )
+            saved_items.append(existing)
+
             saved_item = self.item_repo.create(item)
 
             saved_items.append(saved_item)
