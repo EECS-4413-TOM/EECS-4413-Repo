@@ -17,9 +17,9 @@ class ItemCreate(BaseModel):
     release_date: datetime | None = None
     quantity: int # Number of physical copies in stock
     cover_url: str | None = None
-    age_rating: str | None = None
-    artworks: str | None = None
-    screenshots: str | None = None
+    age_rating: object | None = None
+    artworks: object | None = None
+    screenshots: object | None = None
     similar_games: str | None = None
     videos: str | None = None
     involved_companies: str | None = None
@@ -38,9 +38,9 @@ class ItemUpdate(BaseModel):
     release_date: datetime | None = None
     quantity: int | None = None
     cover_url: str | None = None
-    age_rating: str | None = None
-    artworks: str | None = None
-    screenshots: str | None = None
+    age_rating: object | None = None
+    artworks: object | None = None
+    screenshots: object | None = None
     similar_games: str | None = None
     videos: str | None = None
     involved_companies: str | None = None
@@ -60,9 +60,9 @@ class ItemResponse(BaseModel):
     release_date: datetime | None = None
     quantity: int
     cover_url: str | None = None
-    age_rating: str | None = None
-    artworks: str | None = None
-    screenshots: str | None = None
+    age_rating: object | None = None
+    artworks: object | None = None
+    screenshots: object | None = None
     similar_games: str | None = None
     videos: str | None = None
     involved_companies: str | None = None
