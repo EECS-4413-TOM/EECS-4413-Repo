@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from sqlalchemy import Column, Integer, String, Date, Float
+from sqlalchemy import Column, Integer, String, DateTime, Float
 from app.database import Base
 from sqlalchemy.orm import relationship
 
@@ -13,7 +13,7 @@ class Item(Base):
     description = Column(String, nullable=False)
     genre = Column(String, index=True, nullable=True)
     brand = Column(String, index=True, nullable=True)
-    release_date = Column(Date, nullable=True)
+    release_date = Column(DateTime(timezone=True), nullable=True)
     quantity = Column(Integer, default=0)
     cover_url = Column(String, nullable=True)
     price = Column(Float, nullable=True)
