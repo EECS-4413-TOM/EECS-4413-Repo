@@ -1,22 +1,34 @@
 from __future__ import annotations
-from dotenv import load_dotenv
-import os
 import httpx
+from app.config import settings
+
+#_ROOT = Path(__file__).resolve().parent.parent.parent.parent  # backend/app/utils -> repo root
+#load_dotenv(_ROOT / ".env")
+
 
 TWITCH_TOKEN_URL = "https://id.twitch.tv/oauth2/token"
 IGDB_URL = "https://api.igdb.com/v4/games"
 
-load_dotenv()
+
+#load_dotenv()
+
 
 class IGDBClient:
     """
     Handles authentication with Twitch and requests to IGDB API.
     """
+
     ## FIrst step, authenticate Twitch account
     def __init__(self):
-        self.client_id = os.environ.get("TWITCH_CLIENT_ID")
-        self.client_secret = os.environ.get("TWITCH_CLIENT_SECRET")
+        self.client_id = settings.TWITCH_CLIENT_ID
+        self.client_secret = settings.TWITCH_CLIENT_SECRET
         self.access_token: str | None = None
+
+    def _ensure_twitch_config(self) -> None:
+        if not self.client_id or not self.client_secret:
+            raise ValueError(
+                "Missing TWITCH_CLIENT_ID or TWITCH_CLIENT_SECRET in environment / .env"
+            )
 
     async def authenticate(self) -> None:
         """
@@ -31,10 +43,7 @@ class IGDBClient:
         }
 
         async with httpx.AsyncClient() as client:
-            res = await client.post(
-     TWITCH_TOKEN_URL,
-    data=params
-)
+            res = await client.post(TWITCH_TOKEN_URL, data=params)
             res.raise_for_status()
             data = res.json()
 
@@ -42,7 +51,7 @@ class IGDBClient:
 
     async def get_top_games(self):
         if not self.access_token:
-            await self.authenticate() ## wait for auth response, proceed if OK
+            await self.authenticate()  ## wait for auth response, proceed if OK
 
         if not self.client_id or not self.client_secret:
             raise ValueError("Missing TWITCH_CLIENT_ID or TWITCH_CLIENT_SECRET in .env")
@@ -88,7 +97,7 @@ class IGDBClient:
         limit 10;
         """
 
-        async with httpx.AsyncClient() as client: ## Send query to IGDB api link
+        async with httpx.AsyncClient() as client:  ## Send query to IGDB api link
             res = await client.post(
                 IGDB_URL,
                 headers=headers,
@@ -97,7 +106,7 @@ class IGDBClient:
 
             res.raise_for_status()
 
-            games = res.json() ## Get game as json response
+            games = res.json()  ## Get game as json response
 
         # Fixes image URLs
         for game in games:

@@ -1,44 +1,63 @@
 from __future__ import annotations
 
-# TODO: Import pytest
-# TODO: Import TestClient fixtures from conftest
+import pytest
 
 
 def test_register_success(client):
-    """
-    POST /api/auth/register with valid new user data.
-    Expect: HTTP 200, response contains id, email, first_name, last_name, is_admin=False.
-    """
-    pass
+    res = client.post(
+        "/api/auth/register",
+        json={
+            "email": "new@example.com",
+            "password": "password123",
+            "first_name": "New",
+            "last_name": "User",
+        },
+    )
+
+    assert res.status_code == 200
+    data = res.json()
+    assert data["email"] == "new@example.com"
+    assert data["is_admin"] is False
 
 
 def test_register_duplicate_email(client, sample_user):
-    """
-    POST /api/auth/register with an email that already exists in the database.
-    Expect: HTTP 400 with detail "Email already registered".
-    """
-    pass
+    client.post("/api/auth/register", json=sample_user)
+
+    res = client.post("/api/auth/register", json=sample_user)
+
+    assert res.status_code == 400
+    assert res.json()["detail"] == "Email already registered"
 
 
 def test_login_success(client, sample_user):
-    """
-    POST /api/auth/login with correct credentials.
-    Expect: HTTP 200, response contains access_token and token_type="bearer".
-    """
-    pass
+    client.post("/api/auth/register", json=sample_user)
+
+    res = client.post(
+        "/api/auth/login",
+        json={"email": sample_user["email"], "password": sample_user["password"]},
+    )
+
+    assert res.status_code == 200
+    data = res.json()
+    assert "access_token" in data
+    assert data["token_type"] == "bearer"
 
 
 def test_login_invalid_password(client, sample_user):
-    """
-    POST /api/auth/login with the correct email but wrong password.
-    Expect: HTTP 401 with detail "Invalid email or password".
-    """
-    pass
+    client.post("/api/auth/register", json=sample_user)
+
+    res = client.post(
+        "/api/auth/login",
+        json={"email": sample_user["email"], "password": "wrongpassword"},
+    )
+
+    assert res.status_code == 401
 
 
 def test_login_nonexistent_user(client):
-    """
-    POST /api/auth/login with an email that has never been registered.
-    Expect: HTTP 401 with detail "Invalid email or password".
-    """
-    pass
+    res = client.post(
+        "/api/auth/login",
+        json={"email": "noone@example.com", "password": "password123"},
+    )
+
+    assert res.status_code == 401

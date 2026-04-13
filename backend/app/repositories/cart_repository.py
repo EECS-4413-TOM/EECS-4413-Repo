@@ -5,51 +5,36 @@ from __future__ import annotations
 # TODO: Import BaseRepository from app.repositories.base_repository
 
 
-class CartRepository:
-    """
-    DAO for ShoppingCart (and its CartItem children).
-    Inherits generic CRUD from BaseRepository[ShoppingCart].
-    """
+from sqlalchemy.orm import Session
+from sqlalchemy import or_
 
-    def __init__(self, db):
-        """
-        Call super().__init__(ShoppingCart, db) to bind model and session.
-        """
-        pass
+from app.models.cart import CartItem
+from app.models.cart import ShoppingCart
+from app.repositories.base_repository import BaseRepository
+
+
+class CartRepository(BaseRepository):
+
+    def __init__(self, model, db):
+        self.model = model
+        self.db = db
 
     def get_by_user_id(self, user_id: int):
-        """
-        Find the shopping cart belonging to a specific user.
-        Returns ShoppingCart if the user has one, None if not yet created.
-        """
-        pass
+        return self.db.query(ShoppingCart).filter(ShoppingCart.user_id == user_id).first()
 
     def get_cart_item(self, cart_id: int, item_id: int):
-        """
-        Find a specific CartItem row by its parent cart and item ids.
-        Used to check if an item already exists in the cart before adding.
-        Returns CartItem if found, None otherwise.
-        """
-        pass
+        return self.db.query(CartItem).filter(CartItem.cart_id == cart_id, CartItem.item_id == item_id).first()
 
     def add_cart_item(self, cart_item):
-        """
-        Persist a new CartItem to the database.
-        Steps: db.add(cart_item) → db.commit() → db.refresh(cart_item) → return cart_item
-        """
-        pass
+        self.db.add(cart_item)
+        self.db.commit()
+        self.db.refresh(cart_item)
+        return cart_item
 
     def remove_cart_item(self, cart_item) -> None:
-        """
-        Delete a single CartItem row from the database.
-        Steps: db.delete(cart_item) → db.commit()
-        """
-        pass
+        self.db.delete(cart_item)
+        self.db.commit()
 
     def clear_cart(self, cart) -> None:
-        """
-        Delete ALL CartItem rows belonging to the given cart.
-        Called after a successful checkout to empty the cart.
-        Query CartItem by cart_id and bulk delete.
-        """
-        pass
+        self.db.query(CartItem).filter(CartItem.cart_id == cart.id).delete()
+        self.db.commit()

@@ -22,4 +22,7 @@ class PaymentService:
         mimic the interface of a real payment API, but are not used in
         this mock implementation.
         """
-        pass
+        PaymentService._request_count += 1
+        if PaymentService._request_count % 3 == 0:
+            return False
+        return True

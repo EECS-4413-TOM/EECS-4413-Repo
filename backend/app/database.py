@@ -5,9 +5,8 @@ from dotenv import load_dotenv
 from supabase import create_client, Client
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, DeclarativeBase
-
-
-load_dotenv()
+from pathlib import Path
+from app.config import settings
 
 
 # url: str = os.environ.get("SUPABASE_URL")
@@ -26,9 +25,11 @@ load_dotenv()
 
 
 # - This establishes the connection pool to PostgreSQL. Supabase used through SQLALCHEMY Engine. Best for FastAPI, doesn't use supabase API
-DB_DIR_URL = os.environ.get("SUPABASE_DIRECT_URL")
+#DB_DIR_URL = os.environ.get("SUPABASE_DIRECT_URL")
 engine = create_engine(
-    DB_DIR_URL,
+    settings.DATABASE_URL,
+    pool_pre_ping=True,
+    pool_recycle=280,
 )
 
 

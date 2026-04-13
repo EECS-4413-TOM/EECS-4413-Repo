@@ -1,8 +1,4 @@
-
-// TODO: Import AuthProvider from "./context/AuthContext"
-// TODO: Import CartProvider from "./context/CartContext"
 // TODO: Import all Page components from "./pages/..."
-import React from "react"
 import { Routes, Route } from "react-router-dom"
 import { AuthProvider } from "./context/AuthContext"
 import { CartProvider } from "./context/CartContext"
@@ -60,6 +56,7 @@ export default function App() {
   // TODO: Implement routing and provider tree
 
   return (
+    <AuthProvider>
     <CartProvider>
 
       <Navbar />
@@ -82,5 +79,6 @@ export default function App() {
       </Routes>
 
       </CartProvider>
+    </AuthProvider>
   )
 }
