@@ -6,22 +6,17 @@ from sqlalchemy.orm import Session
 from app.repositories.item_repository import ItemRepository
 from app.utils.igdb_client import IGDBClient
 from app.models.item import Item
-from datetime import datetime
+from datetime import datetime, timezone
 from app.database import SessionLocal
 
-
-# TODO: Import HTTPException, status from fastapi
-# TODO: Import Session from sqlalchemy.orm
-# TODO: Import ItemRepository from app.repositories.item_repository
+import random
 
 igdb = IGDBClient()
 
+# edited to get price
 
 class CatalogService:
-    """
-    Handles business logic for browsing the product catalog.
-    Applies filtering, searching, and sorting on top of the repository layer.
-    """
+
     def __init__(self, db: Session | None):
         db = SessionLocal()
         self.item_repo = ItemRepository(db) if db else None
@@ -31,25 +26,26 @@ class CatalogService:
 
         for game in top_games:
 
+            
             existing = self.item_repo.get_by_igdb_id(
                 game["id"]
             )  # Avoid duplicate game items
 
             if existing:
                 continue
-            release_date = None,
-            # if timestamp:
-            #     release_date = datetime.fromtimestamp(timestamp).date()
-            # timestamp = game.get("first_release_date")
+            
+            r_date = datetime.fromtimestamp(game.get("first_release_date"), tz=timezone.utc)if game.get("first_release_date")else None
+            
             item = Item(
                 igdb_id=game["id"],
                 name=game["name"],
                 description=game.get("summary", ""),
                 genre=game.get("genres"),
                 brand="IGDB",
-                rating=game.get("rating"),
-                quantity=0,
-                cover_url=game.get("cover.url"),
+                release_date=r_date,
+                price=f"{self.randomPriceGenerator(r_date)}.99",
+                quantity=1,
+                cover_url=f"https://images.igdb.com/igdb/image/upload/t_cover_big/{game.get("cover.image_id")}.jpg",
             )
 
             self.item_repo.create(item)
@@ -70,7 +66,8 @@ class CatalogService:
             if existing:
                 saved_items.append(existing)
                 continue
-
+            r_date = datetime.fromtimestamp(game.get("first_release_date"), tz=timezone.utc)if game.get("first_release_date")else None
+            
             item = Item(
                 igdb_id=game["id"],
                 name=game["name"],
@@ -78,8 +75,10 @@ class CatalogService:
                 genre=game.get("genres"),
                 brand="IGDB",
                 rating=game.get("rating"),
-                quantity=0,
-                cover_url=game.get("cover.url"),
+                release_date=r_date,
+                price=f"{self.randomPriceGenerator(r_date)}.99",
+                quantity=1,
+                cover_url=f"https://images.igdb.com/igdb/image/upload/t_cover_big/{game.get("cover.image_id")}.jpg",
             )
             saved_item = self.item_repo.create(item)
 
@@ -87,6 +86,7 @@ class CatalogService:
 
         return saved_items
 
+    ## Use for listing items or filtering by genre, brand, price (not yet), release date, etc.
     def list_items(
         self, genre=None, brand=None, search=None, sort_by=None, order="asc"
     ):
@@ -123,3 +123,17 @@ class CatalogService:
             )
 
         return item
+
+    def randomPriceGenerator(self, releaseDate: datetime):
+        newGames = datetime(2025, 1, 1, tzinfo=timezone.utc)
+        currentGen = datetime(2020, 1, 1, tzinfo=timezone.utc)
+        lastGen = datetime(2016, 1, 1, tzinfo=timezone.utc)
+
+        if (releaseDate >= newGames):
+            return random.randint(79, 94)
+        if (releaseDate <= newGames and releaseDate >= currentGen):
+            return random.randint(49, 79)
+        if releaseDate <= currentGen and releaseDate >= lastGen:
+            return random.randint(29, 59)
+        if (releaseDate <= lastGen):
+            return random.randint(5, 29)

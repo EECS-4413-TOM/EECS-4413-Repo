@@ -12,8 +12,10 @@
  *   formatCurrency(1500)   // "$1,500.00"
  */
 export function formatCurrency(amount: number): string {
-  // TODO: return new Intl.NumberFormat("en-CA", { style: "currency", currency: "CAD" }).format(amount)
-  throw new Error("Not implemented");
+  return new Intl.NumberFormat("en-CA", {
+    style: "currency",
+    currency: "CAD",
+  }).format(amount);
 }
 
 /**
@@ -29,6 +31,9 @@ export function formatCurrency(amount: number): string {
  *   formatDate("2026-03-04T12:00:00Z")  // "March 4, 2026"
  */
 export function formatDate(dateString: string): string {
-  // TODO: return new Intl.DateTimeFormat("en-CA", { year: "numeric", month: "long", day: "numeric" }).format(new Date(dateString))
-  throw new Error("Not implemented");
+  return new Intl.DateTimeFormat("en-CA", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  }).format(new Date(dateString));
 }

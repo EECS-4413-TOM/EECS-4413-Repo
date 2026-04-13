@@ -4,39 +4,31 @@ from __future__ import annotations
 # TODO: Import relationship from sqlalchemy.orm
 # TODO: Import Base from app.database
 
-
-class ShoppingCart:
-    """
-    ORM model for a user's shopping cart.
-    Each user has exactly one cart (one-to-one with User).
-    Maps to the 'shopping_carts' table.
-    """
-
-    # TODO: Declare table columns
-    # id      — Integer, primary key
-    # user_id — Integer, ForeignKey("users.id"), unique, not null
-
-    # TODO: Declare ORM relationships
-    # user  -> User      (many-to-one, back_populates="cart")
-    # items -> CartItem  (one-to-many, back_populates="cart", cascade="all, delete-orphan")
-
-    pass
+from sqlalchemy import Column, Integer, String, Date, Float, ForeignKey
+from app.database import Base
+from sqlalchemy.orm import relationship
 
 
-class CartItem:
-    """
-    ORM model for a single line item inside a ShoppingCart.
-    Maps to the 'cart_items' table.
-    """
+class ShoppingCart(Base):
+    __tablename__ = "shopping_cart"
 
-    # TODO: Declare table columns
-    # id       — Integer, primary key
-    # cart_id  — Integer, ForeignKey("shopping_carts.id"), not null
-    # item_id  — Integer, ForeignKey("items.id"), not null
-    # quantity — Integer, not null, default 1
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), unique=True, nullable=True)
+    total_price = Column(Float, nullable=True)
 
-    # TODO: Declare ORM relationships
-    # cart -> ShoppingCart (many-to-one, back_populates="items")
-    # item -> Item         (many-to-one, no back reference needed)
+    user = relationship("User", back_populates="cart")
+    items = relationship(
+        "CartItem", back_populates="cart", cascade="all, delete-orphan", lazy="joined"
+    )
 
-    pass
+
+class CartItem(Base):
+
+    __tablename__ = "cart_items"
+    id = Column(Integer, primary_key=True, index=True) # ID of the game
+    cart_id = Column(Integer, ForeignKey("shopping_cart.id"), nullable=False) # Cart that the game is assigned to
+    item_id = Column(Integer, ForeignKey("games_catalog.id"))
+    quantity = Column(Integer, nullable=False)
+    price = Column(Float, nullable=False)
+    cart = relationship("ShoppingCart", back_populates="items") # Represents many to one. MANY cart items for ONE shopping cart
+    item = relationship("Item", back_populates="cart_items")

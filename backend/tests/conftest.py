@@ -1,55 +1,71 @@
 from __future__ import annotations
 
-# TODO: Import pytest
-# TODO: Import create_engine from sqlalchemy
-# TODO: Import sessionmaker from sqlalchemy.orm
-# TODO: Import TestClient from fastapi.testclient
-# TODO: Import app from app.main
-# TODO: Import Base from app.database
-# TODO: Import get_db from app.dependencies
+import pytest
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+from fastapi.testclient import TestClient
+
+from app.main import app
+from app.database import Base
+from app.dependencies import get_db
+
+# Test DB (SQLite file for stability)
+TEST_DATABASE_URL = "sqlite:///./test.db"
+
+test_engine = create_engine(
+    TEST_DATABASE_URL, connect_args={"check_same_thread": False}
+)
+
+TestSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=test_engine)
 
 
-# TODO: Create a test-only SQLite in-memory engine
-# TEST_DATABASE_URL = "sqlite:///./test.db"
-# test_engine = create_engine(TEST_DATABASE_URL, connect_args={"check_same_thread": False})
-# TestSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=test_engine)
-
-
+# Override DB dependency
 def override_get_db():
-    """
-    Pytest fixture (or dependency override) that yields a test DB session.
-    Used to replace the real get_db dependency in all test routes.
-    Ensures tests use an isolated database that is reset between runs.
-    """
-    pass
+    db = TestSessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
 
 
+@pytest.fixture
 def client():
-    """
-    Pytest fixture that provides a configured FastAPI TestClient.
+    # Create tables
+    Base.metadata.create_all(bind=test_engine)
 
-    Steps:
-    1. Create all tables on the test engine: Base.metadata.create_all(test_engine)
-    2. Override app.dependency_overrides[get_db] = override_get_db
-    3. yield TestClient(app)
-    4. Drop all tables after the test: Base.metadata.drop_all(test_engine)
-    """
-    pass
+    # Override dependency
+    app.dependency_overrides[get_db] = override_get_db
+
+    with TestClient(app) as c:
+        yield c
+
+    # Cleanup
+    Base.metadata.drop_all(bind=test_engine)
+    app.dependency_overrides.clear()
 
 
+@pytest.fixture
 def sample_user():
-    """
-    Pytest fixture that returns a dict with test user credentials.
-    Used to seed a registered user for tests that require authentication.
-    Example: {"email": "test@example.com", "password": "password123", ...}
-    """
-    pass
+    return {
+        "email": "test@example.com",
+        "password": "password123",
+        "first_name": "Test",
+        "last_name": "User",
+        "is_admin": False
+    }
 
 
+@pytest.fixture
 def auth_headers(client, sample_user):
-    """
-    Pytest fixture that registers and logs in sample_user,
-    then returns the Authorization header dict for authenticated requests.
-    Example: {"Authorization": "Bearer <token>"}
-    """
-    pass
+    # Register user
+    client.post("/api/auth/register", json=sample_user)
+
+    # Login
+    res = client.post(
+        "/api/auth/login",
+        json={"email": sample_user["email"], "password": sample_user["password"]},
+    )
+
+    token = res.json()["access_token"]
+
+    return {"Authorization": f"Bearer {token}"}
