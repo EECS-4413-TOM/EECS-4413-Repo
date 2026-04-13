@@ -1,26 +1,11 @@
 from __future__ import annotations
 
-# TODO: Import Column types from sqlalchemy (Integer, String, Float, Text)
-# TODO: Import Base from app.database
-from sqlalchemy import Column, Integer, String, Date, Float
+from sqlalchemy import Column, Integer, String, DateTime, Float, JSON
 from app.database import Base
-
+from sqlalchemy.orm import relationship
 
 class Item(Base):
-    """
-    ORM model representing a product in the store catalog.
-    Maps to the 'items' table in PostgreSQL.
-    """
     __tablename__ = "games_catalog"
-    # TODO: Declare table columns
-    # id          — Integer, primary key, indexed
-    # name        — String, not null
-    # description — Text, not null
-    # genre    — String, not null, indexed  (used for filtering)
-    # brand       — String, not null, indexed  (used for filtering)
-    # price       — Float, not null
-    # quantity    — Integer, not null, default 0  (inventory count)
-    # image_url   — String, nullable
 
     id = Column(Integer, primary_key=True, index=True)
     igdb_id = Column(Integer, unique=True, index=True)
@@ -28,7 +13,19 @@ class Item(Base):
     description = Column(String, nullable=False)
     genre = Column(String, index=True, nullable=True)
     brand = Column(String, index=True, nullable=True)
-    release_date = Column(Date, nullable=True)
+    release_date = Column(DateTime(timezone=True), nullable=True)
     quantity = Column(Integer, default=0)
     cover_url = Column(String, nullable=True)
+    price = Column(Float, nullable=True)
     rating = Column(Float,nullable=False)
+    age_rating = Column(JSON, index=True, nullable=True)
+    artworks = Column(JSON, index=True, nullable=True)
+    screenshots = Column(JSON, index=True, nullable=True)
+    similar_games = Column(String, index=True, nullable=True)
+    videos = Column(String, index=True, nullable=True)
+    involved_companies = Column(String, index=True, nullable=True)
+    game_type = Column(String, index=True, nullable=True)
+    dlcs = Column(String, index=True, nullable=True)
+    collections = Column(String, index=True, nullable=True)
+
+    cart_items = relationship("CartItem", back_populates="item")

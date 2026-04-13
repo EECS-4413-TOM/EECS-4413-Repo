@@ -1,53 +1,64 @@
 from __future__ import annotations
 
-# TODO: Import pytest
-# TODO: Import TestClient, auth_headers, sample_user fixtures from conftest
-# TODO: Seed test items via fixture or direct insert
+import pytest
+
+
+def seed_item(client):
+    return 94  # mock item_id
 
 
 def test_get_empty_cart(client, auth_headers):
-    """
-    GET /api/cart for a freshly registered user.
-    Expect: HTTP 200, cart has an empty items list.
-    """
-    pass
+    res = client.get("/api/cart", headers=auth_headers)
+
+    assert res.status_code == 200
+    assert res.json()["items"] == []
 
 
 def test_add_item_to_cart(client, auth_headers):
-    """
-    POST /api/cart/items with a valid item_id and quantity=1.
-    Expect: HTTP 200, cart items list contains the added product.
-    """
-    pass
+    item_id = seed_item(client)
+
+    res = client.post("/api/cart/items", json={
+        "item_id": item_id,
+        "quantity": 1
+    }, headers=auth_headers)
+
+    assert res.status_code == 200
+    assert len(res.json()["items"]) == 1
 
 
 def test_add_same_item_increments_quantity(client, auth_headers):
-    """
-    POST /api/cart/items for the same item_id twice.
-    Expect: HTTP 200, the item's quantity in the cart equals the sum of both additions.
-    """
-    pass
+    item_id = seed_item(client)
+
+    client.post("/api/cart/items", json={"item_id": item_id, "quantity": 1}, headers=auth_headers)
+    res = client.post("/api/cart/items", json={"item_id": item_id, "quantity": 2}, headers=auth_headers)
+
+    assert res.status_code == 200
+    assert res.json()["items"][0]["quantity"] == 3
 
 
 def test_update_cart_item_quantity(client, auth_headers):
-    """
-    PUT /api/cart/items/{item_id} with a new quantity value.
-    Expect: HTTP 200, the item's quantity in the cart equals the new value.
-    """
-    pass
+    item_id = seed_item(client)
+
+    client.post("/api/cart/items", json={"item_id": item_id, "quantity": 1}, headers=auth_headers)
+
+    res = client.put(f"/api/cart/items/{item_id}", json={"quantity": 5}, headers=auth_headers)
+
+    assert res.status_code == 200
+    assert res.json()["items"][0]["quantity"] == 5
 
 
 def test_remove_item_from_cart(client, auth_headers):
-    """
-    DELETE /api/cart/items/{item_id} for an item that is in the cart.
-    Expect: HTTP 200, the item no longer appears in the cart items list.
-    """
-    pass
+    item_id = seed_item(client)
+
+    client.post("/api/cart/items", json={"item_id": item_id, "quantity": 1}, headers=auth_headers)
+
+    res = client.delete(f"/api/cart/items/{item_id}", headers=auth_headers)
+
+    assert res.status_code == 200
+    assert res.json()["items"] == []
 
 
 def test_cart_requires_auth(client):
-    """
-    GET /api/cart with no Authorization header.
-    Expect: HTTP 401 (unauthorized).
-    """
-    pass
+    res = client.get("/api/cart")
+
+    assert res.status_code == 401

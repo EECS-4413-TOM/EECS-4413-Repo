@@ -3,32 +3,30 @@
 
 // TODO: Define the following interfaces:
 
-/**
- * User
- * Mirrors UserResponse from backend.
- */
-// export interface User {
-//   id: number;
-//   email: string;
-//   first_name: string;
-//   last_name: string;
-//   is_admin: boolean;
-// }
+export interface User {
+  id: number;
+  email: string;
+  first_name: string;
+  last_name: string;
+  is_admin: boolean;
+}
 
 /**
  * Item
  * Mirrors ItemResponse from backend.
  */
-// export interface Item {
-//   id: number;
-//   name: string;
-//   description: string;
-//   category: string;
-//   brand: string;
-//   price: number;
-//   quantity: number;
-//   image_url: string | null;
-// }
+
+// uncomment below for catalog to work: 
+export interface Item {
+  id: number
+  name: string
+  description: string
+  category: string
+  brand: string
+  price: number
+  quantity: number
+  image_url: string | null
+}
 
 /**
  * CartItem
@@ -77,11 +75,7 @@
 //   items: OrderItem[];
 // }
 
-/**
- * Token
- * Mirrors Token from backend — returned on successful login.
- */
-// export interface Token {
-//   access_token: string;
-//   token_type: string;
-// }
+export interface Token {
+  access_token: string;
+  token_type: string;
+}

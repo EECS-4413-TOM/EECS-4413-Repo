@@ -25,7 +25,7 @@ export async function getCart(): Promise<unknown> {
  * @param quantity - Number of units to add (default 1)
  * @returns Promise<Cart> — the updated cart
  */
-export async function addToCart(itemId: number, quantity: number = 1): Promise<unknown> {
+export async function addToCart(_itemId: number, _quantity: number = 1): Promise<unknown> {
   // TODO: return (await apiClient.post("/cart/items", { item_id: itemId, quantity })).data
   throw new Error("Not implemented");
 }
@@ -40,7 +40,7 @@ export async function addToCart(itemId: number, quantity: number = 1): Promise<u
  * @param quantity - The new quantity to set
  * @returns Promise<Cart> — the updated cart
  */
-export async function updateCartItem(itemId: number, quantity: number): Promise<unknown> {
+export async function updateCartItem(_itemId: number, _quantity: number): Promise<unknown> {
   // TODO: return (await apiClient.put(`/cart/items/${itemId}`, { quantity })).data
   throw new Error("Not implemented");
 }
@@ -53,7 +53,7 @@ export async function updateCartItem(itemId: number, quantity: number): Promise<
  * @param itemId - The product's numeric ID
  * @returns Promise<Cart> — the updated cart
  */
-export async function removeFromCart(itemId: number): Promise<unknown> {
+export async function removeFromCart(_itemId: number): Promise<unknown> {
   // TODO: return (await apiClient.delete(`/cart/items/${itemId}`)).data
   throw new Error("Not implemented");
 }

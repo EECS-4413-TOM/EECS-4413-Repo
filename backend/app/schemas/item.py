@@ -1,59 +1,74 @@
 from __future__ import annotations
 
 from pydantic import BaseModel
-from datetime import datetime
+from datetime import date
+from datetime import datetime, timezone
+
+# edited so that price is now shown since we get price in supabase
 
 class ItemCreate(BaseModel):
-    """
-    Request body for POST /api/admin/inventory.
-    Used by admins when adding a new product.
-    """
-
+    igdb_id: int
     name: str
     description: str
     genre: str
     brand: str
-    # price: float - ADD THIS WHEN WE FIND A WAY TO GET GAME PRICES
-    rating: float | None = None
+    price: float # ADD THIS WHEN WE FIND A WAY TO GET GAME PRICES
+    rating: float | None = 80
     release_date: datetime | None = None
     quantity: int # Number of physical copies in stock
     cover_url: str | None = None
+    age_rating: object | None = None
+    artworks: object | None = None
+    screenshots: object | None = None
+    similar_games: str | None = None
+    videos: str | None = None
+    involved_companies: str | None = None
+    game_type: str | None = None
+    dlcs: str | None = None
+    collections: str | None = None
 
 
 class ItemUpdate(BaseModel):
-    """
-    Request body for PUT /api/admin/inventory/{id}.
-    All fields optional so admins can do partial updates
-    (e.g., update only the quantity without re-sending all other fields).
-    """
-
     name: str | None = None
     description: str | None = None
     genre: str | None = None
     brand: str | None = None
-    # price: float - ADD THIS WHEN WE FIND A WAY TO GET GAME PRICES
+    price: float | None = None # ADD THIS WHEN WE FIND A WAY TO GET GAME PRICES
     rating: float | None = None
     release_date: datetime | None = None
     quantity: int | None = None
     cover_url: str | None = None
+    age_rating: object | None = None
+    artworks: object | None = None
+    screenshots: object | None = None
+    similar_games: str | None = None
+    videos: str | None = None
+    involved_companies: str | None = None
+    game_type: str | None = None
+    dlcs: str | None = None
+    collections: str | None = None
 
 
 class ItemResponse(BaseModel):
-    """
-    Response body returned when an item is read.
-    Requires model_config = {"from_attributes": True} for ORM serialization.
-    """
-
     id: int
     name: str
     description: str
-    genre: str
-    brand: str
-    # price: float - ADD THIS WHEN WE FIND A WAY TO GET GAME PRICES
+    genre: str | None = None
+    brand: str | None = None
+    price: float | None = None # ADD THIS WHEN WE FIND A WAY TO GET GAME PRICES
     rating: float | None = None
     release_date: datetime | None = None
     quantity: int
     cover_url: str | None = None
+    age_rating: object | None = None
+    artworks: object | None = None
+    screenshots: object | None = None
+    similar_games: str | None = None
+    videos: str | None = None
+    involved_companies: str | None = None
+    game_type: str | None = None
+    dlcs: str | None = None
+    collections: str | None = None
 
     model_config = {
         "from_attributes": True

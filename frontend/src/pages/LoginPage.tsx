@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../hooks/useAuth";
 export default function LoginPage() {
   const navigate = useNavigate();
-  //ADD THIS BACK AFTER LOGIN IS DONE: const { login } = useAuth();
+  const { login } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
@@ -13,7 +14,7 @@ export default function LoginPage() {
     setError(null);
     setLoading(true);
     try {
-      //ADD THIS AFTER LOGIN IS DONE: await login({ email, password, rememberMe });
+      await login({ email, password});
       navigate("/");
     } catch (err: any) {
       
