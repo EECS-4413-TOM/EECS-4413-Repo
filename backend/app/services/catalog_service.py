@@ -30,12 +30,12 @@ class CatalogService:
 
             if existing:
                 continue
-            
+
             # release_date = None
             # if timestamp:
             #     timestamp = game.get("first_release_date")
             # release_date =  date(timestamp * 1000)
-            
+
             item = Item(
                 igdb_id=game["id"],
                 name=game["name"],
@@ -46,7 +46,7 @@ class CatalogService:
                 price="79.99",
                 quantity=1,
                 release_date=None,
-                cover_url=game.get("cover.url"),
+                cover_url=f"https://images.igdb.com/igdb/image/upload/t_cover_big/{game['cover']['image_id']}.jpg",
             )
 
             self.item_repo.create(item)
@@ -67,7 +67,7 @@ class CatalogService:
             if existing:
                 saved_items.append(existing)
                 continue
-            
+
             # release_date = None
             # if timestamp:
             #     timestamp = game.get("first_release_date")
@@ -83,7 +83,7 @@ class CatalogService:
                 release_date=None,
                 price="79.99",
                 quantity=1,
-                cover_url=game.get("cover.url"),
+                cover_url=f"https://images.igdb.com/igdb/image/upload/t_cover_big/{game['cover']['image_id']}.jpg",
             )
             saved_item = self.item_repo.create(item)
 

@@ -4,7 +4,6 @@ import pytest
 
 
 def seed_item(client):
-    # Assume you have an admin route or directly insert via DB in real case
     return 94  # mock item_id
 
 
