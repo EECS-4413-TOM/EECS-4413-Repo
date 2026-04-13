@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from "react"
+import React, { useState, useEffect, useRef } from "react"
 import { getItems, searchItems } from "../api/catalog"
 import { useCart } from "../hooks/useCart"
+import { Link, useLocation  } from "react-router-dom"
 
 // to get the image of the game OR go to a temp image if there's none provided:
 const FALLBACK_IMAGE = "https://placehold.co/300x400?text=No+Image"
@@ -77,7 +78,8 @@ function formatGenres(item: any) {
 
 export default function CatalogPage() {
   const [items, setItems] = useState<any[]>([])
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(false)
+  const [hasMore, setHasMore] = useState(true)
 
   const [page, setPage] = useState(1)
   const [limit] = useState(12)
@@ -88,7 +90,18 @@ export default function CatalogPage() {
   const [sortBy, setSortBy] = useState("")
   const [order, setOrder] = useState("asc")
 
+
+
   const { addToCart } = useCart()
+  const location = useLocation()
+
+  // fix the issue with searchbar interfering when clicking home
+useEffect(() => {
+  setSearch("")
+  setPage(1)
+  setItems([])
+  setHasMore(true)
+}, [location.key])
 
   // debounce API calls (prevents spam requests)
   useEffect(() => {
@@ -99,42 +112,96 @@ export default function CatalogPage() {
     return () => clearTimeout(t)
   }, [page, category, brand, search, sortBy, order])
 
- async function loadItems() {
-  try {
-    setLoading(true)
+  const lastCallRef = useRef(0)
 
-    let data: any[] = []
+  function handleScroll() {
+    const now = Date.now()
 
-    // 🔥 IF user is searching → use IGDB-powered endpoint
-    if (search.trim().length > 0) {
-      data = await searchItems(search)
-    } else {
-      // normal catalog (DB)
-      data = await getItems({
-        category,
-        brand,
-        search,
-        sortBy,
-        order,
-        limit,
-        page
-      })
+    if (now - lastCallRef.current < 500) return
+
+    const scrollTop = window.scrollY
+    const windowHeight = window.innerHeight
+    const docHeight = document.documentElement.scrollHeight
+
+    if (
+      scrollTop + windowHeight >= docHeight - 200 &&
+      !loading &&
+      hasMore &&
+      search.trim().length === 0
+    ) {
+      lastCallRef.current = now
+      setPage((prev) => prev + 1)
     }
-
-    if (!Array.isArray(data)) {
-      console.warn("Invalid API response:", data)
-      setItems([])
-      return
-    }
-
-    setItems(data)
-  } catch (err) {
-    console.error("Failed to load catalog:", err)
-    setItems([])
-  } finally {
-    setLoading(false)
   }
-}
+
+  useEffect(() => {
+  window.addEventListener("scroll", handleScroll)
+
+  return () => {
+    window.removeEventListener("scroll", handleScroll)
+  }
+}, [loading, hasMore, search])
+
+  async function loadItems() {
+    if (loading) return   // prevent multiple simultaneous loads
+    try {
+      setLoading(true)
+
+      let data: any[] = []
+
+      // 🔥 IF user is searching → use IGDB-powered endpoint
+      if (search.trim().length > 0) {
+        data = await searchItems(search)
+      } else {
+        // normal catalog (DB)
+        data = await getItems({
+          category,
+          brand,
+          search,
+          sortBy,
+          order,
+          limit,
+          page
+        })
+      }
+
+      if (!Array.isArray(data)) {
+        console.warn("Invalid API response:", data)
+        setItems([])
+        return
+      }
+
+      // if first page → replace
+      if (page === 1) {
+        setItems(data)
+      } else {
+        // append for infinite scroll
+        setItems((prev) => {
+          const combined = [...prev, ...data]
+
+          const unique = combined.filter(
+            (item, index, self) =>
+              index === self.findIndex((i) => i.id === item.id)
+          )
+
+          return unique
+        })
+      }
+
+      // stop when no more data
+      if (page === 1) {
+        setHasMore(true)
+      }
+
+      if (data.length < limit) {
+        setHasMore(false)
+      }
+    } catch (err) {
+      console.error("Failed to load catalog:", err)
+    } finally {
+      setLoading(false)
+    }
+  }
 
   return (
     <div>
@@ -145,17 +212,17 @@ export default function CatalogPage() {
 
       {/* SEARCH */}
       <div className="search-bar">
-      <input
-        placeholder="Search games..."
-        value={search}
-        onChange={(e) => {
-          setPage(1)
-          setSearch(e.target.value)
-        }}
-      />
-</div>
-      {/* LOADING */}
-      {loading && <div>Loading...</div>}
+        <input
+          placeholder="Search games..."
+          value={search}
+          onChange={(e) => {
+            setPage(1)
+            setItems([])      // clear the old results 
+            setHasMore(true)  // reset the infinite scrolling
+            setSearch(e.target.value)
+          }}
+        />
+      </div>
 
       {/* EMPTY STATE */}
       {!loading && items.length === 0 && (
@@ -165,6 +232,9 @@ export default function CatalogPage() {
       {/* PRODUCTS */}
       <div className="product-grid">
         {items.map((item) => (
+
+          // make all the cards link to the product detail page for that item:
+          <Link to={`/product/${item.id}`} key={item.id} style={{ textDecoration: "none", color: "inherit" }}>
           <div className="product-card" key={item.id}>
             <img
               src={getImage(item)}
@@ -181,26 +251,15 @@ export default function CatalogPage() {
               Add to Cart
             </button>
           </div>
+          </Link>
         ))}
       </div>
 
-      {/* PAGINATION */}
-      <div style={{ marginTop: "20px" }}>
-        <button
-          disabled={page === 1}
-          onClick={() => setPage((p) => p - 1)}
-        >
-          Prev
-        </button>
-
-        <span style={{ margin: "0 10px" }}>
-          Page {page}
-        </span>
-
-        <button onClick={() => setPage((p) => p + 1)} disabled={items.length < limit}>
-          Next
-        </button>
-      </div>
+      {loading && (
+        <p style={{ textAlign: "center", margin: "20px" }}>
+          Loading more games...
+        </p>
+      )}
     </div>
   )
 }

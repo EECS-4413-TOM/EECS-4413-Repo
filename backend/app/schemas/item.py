@@ -3,6 +3,8 @@ from __future__ import annotations
 from pydantic import BaseModel
 from datetime import datetime
 
+# edited so that price is now shown since we get price in supabase
+
 class ItemCreate(BaseModel):
     """
     Request body for POST /api/admin/inventory.
@@ -13,7 +15,7 @@ class ItemCreate(BaseModel):
     description: str
     genre: str
     brand: str
-    # price: float - ADD THIS WHEN WE FIND A WAY TO GET GAME PRICES
+    price: float | None = None
     rating: float | None = None
     release_date: datetime | None = None
     quantity: int # Number of physical copies in stock
@@ -31,7 +33,7 @@ class ItemUpdate(BaseModel):
     description: str | None = None
     genre: str | None = None
     brand: str | None = None
-    # price: float - ADD THIS WHEN WE FIND A WAY TO GET GAME PRICES
+    price: float | None = None
     rating: float | None = None
     release_date: datetime | None = None
     quantity: int | None = None
@@ -49,7 +51,7 @@ class ItemResponse(BaseModel):
     description: str
     genre: str | None = None
     brand: str
-    # price: float - ADD THIS WHEN WE FIND A WAY TO GET GAME PRICES
+    price: float | None = None
     rating: float | None = None
     release_date: datetime | None = None
     quantity: int

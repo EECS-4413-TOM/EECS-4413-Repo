@@ -16,6 +16,7 @@ from app.database import SessionLocal
 
 igdb = IGDBClient()
 
+# edited to get price
 
 class CatalogService:
     """
@@ -41,6 +42,10 @@ class CatalogService:
             # if timestamp:
             #     release_date = datetime.fromtimestamp(timestamp).date()
             # timestamp = game.get("first_release_date")
+
+
+            # need covers fyi
+            
             item = Item(
                 igdb_id=game["id"],
                 name=game["name"],
@@ -50,6 +55,7 @@ class CatalogService:
                 rating=game.get("rating"),
                 quantity=0,
                 cover_url=game.get("cover.url"),
+                price = 0.00 # placeholder price done by Amraj 
             )
 
             self.item_repo.create(item)
