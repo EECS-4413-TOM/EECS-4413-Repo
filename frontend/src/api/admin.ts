@@ -36,7 +36,7 @@ export async function getInventory(): Promise<unknown[]> {
  * @param data - { name, description, category, brand, price, quantity, image_url? }
  * @returns Promise<Item>
  */
-export async function addItem(data: unknown): Promise<unknown> {
+export async function addItem(_data: unknown): Promise<unknown> {
   // TODO: return (await apiClient.post("/admin/inventory", data)).data
   throw new Error("Not implemented");
 }
@@ -51,7 +51,7 @@ export async function addItem(data: unknown): Promise<unknown> {
  * @param data - Partial item fields to update
  * @returns Promise<Item>
  */
-export async function updateItem(id: number, data: unknown): Promise<unknown> {
+export async function updateItem(_id: number, _data: unknown): Promise<unknown> {
   // TODO: return (await apiClient.put(`/admin/inventory/${id}`, data)).data
   throw new Error("Not implemented");
 }

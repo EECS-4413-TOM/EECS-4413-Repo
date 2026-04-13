@@ -5,7 +5,7 @@
 // TODO: Import ProductGrid from "../components/catalog/..."
 // TODO: Import FilterBar, SortControl, SearchBar from "../components/catalog/..."
 
-import React, { useState, useEffect } from "react"
+import { useState, useEffect } from "react"
 import { getItems } from "../api/catalog"
 import { useCart } from "../hooks/useCart"
 
