@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from pydantic import BaseModel
 from datetime import date
+from datetime import datetime, timezone
 
 class ItemCreate(BaseModel):
     igdb_id: int
@@ -11,7 +12,7 @@ class ItemCreate(BaseModel):
     brand: str
     price: float # ADD THIS WHEN WE FIND A WAY TO GET GAME PRICES
     rating: float | None = None
-    release_date: date | None = None
+    release_date: datetime | None = None
     quantity: int # Number of physical copies in stock
     cover_url: str | None = None
 
@@ -23,7 +24,7 @@ class ItemUpdate(BaseModel):
     brand: str | None = None
     price: float | None = None # ADD THIS WHEN WE FIND A WAY TO GET GAME PRICES
     rating: float | None = None
-    release_date: date | None = None
+    release_date: datetime | None = None
     quantity: int | None = None
     cover_url: str | None = None
 
@@ -36,7 +37,7 @@ class ItemResponse(BaseModel):
     brand: str | None = None
     price: float | None = None # ADD THIS WHEN WE FIND A WAY TO GET GAME PRICES
     rating: float | None = None
-    release_date: date | None = None
+    release_date: datetime | None = None
     quantity: int
     cover_url: str | None = None
 
