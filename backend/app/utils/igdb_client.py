@@ -2,15 +2,15 @@ from __future__ import annotations
 import httpx
 from app.config import settings
 
-#_ROOT = Path(__file__).resolve().parent.parent.parent.parent  # backend/app/utils -> repo root
-#load_dotenv(_ROOT / ".env")
+# _ROOT = Path(__file__).resolve().parent.parent.parent.parent  # backend/app/utils -> repo root
+# load_dotenv(_ROOT / ".env")
 
 
 TWITCH_TOKEN_URL = "https://id.twitch.tv/oauth2/token"
 IGDB_URL = "https://api.igdb.com/v4/games"
 
 
-#load_dotenv()
+# load_dotenv()
 
 
 class IGDBClient:
@@ -62,7 +62,7 @@ class IGDBClient:
         }
 
         body = f"""
-        fields name, summary, cover.url, genres, first_release_date, rating;
+        fields name, summary, cover.image_id, genres, first_release_date, rating;
         where rating > 70;
         sort rating desc;
         limit 40;
@@ -93,7 +93,7 @@ class IGDBClient:
         ## IGDB return values. Change later, currently showing the first 10 games that match the query, gives name, summary, and cover
         body = f"""
         search "{query}";
-        fields name, summary, cover.url, genres, first_release_date;
+        fields name, summary, cover.image_id, genres, first_release_date;
         limit 10;
         """
 
