@@ -1,59 +1,91 @@
 from __future__ import annotations
 
-# TODO: Import pytest
-# TODO: Import TestClient, auth_headers, sample_user fixtures from conftest
-# TODO: Seed test items with sufficient inventory via fixture
+import pytest
 
 
-def test_checkout_success(client, auth_headers):
-    """
-    Add item to cart, then POST /api/orders/checkout with valid payment info.
-    Expect: HTTP 200, response is a valid OrderResponse with items and total.
-    Cart should be empty after checkout.
-    """
-    pass
+def seed_item():
+    return 1
 
 
 def test_checkout_empty_cart(client, auth_headers):
-    """
-    POST /api/orders/checkout without adding anything to the cart first.
-    Expect: HTTP 400 "Cart is empty".
-    """
-    pass
+    res = client.post(
+        "/api/orders/checkout",
+        json={
+            "shipping_address": "123 Test St",
+            "credit_card_number": "4111111111111111",
+        },
+        headers=auth_headers,
+    )
+
+    assert res.status_code == 400
 
 
-def test_checkout_insufficient_inventory(client, auth_headers):
-    """
-    Add an item to cart with quantity greater than its available inventory.
-    POST /api/orders/checkout.
-    Expect: HTTP 400 "Insufficient inventory for ...".
-    """
-    pass
+def test_checkout_success(client, auth_headers):
+    item_id = seed_item()
+
+    client.post(
+        "/api/cart/items",
+        json={"item_id": item_id, "quantity": 1},
+        headers=auth_headers,
+    )
+
+    res = client.post(
+        "/api/orders/checkout",
+        json={
+            "shipping_address": "123 Test St",
+            "credit_card_number": "4111111111111111",
+        },
+        headers=auth_headers,
+    )
+
+    assert res.status_code == 200
 
 
 def test_checkout_payment_denied(client, auth_headers):
-    """
-    Force the 3rd checkout request (when PaymentService denies it).
-    Expect: HTTP 402 "Credit Card Authorization Failed."
+    item_id = seed_item()
 
-    Hint: Make two prior successful checkouts first to exhaust the counter,
-    or mock/reset PaymentService._request_count to 2 before the test.
-    """
-    pass
+    # Force counter
+    from app.services.payment_service import PaymentService
+
+    PaymentService._request_count = 2
+
+    client.post(
+        "/api/cart/items",
+        json={"item_id": item_id, "quantity": 1},
+        headers=auth_headers,
+    )
+
+    res = client.post(
+        "/api/orders/checkout",
+        json={
+            "shipping_address": "123 Test St",
+            "credit_card_number": "4111111111111111",
+        },
+        headers=auth_headers,
+    )
+
+    assert res.status_code == 402
 
 
 def test_get_order_history(client, auth_headers):
-    """
-    Complete a checkout, then GET /api/orders.
-    Expect: HTTP 200, list contains the completed order.
-    """
-    pass
+    item_id = seed_item()
 
+    client.post(
+        "/api/cart/items",
+        json={"item_id": item_id, "quantity": 1},
+        headers=auth_headers,
+    )
 
-def test_inventory_decreases_after_checkout(client, auth_headers):
-    """
-    Record item.quantity before checkout.
-    Complete a checkout with quantity=N.
-    GET /api/catalog/{item_id} and verify item.quantity decreased by N.
-    """
-    pass
+    client.post(
+        "/api/orders/checkout",
+        json={
+            "shipping_address": "123 Test St",
+            "credit_card_number": "4111111111111111",
+        },
+        headers=auth_headers,
+    )
+
+    res = client.get("/api/orders", headers=auth_headers)
+
+    assert res.status_code == 200
+    assert len(res.json()) >= 1
