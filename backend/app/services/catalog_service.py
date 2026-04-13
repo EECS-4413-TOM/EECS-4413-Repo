@@ -15,6 +15,7 @@ igdb = IGDBClient()
 
 # edited to get price
 
+
 class CatalogService:
 
     def __init__(self, db: Session | None):
@@ -33,11 +34,16 @@ class CatalogService:
             if existing:
                 continue
 
-            r_date = datetime.fromtimestamp(game.get("first_release_date"), tz=timezone.utc)if game.get("first_release_date")else None
+            r_date = (
+                datetime.fromtimestamp(game.get("first_release_date"), tz=timezone.utc)
+                if game.get("first_release_date")
+                else None
+            )
             cover = game.get("cover")
             artwork_ids = game.get("artworks")
             screenshot_ids = game.get("screenshots")
             video_ids = game.get("videos") or []
+            companies = game.get("involved_companies", [])
             item = Item(
                 igdb_id=game["id"],
                 name=game["name"],
@@ -58,11 +64,15 @@ class CatalogService:
                 ],
                 similar_games=game.get("similar_games"),
                 videos=[
-                    f"https://www.youtube.com/watch?v={v}"
+                    f"https://www.youtube.com/watch?v={v.get('video_id')}"
                     for v in (video_ids or [])
-                    if isinstance(v, int)
+                    if isinstance(v, dict)
                 ],
-                involved_companies=game.get("involved_companies"),
+                involved_companies=(
+                    companies[0]["company"]["name"]
+                    if companies and isinstance(companies[0], dict)
+                    else None
+                ),
                 game_type=game.get("game_type"),
                 dlcs=game.get("dlcs"),
                 collections=game.get("collections"),
@@ -93,11 +103,16 @@ class CatalogService:
 
             if existing:
                 continue
-            r_date = datetime.fromtimestamp(game.get("first_release_date"), tz=timezone.utc)if game.get("first_release_date")else None
-            cover=game.get("cover")
+            r_date = (
+                datetime.fromtimestamp(game.get("first_release_date"), tz=timezone.utc)
+                if game.get("first_release_date")
+                else None
+            )
+            cover = game.get("cover")
             artwork_ids = game.get("artworks")
             screenshot_ids = game.get("screenshots")
             video_ids = game.get("videos") or []
+            companies = game.get("involved_companies", [])
             item = Item(
                 igdb_id=game["id"],
                 name=game["name"],
@@ -118,11 +133,15 @@ class CatalogService:
                 ],
                 similar_games=game.get("similar_games"),
                 videos=[
-                    f"https://www.youtube.com/watch?v={v}"
+                    f"https://www.youtube.com/watch?v={v.get('video_id')}"
                     for v in (video_ids or [])
-                    if isinstance(v, int)
+                    if isinstance(v, dict)
                 ],
-                involved_companies=game.get("involved_companies"),
+                involved_companies=(
+                    companies[0]["company"]["name"]
+                    if companies and isinstance(companies[0], dict)
+                    else None
+                ),
                 game_type=game.get("game_type"),
                 dlcs=game.get("dlcs"),
                 collections=game.get("collections"),
@@ -186,11 +205,11 @@ class CatalogService:
         currentGen = datetime(2020, 1, 1, tzinfo=timezone.utc)
         lastGen = datetime(2016, 1, 1, tzinfo=timezone.utc)
 
-        if (releaseDate >= newGames):
+        if releaseDate >= newGames:
             return random.randint(79, 94)
-        if (releaseDate <= newGames and releaseDate >= currentGen):
+        if releaseDate <= newGames and releaseDate >= currentGen:
             return random.randint(49, 79)
         if releaseDate <= currentGen and releaseDate >= lastGen:
             return random.randint(29, 59)
-        if (releaseDate <= lastGen):
+        if releaseDate <= lastGen:
             return random.randint(5, 29)
