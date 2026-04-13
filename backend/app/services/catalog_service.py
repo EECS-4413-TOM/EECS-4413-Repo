@@ -12,6 +12,7 @@ from app.database import SessionLocal
 
 igdb = IGDBClient()
 
+# edited to get price
 
 class CatalogService:
 
@@ -47,6 +48,7 @@ class CatalogService:
                 quantity=1,
                 release_date=None,
                 cover_url=game.get("cover.url"),
+                price = 0.00 # placeholder price done by Amraj 
             )
 
             self.item_repo.create(item)

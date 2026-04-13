@@ -19,16 +19,18 @@
  * Item
  * Mirrors ItemResponse from backend.
  */
-// export interface Item {
-//   id: number;
-//   name: string;
-//   description: string;
-//   category: string;
-//   brand: string;
-//   price: number;
-//   quantity: number;
-//   image_url: string | null;
-// }
+
+// uncomment below for catalog to work: 
+export interface Item {
+  id: number
+  name: string
+  description: string
+  category: string
+  brand: string
+  price: number
+  quantity: number
+  image_url: string | null
+}
 
 /**
  * CartItem

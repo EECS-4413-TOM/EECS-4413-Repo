@@ -3,6 +3,8 @@ from __future__ import annotations
 from pydantic import BaseModel
 from datetime import date
 
+# edited so that price is now shown since we get price in supabase
+
 class ItemCreate(BaseModel):
     igdb_id: int
     name: str
