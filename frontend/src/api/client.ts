@@ -1,24 +1,18 @@
-// TODO: Import axios from "axios"
+import axios from "axios";
 
-/**
- * Configured Axios instance used by all API modules.
- * Sets the base URL so every call is relative to /api.
- *
- * Steps to implement:
- * 1. Create the instance:
- *    const apiClient = axios.create({ baseURL: "/api" })
- *
- * 2. Add a request interceptor:
- *    - Read the JWT token from localStorage (key: "token")
- *    - If present, attach it as: config.headers.Authorization = `Bearer ${token}`
- *    - Return the modified config
- *
- * 3. Export apiClient as default
- */
+export const tokenStorageKey = "token";
 
-// TODO: const apiClient = axios.create({ baseURL: "/api" });
+const apiClient = axios.create({
+  baseURL: "/api",
+});
 
-// TODO: apiClient.interceptors.request.use(...)
+apiClient.interceptors.request.use(function (config) {
+  const token = localStorage.getItem(tokenStorageKey);
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
 
 // export default apiClient;
 
