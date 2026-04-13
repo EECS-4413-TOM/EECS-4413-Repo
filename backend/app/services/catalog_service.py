@@ -12,6 +12,7 @@ from app.database import SessionLocal
 
 igdb = IGDBClient()
 
+# edited to get price
 
 class CatalogService:
 

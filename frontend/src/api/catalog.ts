@@ -1,5 +1,7 @@
 // TODO: Import apiClient from "./client"
 // TODO: Import Item type from "../types"
+import apiClient from "./client"
+import type { Item } from "../types"
 
 /**
  * getItems
@@ -10,36 +12,39 @@
  * @param params - Optional filters: { category?, brand?, search?, sort_by?, order? }
  * @returns Promise<Item[]>
  */
-export async function getItems(_params?: unknown): Promise<unknown[]> {
-  return [
-     {
-      id: 1, title: "Cyberpunk 2077", price: 59.99, image: "https://cdn.cloudflare.steamstatic.com/steam/apps/1091500/header.jpg"
-    },
-    {
-      id: 2, title: "Elden Ring", price: 49.99, image: "https://cdn.cloudflare.steamstatic.com/steam/apps/1245620/header.jpg"
-    },
-    {
-      id: 3, title: "Grand Theft Auto V", price: 19.99, image: "https://cdn.cloudflare.steamstatic.com/steam/apps/271590/header.jpg"
-    },
-    {
-      id: 4, title: "Cyberpunk 2078", price: 59.99, image: "https://cdn.cloudflare.steamstatic.com/steam/apps/1091500/header.jpg"
-    },
-    {
-      id: 5, title: "Elden Ring 2", price: 49.99, image: "https://cdn.cloudflare.steamstatic.com/steam/apps/1245620/header.jpg"
-    },
-    {
-      id: 6, title: "Grand Theft Auto V: Deluxe", price: 19.99, image: "https://cdn.cloudflare.steamstatic.com/steam/apps/271590/header.jpg"
-    },
-      {
-      id: 7, title: "Grand Theft Auto V: Deluxe", price: 19.99, image: "https://cdn.cloudflare.steamstatic.com/steam/apps/271590/header.jpg"
-    },
-      {
-      id: 8, title: "Grand Theft Auto V: Deluxe", price: 19.99, image: "https://cdn.cloudflare.steamstatic.com/steam/apps/271590/header.jpg"
-    }, 
-      {
-      id: 9, title: "Grand Theft Auto V: Deluxe", price: 19.99, image: "https://cdn.cloudflare.steamstatic.com/steam/apps/271590/header.jpg"
-    }
-  ]
+
+type GetItemsParams = {
+  category?: string
+  brand?: string
+  search?: string
+  sortBy?: string
+  order?: string
+  limit?: number
+  page?: number
+}
+
+// we gotta have it so that we search game either in db or api 
+
+export async function searchItems(query: string): Promise<Item[]> {
+  const res = await apiClient.get(`/catalog/search?q=${query}`)
+  return res.data
+}
+
+export async function getItems(params: GetItemsParams = {}): Promise<Item[]> {
+  const query = new URLSearchParams()
+
+  if (params.category) query.append("genre", params.category)
+  if (params.brand) query.append("brand", params.brand)
+  if (params.search) query.append("search", params.search)
+  if (params.sortBy) query.append("sort_by", params.sortBy)
+  if (params.order) query.append("order", params.order)
+
+  if (params.limit) query.append("limit", String(params.limit))
+  if (params.page) query.append("page", String(params.page))
+
+  const res = await apiClient.get(`/catalog?${query.toString()}`)
+
+  return res.data
 }
 
 /**
@@ -51,7 +56,8 @@ export async function getItems(_params?: unknown): Promise<unknown[]> {
  * @param id - The product's numeric ID
  * @returns Promise<Item>
  */
-export async function getItem(_id: number): Promise<unknown> {
-  // TODO: return (await apiClient.get(`/catalog/${id}`)).data
-  throw new Error("Not implemented");
+
+export async function getItem(id: number): Promise<Item> {
+  const res = await apiClient.get(`/catalog/${id}`)
+  return res.data
 }
