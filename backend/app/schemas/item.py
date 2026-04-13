@@ -13,7 +13,7 @@ class ItemCreate(BaseModel):
     genre: str
     brand: str
     price: float # ADD THIS WHEN WE FIND A WAY TO GET GAME PRICES
-    rating: float | None = None
+    rating: float | None = 80
     release_date: datetime | None = None
     quantity: int # Number of physical copies in stock
     cover_url: str | None = None

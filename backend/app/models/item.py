@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from sqlalchemy import Column, Integer, String, DateTime, Float
+from sqlalchemy import Column, Integer, String, DateTime, Float, JSON
 from app.database import Base
 from sqlalchemy.orm import relationship
 
@@ -18,9 +18,9 @@ class Item(Base):
     cover_url = Column(String, nullable=True)
     price = Column(Float, nullable=True)
     rating = Column(Float,nullable=False)
-    age_rating = Column(String, index=True, nullable=True)
-    artworks = Column(String, index=True, nullable=True)
-    screenshots = Column(String, index=True, nullable=True)
+    age_rating = Column(JSON, index=True, nullable=True)
+    artworks = Column(JSON, index=True, nullable=True)
+    screenshots = Column(JSON, index=True, nullable=True)
     similar_games = Column(String, index=True, nullable=True)
     videos = Column(String, index=True, nullable=True)
     involved_companies = Column(String, index=True, nullable=True)

@@ -35,18 +35,33 @@ class CatalogService:
 
             r_date = datetime.fromtimestamp(game.get("first_release_date"), tz=timezone.utc)if game.get("first_release_date")else None
             cover = game.get("cover")
+            artwork_ids = game.get("artworks")
+            screenshot_ids = game.get("screenshots")
+            video_ids = game.get("videos") or []
             item = Item(
                 igdb_id=game["id"],
                 name=game["name"],
                 description=game.get("summary", ""),
                 genre=game.get("genres"),
                 brand="IGDB",
-                rating=game.get("total_rating"),
-                age_rating=game.get("age_ratings"),
-                artworks=game.get("artworks"),
-                screenshots=game.get("screenshots"),
+                rating=game.get("total_rating") if game.get("total_rating") else 75.5,
+                age_rating=game.get("age_ratings") or [],
+                artworks=[
+                    f"https://images.igdb.com/igdb/image/upload/t_1080p/{a}.jpg"
+                    for a in (artwork_ids or [])
+                    if isinstance(a, int)
+                ],
+                screenshots=[
+                    f"https://images.igdb.com/igdb/image/upload/t_1080p/{s}.jpg"
+                    for s in (screenshot_ids or [])
+                    if isinstance(s, int)
+                ],
                 similar_games=game.get("similar_games"),
-                videos=game.get("videos"),
+                videos=[
+                    f"https://www.youtube.com/watch?v={v}"
+                    for v in (video_ids or [])
+                    if isinstance(v, int)
+                ],
                 involved_companies=game.get("involved_companies"),
                 game_type=game.get("game_type"),
                 dlcs=game.get("dlcs"),
@@ -80,18 +95,33 @@ class CatalogService:
                 continue
             r_date = datetime.fromtimestamp(game.get("first_release_date"), tz=timezone.utc)if game.get("first_release_date")else None
             cover=game.get("cover")
+            artwork_ids = game.get("artworks")
+            screenshot_ids = game.get("screenshots")
+            video_ids = game.get("videos") or []
             item = Item(
                 igdb_id=game["id"],
                 name=game["name"],
                 description=game.get("summary", ""),
                 genre=game.get("genres"),
                 brand="IGDB",
-                rating=game.get("total_rating"),
-                age_rating=game.get("age_ratings"),
-                artworks=game.get("artworks"),
-                screenshots=game.get("screenshots"),
+                rating=game.get("total_rating") if game.get("total_rating") else 75.5,
+                age_rating=game.get("age_ratings") or [],
+                artworks=[
+                    f"https://images.igdb.com/igdb/image/upload/t_1080p/{a}.jpg"
+                    for a in (artwork_ids or [])
+                    if isinstance(a, int)
+                ],
+                screenshots=[
+                    f"https://images.igdb.com/igdb/image/upload/t_1080p/{s}.jpg"
+                    for s in (screenshot_ids or [])
+                    if isinstance(s, int)
+                ],
                 similar_games=game.get("similar_games"),
-                videos=game.get("videos"),
+                videos=[
+                    f"https://www.youtube.com/watch?v={v}"
+                    for v in (video_ids or [])
+                    if isinstance(v, int)
+                ],
                 involved_companies=game.get("involved_companies"),
                 game_type=game.get("game_type"),
                 dlcs=game.get("dlcs"),

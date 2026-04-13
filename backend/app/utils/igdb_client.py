@@ -61,10 +61,10 @@ class IGDBClient:
         }
 
         body = f"""
-        fields name, summary, cover.image_id, genres, first_release_date, total_rating, age_ratings, artworks, screenshots, similar_games, videos, involved_companies, game_type, dlcs, collections;
-        where rating > 70;
-        sort rating desc;
-        limit 40;
+        fields name, summary, cover.image_id, genres, first_release_date, total_rating, age_ratings.rating, age_ratings.category, age_ratings.rating_cover_url, artworks, screenshots, similar_games, videos, involved_companies, game_type, dlcs, collections;
+        where total_rating > 70;
+        sort total_rating desc;
+        limit 100;
         """
         async with httpx.AsyncClient() as client:  ## Send query to IGDB api link
             res = await client.post(
@@ -92,7 +92,7 @@ class IGDBClient:
         ## IGDB return values. Change later, currently showing the first 10 games that match the query, gives name, summary, and cover
         body = f"""
         search "{query}";
-        fields name, summary, cover.image_id, genres, first_release_date, total_rating, age_ratings, artworks, screenshots, similar_games, videos, involved_companies, game_type, dlcs, collections;
+        fields name, summary, cover.image_id, genres, first_release_date, total_rating, age_ratings.rating, age_ratings.category, age_ratings.rating_cover_url, artworks, screenshots, similar_games, videos, involved_companies, game_type, dlcs, collections;
         limit 10;
         """
 
