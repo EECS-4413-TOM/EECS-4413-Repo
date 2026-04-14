@@ -1,4 +1,4 @@
-//import React, { useState, useEffect, useRef } from "react"
+import { useState, useEffect, useRef } from "react"
 import { getItems, searchItems } from "../api/catalog"
 import { useCart } from "../hooks/useCart"
 import { Link, useLocation  } from "react-router-dom"
@@ -6,7 +6,21 @@ import { Link, useLocation  } from "react-router-dom"
 // to get the image of the game OR go to a temp image if there's none provided:
 const FALLBACK_IMAGE = "https://placehold.co/300x400?text=No+Image"
 
-function getImage(item: any) {
+/** Loose shape for catalog / IGDB-backed items */
+type CatalogItem = {
+  id: number
+  name?: string
+  price?: number
+  cover_url?: string | null
+  cover?: { image_id?: string }
+  screenshots?: { image_id?: string }[]
+  rating?: number
+  total_rating?: number
+  genres?: unknown
+  genre?: unknown
+}
+
+function getImage(item: CatalogItem) {
   if (item.cover_url) return item.cover_url
 
   if (item.cover?.image_id) {
@@ -21,7 +35,7 @@ function getImage(item: any) {
 }
 
 // fixing rating of games:
-function formatRating(item: any) {
+function formatRating(item: CatalogItem) {
   if (item.rating) return item.rating.toFixed(1)
 
   // IGDB sometimes uses rating_count + rating
@@ -57,7 +71,7 @@ const GENRE_MAP: Record<number, string> = {
   37: "Battle Royale"
 }
 
-function formatGenres(item: any) {
+function formatGenres(item: CatalogItem) {
   const genres = item.genres || item.genre
 
   if (!genres) return "Unknown"
@@ -77,7 +91,7 @@ function formatGenres(item: any) {
 }
 
 export default function CatalogPage() {
-  const [items, setItems] = useState<any[]>([])
+  const [items, setItems] = useState<CatalogItem[]>([])
   const [loading, setLoading] = useState(false)
   const [hasMore, setHasMore] = useState(true)
 
@@ -96,7 +110,7 @@ export default function CatalogPage() {
   const location = useLocation()
 
   // fix the issue with searchbar interfering when clicking home
-useEffect(() => {
+  useEffect(() => {
   setSearch("")
   setPage(1)
   setItems([])
@@ -130,7 +144,7 @@ useEffect(() => {
       search.trim().length === 0
     ) {
       lastCallRef.current = now
-      setPage((prev) => prev + 1)
+      setPage((prev: number) => prev + 1)
     }
   }
 
@@ -147,7 +161,7 @@ useEffect(() => {
     try {
       setLoading(true)
 
-      let data: any[] = []
+      let data: CatalogItem[] = []
 
       // 🔥 IF user is searching → use IGDB-powered endpoint
       if (search.trim().length > 0) {
@@ -172,11 +186,11 @@ useEffect(() => {
         setItems(data)
       } else {
         // append for infinite scroll
-        setItems((prev) => {
+        setItems((prev: CatalogItem[]) => {
           const combined = [...prev, ...data]
 
           const unique = combined.filter(
-            (item, index, self) =>
+            (item: CatalogItem, index: number, self: CatalogItem[]) =>
               index === self.findIndex((i) => i.id === item.id)
           )
 
@@ -227,7 +241,7 @@ useEffect(() => {
 
       {/* PRODUCTS */}
       <div className="product-grid">
-        {items.map((item) => (
+        {items.map((item: CatalogItem) => (
 
           // make all the cards link to the product detail page for that item:
           <Link to={`/product/${item.id}`} key={item.id} style={{ textDecoration: "none", color: "inherit" }}>
@@ -243,7 +257,17 @@ useEffect(() => {
             <p>⭐ {formatRating(item)}</p>
             <p>{formatGenres(item)}</p>
 
-            <button onClick={() => addToCart(item)}>
+            <button
+              type="button"
+              onClick={() =>
+                addToCart({
+                  id: item.id,
+                  title: item.name ?? "Unnamed Game",
+                  price: typeof item.price === "number" ? item.price : 0,
+                  image: getImage(item),
+                })
+              }
+            >
               Add to Cart
             </button>
           </div>
