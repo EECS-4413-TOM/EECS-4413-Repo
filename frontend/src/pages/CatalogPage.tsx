@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react"
+//import React, { useState, useEffect, useRef } from "react"
 import { getItems, searchItems } from "../api/catalog"
 import { useCart } from "../hooks/useCart"
 import { Link, useLocation  } from "react-router-dom"
@@ -84,11 +84,11 @@ export default function CatalogPage() {
   const [page, setPage] = useState(1)
   const [limit] = useState(12)
 
-  const [category, setCategory] = useState("")
-  const [brand, setBrand] = useState("")
+  //const [category, setCategory] = useState("")
+  //const [brand, setBrand] = useState("")
   const [search, setSearch] = useState("")
-  const [sortBy, setSortBy] = useState("")
-  const [order, setOrder] = useState("asc")
+  //const [sortBy, setSortBy] = useState("")
+ // const [order, setOrder] = useState("asc")
 
 
 
