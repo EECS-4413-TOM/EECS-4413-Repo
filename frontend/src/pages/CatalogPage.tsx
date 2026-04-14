@@ -110,7 +110,7 @@ useEffect(() => {
     }, 300)
 
     return () => clearTimeout(t)
-  }, [page, category, brand, search, sortBy, order])
+  }, [page, search])
 
   const lastCallRef = useRef(0)
 
@@ -155,11 +155,7 @@ useEffect(() => {
       } else {
         // normal catalog (DB)
         data = await getItems({
-          category,
-          brand,
           search,
-          sortBy,
-          order,
           limit,
           page
         })
