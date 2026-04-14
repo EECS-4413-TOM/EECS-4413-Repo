@@ -28,7 +28,7 @@ import { useState, useEffect } from "react"
 import { useParams } from "react-router-dom"
 import { getItem } from "../api/catalog"
 import { useCart } from "../hooks/useCart"
-import type { Item } from "../types"
+//import type { Item } from "../types"
 
 const FALLBACK_IMAGE = "https://placehold.co/300x400?text=No+Image"
 
