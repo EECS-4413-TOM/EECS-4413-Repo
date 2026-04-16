@@ -23,6 +23,9 @@ import { useCart } from "../hooks/useCart";
  *    - "Continue Shopping" → navigate("/")
  *    - "Checkout" → navigate("/checkout")
  */
+
+const FALLBACK_IMAGE = "https://placehold.co/300x400?text=No+Image"
+
 export default function CartPage() {
   const { cart, updateQuantity, removeFromCart, total } = useCart();
   const navigate = useNavigate();
@@ -50,14 +53,11 @@ export default function CartPage() {
             <div key={item.id} className="cart-row">
 
               {/* IMAGE */}
-              <img src={item.image} className="cart-image" />
+              <img src={item.image || FALLBACK_IMAGE } className="cart-image" />
 
               {/* info */}
               <div className="cart-info">
                 <h3>{item.title}</h3>
-                <p className="cart-price">
-                  ${Number(item.price).toFixed(2)}
-                </p>
 
                 {/* QUANTITY */}
                 <div className="cart-qty">

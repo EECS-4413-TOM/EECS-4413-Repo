@@ -123,7 +123,12 @@ export default function ProductDetailPage() {
           <button
             className="add-to-cart-btn"
             onClick={() => {
-              addToCart({ ...item, quantity })
+              addToCart({
+                id: item.id,
+                title: item.name ?? "Unknown Game",
+                price: item.price ?? 0,
+                image: getImage(item),
+              })
               setAdded(true)
             }}
           >

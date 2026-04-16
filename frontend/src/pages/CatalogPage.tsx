@@ -90,6 +90,17 @@ function formatGenres(item: CatalogItem) {
   return "Unknown"
 }
 
+function normalizeImage(item: any) {
+  const coverId = item.cover?.image_id
+  const coverUrl = item.cover?.url
+
+  if (item.cover_url) return item.cover_url
+  if (coverUrl) return coverUrl.startsWith("//") ? `https:${coverUrl}` : coverUrl
+  if (coverId) return `https://images.igdb.com/igdb/image/upload/t_cover_big/${coverId}.jpg`
+
+  return FALLBACK_IMAGE
+}
+
 export default function CatalogPage() {
   const [items, setItems] = useState<CatalogItem[]>([])
   const [loading, setLoading] = useState(false)
@@ -103,10 +114,6 @@ export default function CatalogPage() {
   const [search, setSearch] = useState("")
   //const [sortBy, setSortBy] = useState("")
   // const [order, setOrder] = useState("asc")
-
-  // too many requests, adding for overload protection (e.g. when user clicks home or types in search bar)
-  const requestRef = useRef(false)
-
 
 
 
@@ -161,8 +168,6 @@ export default function CatalogPage() {
   }, [loading, hasMore, search])
 
   async function loadItems() {
-    if (requestRef.current) return
-    requestRef.current = true
     if (loading) return   // prevent multiple simultaneous loads
     try {
       setLoading(true)
@@ -215,7 +220,6 @@ export default function CatalogPage() {
     } catch (err) {
       console.error("Failed to load catalog:", err)
     } finally {
-      requestRef.current = false
       setLoading(false)
     }
   }
@@ -275,7 +279,7 @@ export default function CatalogPage() {
                     id: item.id,
                     title: item.name ?? "Unnamed Game",
                     price: typeof item.price === "number" ? item.price : 0,
-                    image: getImage(item),
+                    image: normalizeImage(item),
                   })
                 }
               >
@@ -293,4 +297,4 @@ export default function CatalogPage() {
       )}
     </div>
   )
-} 
+}
