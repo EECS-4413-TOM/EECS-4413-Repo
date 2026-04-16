@@ -25,7 +25,7 @@
  */
 
 import { useState, useEffect } from "react"
-import { useParams } from "react-router-dom"
+import { useParams, useNavigate } from "react-router-dom"
 import { getItem } from "../api/catalog"
 import { useCart } from "../hooks/useCart"
 //import type { Item } from "../types"
@@ -49,11 +49,13 @@ function getImage(item: any) {
 
 export default function ProductDetailPage() {
   const { id } = useParams()
+  const navigate = useNavigate()
   const { addToCart } = useCart()
 
   const [item, setItem] = useState<any>(null)
   const [quantity, setQuantity] = useState(1)
   const [loading, setLoading] = useState(true)
+  const [added, setAdded] = useState(false)
 
   useEffect(() => {
     async function fetchItem() {
@@ -120,10 +122,38 @@ export default function ProductDetailPage() {
           {/* Add to Cart */}
           <button
             className="add-to-cart-btn"
-            onClick={() => addToCart({ ...item, quantity })}
+            onClick={() => {
+              addToCart({ ...item, quantity })
+              setAdded(true)
+            }}
           >
             Add to Cart
           </button>
+
+          {added && (
+            <div
+              className="cart-popup-overlay"
+              onClick={() => setAdded(false)}
+            >
+              <div
+                className="cart-popup-content"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <h3>✅ Added to Cart</h3>
+                <p>{item.name}</p>
+
+                <div className="cart-popup-actions">
+                  <button onClick={() => setAdded(false)}>
+                    Continue Shopping
+                  </button>
+
+                  <button onClick={() => navigate("/cart")}>
+                    Go to Cart
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>

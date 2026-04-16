@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react"
 import { getItems, searchItems } from "../api/catalog"
 import { useCart } from "../hooks/useCart"
-import { Link, useLocation  } from "react-router-dom"
+import { Link, useLocation } from "react-router-dom"
 
 // to get the image of the game OR go to a temp image if there's none provided:
 const FALLBACK_IMAGE = "https://placehold.co/300x400?text=No+Image"
@@ -102,7 +102,11 @@ export default function CatalogPage() {
   //const [brand, setBrand] = useState("")
   const [search, setSearch] = useState("")
   //const [sortBy, setSortBy] = useState("")
- // const [order, setOrder] = useState("asc")
+  // const [order, setOrder] = useState("asc")
+
+  // too many requests, adding for overload protection (e.g. when user clicks home or types in search bar)
+  const requestRef = useRef(false)
+
 
 
 
@@ -111,11 +115,11 @@ export default function CatalogPage() {
 
   // fix the issue with searchbar interfering when clicking home
   useEffect(() => {
-  setSearch("")
-  setPage(1)
-  setItems([])
-  setHasMore(true)
-}, [location.key])
+    setSearch("")
+    setPage(1)
+    setItems([])
+    setHasMore(true)
+  }, [location.key])
 
   // debounce API calls (prevents spam requests)
   useEffect(() => {
@@ -149,14 +153,16 @@ export default function CatalogPage() {
   }
 
   useEffect(() => {
-  window.addEventListener("scroll", handleScroll)
+    window.addEventListener("scroll", handleScroll)
 
-  return () => {
-    window.removeEventListener("scroll", handleScroll)
-  }
-}, [loading, hasMore, search])
+    return () => {
+      window.removeEventListener("scroll", handleScroll)
+    }
+  }, [loading, hasMore, search])
 
   async function loadItems() {
+    if (requestRef.current) return
+    requestRef.current = true
     if (loading) return   // prevent multiple simultaneous loads
     try {
       setLoading(true)
@@ -209,6 +215,7 @@ export default function CatalogPage() {
     } catch (err) {
       console.error("Failed to load catalog:", err)
     } finally {
+      requestRef.current = false
       setLoading(false)
     }
   }
@@ -245,32 +252,36 @@ export default function CatalogPage() {
 
           // make all the cards link to the product detail page for that item:
           <Link to={`/product/${item.id}`} key={item.id} style={{ textDecoration: "none", color: "inherit" }}>
-          <div className="product-card" key={item.id}>
-            <img
-              src={getImage(item)}
-              alt={item.name || "Game"}
-              onError={(e) => (e.currentTarget.src = FALLBACK_IMAGE)}
-            />
+            <div className="product-card" key={item.id}>
+              <img
+                src={getImage(item)}
+                alt={item.name || "Game"}
+                onError={(e) => (e.currentTarget.src = FALLBACK_IMAGE)}
+              />
 
-            <h3>{item.name || "Unnamed Game"}</h3>
+              <h3>{item.name || "Unnamed Game"}</h3>
+              <p>
+                {typeof item.price === "number"
+                  ? `$${item.price.toFixed(2)}`
+                  : `$${item.price ?? "N/A"}`}
+              </p>
+              <p>⭐ {formatRating(item)}</p>
+              <p>{formatGenres(item)}</p>
 
-            <p>⭐ {formatRating(item)}</p>
-            <p>{formatGenres(item)}</p>
-
-            <button
-              type="button"
-              onClick={() =>
-                addToCart({
-                  id: item.id,
-                  title: item.name ?? "Unnamed Game",
-                  price: typeof item.price === "number" ? item.price : 0,
-                  image: getImage(item),
-                })
-              }
-            >
-              Add to Cart
-            </button>
-          </div>
+              <button
+                type="button"
+                onClick={() =>
+                  addToCart({
+                    id: item.id,
+                    title: item.name ?? "Unnamed Game",
+                    price: typeof item.price === "number" ? item.price : 0,
+                    image: getImage(item),
+                  })
+                }
+              >
+                Add to Cart
+              </button>
+            </div>
           </Link>
         ))}
       </div>
@@ -282,4 +293,4 @@ export default function CatalogPage() {
       )}
     </div>
   )
-}
+} 
