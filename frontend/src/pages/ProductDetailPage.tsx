@@ -46,6 +46,52 @@ function getImage(item: any) {
   return FALLBACK_IMAGE
 }
 
+// fixing genres because they just show the ID of the genre from API. We want to show the name of the genre instead.
+const GENRE_MAP: Record<number, string> = {
+  4: "Fighting",
+  5: "Shooter",
+  7: "Music",
+  8: "Platform",
+  9: "Puzzle",
+  10: "Racing",
+  11: "Real Time Strategy",
+  12: "RPG",
+  13: "Simulator",
+  14: "Sport",
+  15: "Strategy",
+  16: "Turn-Based Strategy",
+  24: "Tactical",
+  25: "Hack and Slash",
+  26: "Quiz",
+  30: "Pinball",
+  31: "Adventure",
+  32: "Indie",
+  33: "Arcade",
+  34: "Visual Novel",
+  35: "Card & Board Game",
+  36: "MOBA",
+  37: "Battle Royale"
+}
+
+function formatGenres(item: any) {
+  const genres = item.genres || item.genre
+
+  if (!genres) return "Unknown"
+
+  // turn genre string into readable format (e.g. "{12, 14}" → "RPG, Sport")
+  if (typeof genres === "string") {
+    const cleaned = genres.replace(/[{}]/g, "") // remove { }
+    const ids = cleaned.split(",").map(Number)
+
+    return ids
+      .map((id) => GENRE_MAP[id] || id)
+      .join(", ")
+  }
+
+  // if no genre, return "Unknown"
+  return "Unknown"
+}
+
 
 export default function ProductDetailPage() {
   const { id } = useParams()
@@ -78,7 +124,11 @@ export default function ProductDetailPage() {
 
   return (
     <div className="catalog-container">
-      <div style={{ display: "flex", gap: "40px", alignItems: "flex-start" }}>
+       {/* BREADCRUMB */}
+  <p style={{ marginBottom: "20px", color: "#777" }}>
+    Home / Catalog / {item.name}
+  </p>
+      <div className="product-detail">
 
         {/* display image */}
         <div className="product-image">
@@ -94,6 +144,14 @@ export default function ProductDetailPage() {
 
           <p className="product-price">
             {item.price != null ? `$ ${item.price.toFixed(2)}` : "Price not available"}
+          </p>
+
+          <p><strong>⭐ Rating:</strong> {item.rating ? `${item.rating.toFixed(1)} / 100` : "N/A"}</p>
+          <p><strong>🎮 Genre:</strong> {formatGenres(item)}</p>
+          <p><strong>🏢 Company:</strong> {item.involved_companies || "Unknown"}</p>
+          <p><strong>📅 Release Date:</strong> {item.release_date
+            ? new Date(item.release_date).toLocaleDateString()
+            : "Unknown"}
           </p>
           <p>
             <strong>In stock:</strong>{" "}
@@ -118,6 +176,7 @@ export default function ProductDetailPage() {
             <h3>Description</h3>
             <p>{item.description || "No description available."}</p>
           </div>
+          
 
           {/* Add to Cart */}
           <button

@@ -181,10 +181,16 @@ class CatalogService:
             reverse = order == "desc"
 
             if sort_by == "price":
-                items.sort(key=lambda x: x.price, reverse=reverse)
+                items.sort(key=lambda x: float(x.price), reverse=reverse)
 
             elif sort_by == "name":
                 items.sort(key=lambda x: x.name.lower(), reverse=reverse)
+            
+            elif sort_by == "rating":
+                items.sort(key=lambda x: float(x.rating) or 0, reverse=reverse)
+                
+            elif sort_by == "involved_companies":
+                items.sort(key=lambda x: (x.involved_companies or "").lower(), reverse=reverse)
 
         return items
 
