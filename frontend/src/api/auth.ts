@@ -1,5 +1,5 @@
 import apiClient from "./client";
-import type { User, Token } from "../types";
+import type {User, Token} from "../types";
 
 export type RegisterBody = {
   email: string;

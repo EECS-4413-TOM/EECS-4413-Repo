@@ -53,27 +53,27 @@ export interface Item {
  * OrderItem
  * Mirrors OrderItemResponse. Stores price_at_purchase as a historical snapshot.
  */
-// export interface OrderItem {
-//   id: number;
-//   item_id: number;
-//   quantity: number;
-//   price_at_purchase: number;
-//   item: Item;
-// }
+export interface OrderItem {
+  id: number;
+  item_id: number;
+  quantity: number;
+  price_at_purchase: number;
+  item: Item;
+}
 
 /**
  * Order
  * Mirrors OrderResponse from backend.
  */
-// export interface Order {
-//   id: number;
-//   customer_id: number;
-//   total: number;
-//   status: string;
-//   shipping_address: string | null;
-//   created_at: string;
-//   items: OrderItem[];
-// }
+export interface Order {
+  id: number;
+  customer_id: number;
+  total: number;
+  status: string;
+  shipping_address: string | null;
+  created_at: string;
+  items: OrderItem[];
+}
 
 export interface Token {
   access_token: string;
