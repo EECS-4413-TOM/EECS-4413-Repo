@@ -23,87 +23,103 @@ import { useCart } from "../hooks/useCart";
  *    - "Continue Shopping" → navigate("/")
  *    - "Checkout" → navigate("/checkout")
  */
+
+const FALLBACK_IMAGE = "https://placehold.co/300x400?text=No+Image"
+
 export default function CartPage() {
   const { cart, updateQuantity, removeFromCart, total } = useCart();
   const navigate = useNavigate();
 
   if (cart.length === 0) {
     return (
-      <div>
-        <section className="hero">
-          <h2>Your Cart is Empty</h2>
-          <p>Add products to see cost</p>
-          <button className="buttons" onClick={() => navigate("/")}>
-            Browse Products
-          </button>
-        </section>
-      </div>
+      <section className="hero">
+        <h2>Your Cart is Empty</h2>
+        <p>Looks like you haven't added any games to your cart yet.</p>
+        <button onClick={() => navigate("/")}>Browse Games</button>
+      </section>
     );
   }
 
   return (
-    <div>
-      {/* hero header stuff */}
-      <section className="hero">
-        <h2>Your Cart</h2>
-        <p>Review your selected games</p>
-      </section>
+    <div className="cart-container">
 
-      {/* Same grid layout for now.*/}
-      <div className="product-grid">
-        {cart.map(item => (
-          <div key={item.id} className="product-card">
-            <img src={item.image} style={{ width: "100%" }} />
+      <h2 className="cart-title">Your Cart</h2>
 
-            <h3>{item.title}</h3>
-            <p>${item.price}</p>
+      <div className="cart-layout">
 
-            {/* just like catalogpage style buttons */}
-            <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
+        {/* items */}
+        <div className="cart-list">
+          {cart.map(item => (
+            <div key={item.id} className="cart-row">
+
+              {/* IMAGE */}
+              <img src={item.image || FALLBACK_IMAGE } className="cart-image" />
+
+              {/* info */}
+              <div className="cart-info">
+                <h3>{item.title}</h3>
+
+                {/* QUANTITY */}
+                <div className="cart-qty">
+                  <button onClick={() => updateQuantity(item.id, item.quantity - 1)}>
+                    -
+                  </button>
+
+                  <span>{item.quantity}</span>
+
+                  <button onClick={() => updateQuantity(item.id, item.quantity + 1)}>
+                    +
+                  </button>
+                </div>
+              </div>
+
+              {/* subtotal of purchase */}
+              <div className="cart-subtotal">
+                ${(item.price * item.quantity).toFixed(2)}
+              </div>
+
+              {/* remove item */}
               <button
-                className="buttons"
-                onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                className="remove-btn"
+                onClick={() => removeFromCart(item.id)}
               >
-                -
+                ✕
               </button>
 
-              <span>{item.quantity}</span>
-
-              <button
-                className="buttons"
-                onClick={() => updateQuantity(item.id, item.quantity + 1)}
-              >
-                +
-              </button>
             </div>
+          ))}
+        </div>
 
-            {/* Subtotal */}
-            <p>Subtotal: ${item.price * item.quantity}</p>
+        {/* summary of what you got in your cart */}
+        <div className="cart-summary">
+          <h3>Order Summary</h3>
 
-            <button
-              className="buttons"
-              onClick={() => removeFromCart(item.id)}
-            >
-              Remove
-            </button>
+          <div className="summary-line">
+            <span>Subtotal</span>
+            <span>${total.toFixed(2)}</span>
           </div>
-        ))}
-      </div>
 
-      {/* total section */}
-      <section className="hero">
-        <h2>Total: ${total}</h2>
+          <div className="summary-line total">
+            <span>Total</span>
+            <span>${total.toFixed(2)}</span>
+          </div>
 
-        <div style={{ display: "flex", gap: "10px", justifyContent: "center" }}>
-          <button className="buttons" onClick={() => navigate("/")}>
-            Continue Shopping
-          </button>
-
-          <button className="buttons" onClick={() => navigate("/checkout")}>
+          <button
+            className="checkout-btn"
+            onClick={() => navigate("/checkout")}
+          >
             Checkout
           </button>
+
+          <button
+            className="continue-btn"
+            onClick={() => navigate("/")}
+          >
+            Continue Shopping
+          </button>
         </div>
-      </section>
+
+      </div>
     </div>
   );
 }

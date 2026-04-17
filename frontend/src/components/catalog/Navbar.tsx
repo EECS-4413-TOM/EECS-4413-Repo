@@ -6,11 +6,11 @@ export default function Navbar() {
 
   return (
     <nav className="navbar">
-      <Link to="/" className="logo">Video Game Store</Link>
+      <Link to="/" className="logo">TOMAGames</Link>
 
       <div className="nav-links">
+        <Link to="/">Account</Link>
         <Link to="/">Deals</Link>
-        <Link to="/">Pre-Owned</Link>
         <Link to="/cart">Cart ({cart.length})</Link>
       </div>
     </nav>

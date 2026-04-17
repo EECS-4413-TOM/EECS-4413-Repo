@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react"
 import { getItems, searchItems } from "../api/catalog"
 import { useCart } from "../hooks/useCart"
-import { Link, useLocation  } from "react-router-dom"
+import { Link, useLocation } from "react-router-dom"
 
 // to get the image of the game OR go to a temp image if there's none provided:
 const FALLBACK_IMAGE = "https://placehold.co/300x400?text=No+Image"
@@ -18,6 +18,7 @@ type CatalogItem = {
   total_rating?: number
   genres?: unknown
   genre?: unknown
+  involved_companies?: string
 }
 
 function getImage(item: CatalogItem) {
@@ -90,32 +91,37 @@ function formatGenres(item: CatalogItem) {
   return "Unknown"
 }
 
+function normalizeImage(item: any) {
+  const coverId = item.cover?.image_id
+  const coverUrl = item.cover?.url
+
+  if (item.cover_url) return item.cover_url
+  if (coverUrl) return coverUrl.startsWith("//") ? `https:${coverUrl}` : coverUrl
+  if (coverId) return `https://images.igdb.com/igdb/image/upload/t_cover_big/${coverId}.jpg`
+
+  return FALLBACK_IMAGE
+}
+
 export default function CatalogPage() {
   const [items, setItems] = useState<CatalogItem[]>([])
   const [loading, setLoading] = useState(false)
   const [hasMore, setHasMore] = useState(true)
-
   const [page, setPage] = useState(1)
   const [limit] = useState(12)
-
-  //const [category, setCategory] = useState("")
-  //const [brand, setBrand] = useState("")
+  const [category, setCategory] = useState("")
+  const [brand, setBrand] = useState("")
   const [search, setSearch] = useState("")
-  //const [sortBy, setSortBy] = useState("")
- // const [order, setOrder] = useState("asc")
-
-
-
+  const [sortBy, setSortBy] = useState("")
+  const [order, setOrder] = useState("asc")
   const { addToCart } = useCart()
   const location = useLocation()
 
   // fix the issue with searchbar interfering when clicking home
   useEffect(() => {
-  setSearch("")
-  setPage(1)
-  setItems([])
-  setHasMore(true)
-}, [location.key])
+    setPage(1)
+    setItems([])
+    setHasMore(true)
+  }, [category, brand, sortBy, order])
 
   // debounce API calls (prevents spam requests)
   useEffect(() => {
@@ -124,7 +130,7 @@ export default function CatalogPage() {
     }, 300)
 
     return () => clearTimeout(t)
-  }, [page, search])
+  }, [page, search, category, brand, sortBy, order])
 
   const lastCallRef = useRef(0)
 
@@ -149,12 +155,12 @@ export default function CatalogPage() {
   }
 
   useEffect(() => {
-  window.addEventListener("scroll", handleScroll)
+    window.addEventListener("scroll", handleScroll)
 
-  return () => {
-    window.removeEventListener("scroll", handleScroll)
-  }
-}, [loading, hasMore, search])
+    return () => {
+      window.removeEventListener("scroll", handleScroll)
+    }
+  }, [loading, hasMore, search])
 
   async function loadItems() {
     if (loading) return   // prevent multiple simultaneous loads
@@ -171,7 +177,11 @@ export default function CatalogPage() {
         data = await getItems({
           search,
           limit,
-          page
+          page,
+          category,
+          brand,
+          sortBy,
+          order
         })
       }
 
@@ -234,6 +244,49 @@ export default function CatalogPage() {
         />
       </div>
 
+      <div className="catalog-filters">
+
+        {/* CATEGORY */}
+        <select
+          value={sortBy ? `${sortBy}-${order}` : "none"}
+          onChange={(e) => {
+            if (e.target.value === "none") {
+              setSortBy("")
+              setOrder("asc")
+              setPage(1)
+              setItems([])
+              setHasMore(true)
+              return
+            }
+
+            const [field, ord] = e.target.value.split("-")
+            setSortBy(field)
+            setOrder(ord)
+          }}
+        >
+          <option value="none">Sort By</option>
+
+          <option value="price-asc">Price (Low → High)</option>
+          <option value="price-desc">Price (High → Low)</option>
+
+          <option value="rating-desc">Rating (High → Low)</option>
+          <option value="rating-asc">Rating (Low → High)</option>
+
+          <option value="involved_companies-asc">Company (A–Z)</option>
+          <option value="involved_companies-desc">Company (Z–A)</option>
+        </select>
+
+        <button onClick={() => {
+          setCategory("")
+          setBrand("")
+          setSortBy("")
+          setOrder("asc")
+        }}>
+          Reset Filters
+        </button>
+
+      </div>
+
       {/* EMPTY STATE */}
       {!loading && items.length === 0 && (
         <p>No games found</p>
@@ -245,41 +298,52 @@ export default function CatalogPage() {
 
           // make all the cards link to the product detail page for that item:
           <Link to={`/product/${item.id}`} key={item.id} style={{ textDecoration: "none", color: "inherit" }}>
-          <div className="product-card" key={item.id}>
-            <img
-              src={getImage(item)}
-              alt={item.name || "Game"}
-              onError={(e) => (e.currentTarget.src = FALLBACK_IMAGE)}
-            />
+            <div className="product-card" key={item.id}>
+              <img
+                src={getImage(item)}
+                alt={item.name || "Game"}
+                onError={(e) => (e.currentTarget.src = FALLBACK_IMAGE)}
+              />
 
-            <h3>{item.name || "Unnamed Game"}</h3>
+              <h3>{item.name || "Unnamed Game"}</h3>
+              <p><b>
+                {typeof item.price === "number"
+                  ? `$${item.price.toFixed(2)}`
+                  : `$${item.price ?? "N/A"}`}
+              </b>
+              </p>
+              <p>⭐ <b>{formatRating(item)} / 100</b></p>
+              <p><b>{formatGenres(item)}</b></p>
+              <p>
+                <b>Company:</b> {item.involved_companies || "Company is Unknown"}
+              </p>
 
-            <p>⭐ {formatRating(item)}</p>
-            <p>{formatGenres(item)}</p>
-
-            <button
-              type="button"
-              onClick={() =>
-                addToCart({
-                  id: item.id,
-                  title: item.name ?? "Unnamed Game",
-                  price: typeof item.price === "number" ? item.price : 0,
-                  image: getImage(item),
-                })
-              }
-            >
-              Add to Cart
-            </button>
-          </div>
+              <button
+                type="button"
+                onClick={() =>
+                  addToCart({
+                    id: item.id,
+                    title: item.name ?? "Unnamed Game",
+                    price: typeof item.price === "number" ? item.price : 0,
+                    image: normalizeImage(item),
+                  })
+                }
+              >
+                Add to Cart
+              </button>
+            </div>
           </Link>
         ))}
       </div>
 
-      {loading && (
-        <p style={{ textAlign: "center", margin: "20px" }}>
-          Loading more games...
-        </p>
+      {loading && items.length === 0 && (
+        <div className="product-grid">
+          {[...Array(12)].map((_, i) => (
+            <div className="product-card skeleton" key={i}></div>
+          ))}
+        </div>
       )}
+
     </div>
   )
 }
