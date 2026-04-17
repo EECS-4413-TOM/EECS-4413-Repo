@@ -6,6 +6,11 @@ export type RegisterBody = {
   password: string;
   first_name: string;
   last_name: string;
+  street: string;
+  province: string;
+  country: string;
+  zip: string;
+  phone: string;
 };
 
 export async function register(data: RegisterBody): Promise<User> {

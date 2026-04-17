@@ -11,6 +11,21 @@ function apiErrorMessage(err: unknown): string {
   return "Registration failed. Please try again.";
 }
 
+/** Digits only — used to require exactly 10 digits for phone. */
+function phoneDigitsOnly(value: string): string {
+  return value.replace(/\D/g, "");
+}
+
+/**
+ * Canadian postal code: 6 characters, alternating letter / digit (e.g. K1A0B1 or K1A 0B1).
+ * Returns normalized form (no spaces, uppercase) or empty if invalid length after stripping spaces.
+ */
+function normalizeCanadianPostalCode(value: string): string {
+  return value.replace(/\s/g, "").toUpperCase();
+}
+
+const CANADIAN_POSTAL_CODE = /^[A-Z]\d[A-Z]\d[A-Z]\d$/;
+
 export default function RegisterPage() {
   const navigate = useNavigate();
   const {register} = useAuth();
@@ -19,6 +34,11 @@ export default function RegisterPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [street, setStreet] = useState("");
+  const [province, setProvince] = useState("");
+  const [country, setCountry] = useState("");
+  const [zip, setZip] = useState("");
+  const [phone, setPhone] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -31,6 +51,24 @@ export default function RegisterPage() {
       return;
     }
 
+    const phoneDigits = phoneDigitsOnly(phone);
+    if (phoneDigits.length !== 10) {
+      setError("Phone number must be exactly 10 digits.");
+      return;
+    }
+
+    const postalNormalized = normalizeCanadianPostalCode(zip);
+    if (postalNormalized.length !== 6) {
+      setError("Postal code must be 6 characters (spaces optional).");
+      return;
+    }
+    if (!CANADIAN_POSTAL_CODE.test(postalNormalized)) {
+      setError(
+        "Postal code must match Canadian format: letter, number, letter, number, letter, number (e.g. K1A0B1)."
+      );
+      return;
+    }
+
     setLoading(true);
     try {
       await register({
@@ -38,6 +76,11 @@ export default function RegisterPage() {
         password,
         first_name: firstName.trim(),
         last_name: lastName.trim(),
+        street: street.trim(),
+        province: province.trim(),
+        country: country.trim(),
+        zip: postalNormalized,
+        phone: phoneDigits,
       });
       navigate("/");
     } catch (err: unknown) {
@@ -222,6 +265,146 @@ export default function RegisterPage() {
               onChange={(e) => setConfirmPassword(e.target.value)}
               required
               autoComplete="new-password"
+              style={{
+                width: "100%",
+                padding: "12px 14px",
+                borderRadius: "10px",
+                border: "1px solid #e0e0e0",
+                backgroundColor: "#fafafa",
+                outline: "none",
+                fontSize: "14px",
+              }}
+            />
+          </div>
+          <div style={{ marginBottom: "16px" }}>
+            <label
+              style={{
+                display: "block",
+                marginBottom: "6px",
+                fontSize: "14px",
+                fontWeight: 500,
+              }}
+            >
+              Street
+            </label>
+            <input
+              type="text"
+              value={street}
+              onChange={(e) => setStreet(e.target.value)}
+              required
+              autoComplete="street-address"
+              style={{
+                width: "100%",
+                padding: "12px 14px",
+                borderRadius: "10px",
+                border: "1px solid #e0e0e0",
+                backgroundColor: "#fafafa",
+                outline: "none",
+                fontSize: "14px",
+              }}
+            />
+          </div>
+          <div style={{ marginBottom: "16px" }}>
+            <label
+              style={{
+                display: "block",
+                marginBottom: "6px",
+                fontSize: "14px",
+                fontWeight: 500,
+              }}
+            >
+              Province
+            </label>
+            <input
+              type="text"
+              value={province}
+              onChange={(e) => setProvince(e.target.value)}
+              required
+              autoComplete="address-level1"
+              style={{
+                width: "100%",
+                padding: "12px 14px",
+                borderRadius: "10px",
+                border: "1px solid #e0e0e0",
+                backgroundColor: "#fafafa",
+                outline: "none",
+                fontSize: "14px",
+              }}
+            />
+          </div>
+          <div style={{ marginBottom: "16px" }}>
+            <label
+              style={{
+                display: "block",
+                marginBottom: "6px",
+                fontSize: "14px",
+                fontWeight: 500,
+              }}
+            >
+              Country
+            </label>
+            <input
+              type="text"
+              value={country}
+              onChange={(e) => setCountry(e.target.value)}
+              required
+              autoComplete="country-name"
+              style={{
+                width: "100%",
+                padding: "12px 14px",
+                borderRadius: "10px",
+                border: "1px solid #e0e0e0",
+                backgroundColor: "#fafafa",
+                outline: "none",
+                fontSize: "14px",
+              }}
+            />
+          </div>
+          <div style={{ marginBottom: "16px" }}>
+            <label
+              style={{
+                display: "block",
+                marginBottom: "6px",
+                fontSize: "14px",
+                fontWeight: 500,
+              }}
+            >
+              ZIP / postal code
+            </label>
+            <input
+              type="text"
+              value={zip}
+              onChange={(e) => setZip(e.target.value)}
+              required
+              autoComplete="postal-code"
+              style={{
+                width: "100%",
+                padding: "12px 14px",
+                borderRadius: "10px",
+                border: "1px solid #e0e0e0",
+                backgroundColor: "#fafafa",
+                outline: "none",
+                fontSize: "14px",
+              }}
+            />
+          </div>
+          <div style={{ marginBottom: "16px" }}>
+            <label
+              style={{
+                display: "block",
+                marginBottom: "6px",
+                fontSize: "14px",
+                fontWeight: 500,
+              }}
+            >
+              Phone number
+            </label>
+            <input
+              type="tel"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              required
+              autoComplete="tel"
               style={{
                 width: "100%",
                 padding: "12px 14px",
