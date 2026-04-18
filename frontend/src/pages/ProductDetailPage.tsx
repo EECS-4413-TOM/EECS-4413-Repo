@@ -189,7 +189,7 @@ export default function ProductDetailPage() {
                 className="cart-popup-content"
                 onClick={(e) => e.stopPropagation()}
               >
-                <h3>✅ Added to Cart</h3>
+                <h3>Added to Cart</h3>
                 <p>{item.name}</p>
 
                 <div className="cart-popup-actions">
