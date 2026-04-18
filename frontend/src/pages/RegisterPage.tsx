@@ -10,16 +10,11 @@ function apiErrorMessage(err: unknown): string {
   }
   return "Registration failed. Please try again.";
 }
-
-/** Digits only — used to require exactly 10 digits for phone. */
+//Checks phone number fits proper amount of digits and that postal code fits proper format
 function phoneDigitsOnly(value: string): string {
   return value.replace(/\D/g, "");
 }
 
-/**
- * Canadian postal code: 6 characters, alternating letter / digit (e.g. K1A0B1 or K1A 0B1).
- * Returns normalized form (no spaces, uppercase) or empty if invalid length after stripping spaces.
- */
 function normalizeCanadianPostalCode(value: string): string {
   return value.replace(/\s/g, "").toUpperCase();
 }
@@ -59,12 +54,12 @@ export default function RegisterPage() {
 
     const postalNormalized = normalizeCanadianPostalCode(zip);
     if (postalNormalized.length !== 6) {
-      setError("Postal code must be 6 characters (spaces optional).");
+      setError("Postal code must be 6 characters.");
       return;
     }
     if (!CANADIAN_POSTAL_CODE.test(postalNormalized)) {
       setError(
-        "Postal code must match Canadian format: letter, number, letter, number, letter, number (e.g. K1A0B1)."
+        "Postal code must be Canadian : letter, number, letter, number, letter, number (e.g. K1A0B1)."
       );
       return;
     }

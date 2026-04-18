@@ -1,5 +1,5 @@
 import apiClient from "./client";
-import type { Order } from "../types";
+import type { Item, Order } from "../types";
 
 /**
  * getSalesHistory
@@ -23,8 +23,8 @@ export async function getSalesHistory(): Promise<Order[]> {
  * @returns Promise<Item[]>
  */
 export async function getInventory(): Promise<unknown[]> {
-  // TODO: return (await apiClient.get("/admin/inventory")).data
-  throw new Error("Not implemented");
+  const res = await apiClient.get<Item[]>("/admin/inventory");
+  return res.data;
 }
 
 /**
