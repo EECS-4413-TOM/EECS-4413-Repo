@@ -11,20 +11,30 @@
  * @param data - { shipping_address?, credit_card_number, credit_card_expiry, credit_card_cvv }
  * @returns Promise<Order>
  */
-export async function checkout(_data: unknown): Promise<unknown> {
-  // TODO: return (await apiClient.post("/orders/checkout", data)).data
-  throw new Error("Not implemented");
+
+import apiClient from "./client";
+import type { Order } from "../types";
+
+/**
+ * Checkout cart and create order
+ */
+export async function checkout(data: {
+  shipping_address?: string
+  credit_card_number: string
+  credit_card_expiry: string
+  credit_card_cvv: string
+}): Promise<Order> {
+  const { data: order } = await apiClient.post<Order>(
+    "/orders/checkout",
+    data
+  )
+  return order
 }
 
 /**
- * getOrders
- *
- * Sends a GET request to /orders to retrieve the user's purchase history.
- * Requires authentication.
- *
- * @returns Promise<Order[]>
+ * Get user's order history
  */
-export async function getOrders(): Promise<unknown[]> {
-  // TODO: return (await apiClient.get("/orders")).data
-  throw new Error("Not implemented");
+export async function getOrders(): Promise<Order[]> {
+  const { data } = await apiClient.get<Order[]>("/orders")
+  return data
 }
