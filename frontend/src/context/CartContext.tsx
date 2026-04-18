@@ -1,110 +1,191 @@
-// TODO: Import createContext, useContext, useState, useEffect, ReactNode from "react"
-// TODO: Import * as cartApi from "../api/cart"
-// TODO: Import Cart, CartItem types from "../types"
-// TODO: Import useAuth from "../hooks/useAuth"
+import React, {
+  createContext,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react"
+import * as cartApi from "../api/cart"
+import { useAuth } from "../hooks/useAuth"
 
-/**
- * CartContext
- *
- * Provides global shopping cart state to the entire app.
- * Syncs with the backend API whenever the user is authenticated.
- *
- * Context value shape:
- *   cart         — Cart object with items array, or null if not loaded
- *   itemCount    — total number of units across all cart items
- *   total        — sum of (item.price * quantity) for all cart items
- *   addToCart(itemId, quantity) — calls cartApi.addToCart(), refreshes cart
- *   updateQuantity(itemId, qty) — calls cartApi.updateCartItem(), refreshes cart
- *   removeItem(itemId)          — calls cartApi.removeFromCart(), refreshes cart
- *   clearCart()                 — locally resets cart to empty (after checkout)
- *   refreshCart()               — re-fetches cart from backend
- */
+const FALLBACK_IMAGE = "https://placehold.co/300x400?text=No+Image"
 
-// TODO: Define CartContextType interface with the shape above
-
-// TODO: const CartContext = createContext<CartContextType | null>(null)
-
-
-/**
- * CartProvider
- *
- * Steps to implement:
- * 1. useState for cart (Cart | null), initialized to null
- * 2. useEffect: when isAuthenticated changes to true, call refreshCart()
- *    When logged out, reset cart to null
- * 3. refreshCart(): call cartApi.getCart(), set cart state
- * 4. Derive itemCount and total from cart.items in useMemo or inline
- * 5. addToCart, updateQuantity, removeItem: call API, then refreshCart()
- * 6. Return <CartContext.Provider value={{...}}>{children}</CartContext.Provider>
- */
-
-
-import React, { createContext, useState } from "react";
-
-interface CartItem {
-  id: number;
-  title: string;
-  price: number;
-  image: string;
-  quantity: number;
+export interface CartLine {
+  /** Catalog item id (same id used for PUT/DELETE /cart/items/{item_id}) */
+  id: number
+  title: string
+  price: number
+  image: string
+  quantity: number
 }
 
 interface CartContextType {
-  cart: CartItem[];
-  addToCart: (item: Omit<CartItem, "quantity">) => void;
-  updateQuantity: (id: number, quantity: number) => void;
-  removeFromCart: (id: number) => void;
-  total: number;
+  cart: CartLine[]
+  addToCart: (item: Omit<CartLine, "quantity">, quantity?: number) => Promise<void>
+  updateQuantity: (itemId: number, quantity: number) => Promise<void>
+  removeFromCart: (itemId: number) => Promise<void>
+  clearCart: () => void
+  /** Re-fetch cart from API when logged in; returns line count (or local guest count). */
+  refreshCart: () => Promise<number>
+  total: number
 }
 
-export const CartContext = createContext<CartContextType | null>(null);
+export const CartContext = createContext<CartContextType | null>(null)
+
+function mapServerCart(res: cartApi.CartResponse): CartLine[] {
+  return res.items.map((line) => ({
+    id: line.item_id,
+    title: line.item.name,
+    price: line.item.price ?? 0,
+    image: line.item.cover_url || FALLBACK_IMAGE,
+    quantity: line.quantity,
+  }))
+}
 
 export function CartProvider({ children }: { children: React.ReactNode }) {
+  const { user, loading: authLoading } = useAuth()
+  const [cart, setCart] = useState<CartLine[]>([])
+  const cartRef = useRef(cart)
+  cartRef.current = cart
 
-  const [cart, setCart] = useState<CartItem[]>([]);
-  function addToCart(item: Omit<CartItem, "quantity">) {
-    setCart(prev => {
-      const existing = prev.find(i => i.id === item.id);
+  const wasAuthenticatedRef = useRef(false)
 
-      if (existing) {
-        return prev.map(i =>
-          i.id === item.id
-            ? { ...i, quantity: i.quantity + 1 }
-            : i
-        );
-      }
+  const refreshCart = useCallback(async (): Promise<number> => {
+    if (!user?.id) {
+      return cartRef.current.length
+    }
+    try {
+      const res = await cartApi.getCart()
+      const mapped = mapServerCart(res)
+      setCart(mapped)
+      return mapped.length
+    } catch (e) {
+      console.error("Failed to load cart:", e)
+      return 0
+    }
+  }, [user?.id])
 
-      return [...prev, { ...item, quantity: 1 }];
-    });
-  }
+  useEffect(() => {
+    if (authLoading) return
 
-  function removeFromCart(id: number) {
-    setCart(prev => prev.filter(i => i.id !== id));
-  }
-
-  // update the quantity of the item 
-  function updateQuantity(id: number, quantity: number) {
-    if (quantity <= 0) {
-      removeFromCart(id);
-      return;
+    if (!user?.id) {
+      wasAuthenticatedRef.current = false
+      return
     }
 
-    setCart(prev =>
-      prev.map(i =>
-        i.id === id
-          ? { ...i, quantity }
-          : i
-      )
-    );
-  }
-    
-  // total cost of items
-  const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+    const justLoggedIn = !wasAuthenticatedRef.current
+    wasAuthenticatedRef.current = true
 
+    ;(async () => {
+      try {
+        if (justLoggedIn && cartRef.current.length > 0) {
+          for (const line of cartRef.current) {
+            await cartApi.addToCartApi(line.id, line.quantity)
+          }
+        }
+        const res = await cartApi.getCart()
+        setCart(mapServerCart(res))
+      } catch (e) {
+        console.error("Cart sync failed:", e)
+      }
+    })()
+  }, [user?.id, authLoading])
+
+  useEffect(() => {
+    if (!authLoading && !user) {
+      setCart([])
+    }
+  }, [user, authLoading])
+
+  async function addToCart(
+    item: Omit<CartLine, "quantity">,
+    quantity = 1
+  ): Promise<void> {
+    if (user?.id) {
+      try {
+        await cartApi.addToCartApi(item.id, quantity)
+        const res = await cartApi.getCart()
+        setCart(mapServerCart(res))
+      } catch (e) {
+        console.error("addToCart failed:", e)
+        throw e
+      }
+      return
+    }
+
+    setCart((prev) => {
+      const existing = prev.find((i) => i.id === item.id)
+      if (existing) {
+        return prev.map((i) =>
+          i.id === item.id
+            ? { ...i, quantity: i.quantity + quantity }
+            : i
+        )
+      }
+      return [...prev, { ...item, quantity }]
+    })
+  }
+
+  async function updateQuantity(itemId: number, quantity: number): Promise<void> {
+    if (user?.id) {
+      try {
+        if (quantity <= 0) {
+          await cartApi.removeFromCartApi(itemId)
+        } else {
+          await cartApi.updateCartItemApi(itemId, quantity)
+        }
+        const res = await cartApi.getCart()
+        setCart(mapServerCart(res))
+      } catch (e) {
+        console.error("updateQuantity failed:", e)
+        throw e
+      }
+      return
+    }
+
+    if (quantity <= 0) {
+      setCart((prev) => prev.filter((i) => i.id !== itemId))
+      return
+    }
+    setCart((prev) =>
+      prev.map((i) => (i.id === itemId ? { ...i, quantity } : i))
+    )
+  }
+
+  async function removeFromCart(itemId: number): Promise<void> {
+    if (user?.id) {
+      try {
+        await cartApi.removeFromCartApi(itemId)
+        const res = await cartApi.getCart()
+        setCart(mapServerCart(res))
+      } catch (e) {
+        console.error("removeFromCart failed:", e)
+        throw e
+      }
+      return
+    }
+    setCart((prev) => prev.filter((i) => i.id !== itemId))
+  }
+
+  function clearCart(): void {
+    setCart([])
+  }
+
+  const total = cart.reduce((sum, line) => sum + line.price * line.quantity, 0)
 
   return (
-    <CartContext.Provider value={{ cart, addToCart, removeFromCart, updateQuantity, total }}>
+    <CartContext.Provider
+      value={{
+        cart,
+        addToCart,
+        updateQuantity,
+        removeFromCart,
+        clearCart,
+        refreshCart,
+        total,
+      }}
+    >
       {children}
     </CartContext.Provider>
-  );
+  )
 }

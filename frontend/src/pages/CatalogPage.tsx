@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react"
 import { getItems, searchItems } from "../api/catalog"
 import { useCart } from "../hooks/useCart"
-import { Link, useLocation } from "react-router-dom"
+import { Link } from "react-router-dom"
 
 // to get the image of the game OR go to a temp image if there's none provided:
 const FALLBACK_IMAGE = "https://placehold.co/300x400?text=No+Image"
@@ -310,7 +310,7 @@ export default function CatalogPage() {
                 type="button"
                 disabled={isOutOfStock(item)}
                 onClick={() =>
-                  addToCart({
+                  void addToCart({
                     id: item.id,
                     title: item.name ?? "Unnamed Game",
                     price: typeof item.price === "number" ? item.price : 0,
