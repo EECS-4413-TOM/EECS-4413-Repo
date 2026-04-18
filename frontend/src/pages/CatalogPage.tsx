@@ -217,7 +217,7 @@ export default function CatalogPage() {
   }
 
   return (
-    <div>
+    <div className="catalog-page">
 
       <section className="hero">
         <h2>Welcome to Our Store</h2>

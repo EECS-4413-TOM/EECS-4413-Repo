@@ -97,6 +97,19 @@ body {
   width: 100%;
 }
 
+/* so cards can all be same size also lmk if this breaks anything - thor */
+.catalog-page .product-card {
+  min-height: 650px;
+  max-height: 650px;
+  max-width: 300px;
+  display: flex;
+  flex-direction: column;
+}
+
+.catalog-page .product-card button {
+  margin-top: auto;
+}
+
 .product-price {
   color: #7ae759;
   font-weight: bold;
