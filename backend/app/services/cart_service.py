@@ -93,7 +93,7 @@ class CartService:
         )
         self.cart_repo.update(cart_item)
 
-        return self.get_or_create_cart(user_id)
+        return self.get_or_create_cart(user_id, session_id)
 
     def remove_item(self, user_id: int, session_id: str | None, item_id: int ):
 
@@ -116,7 +116,7 @@ class CartService:
         )
         self.cart_repo.update(cart)
 
-        return self.get_or_create_cart(user_id)
+        return self.get_or_create_cart(user_id, session_id)
 
     def clear(self, user_id: int, session_id: str) -> None:
 

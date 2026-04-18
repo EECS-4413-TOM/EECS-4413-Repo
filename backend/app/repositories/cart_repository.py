@@ -1,9 +1,5 @@
 from __future__ import annotations
 
-# TODO: Import Session from sqlalchemy.orm
-# TODO: Import ShoppingCart, CartItem from app.models.cart
-# TODO: Import BaseRepository from app.repositories.base_repository
-
 
 from sqlalchemy.orm import Session
 from sqlalchemy import or_

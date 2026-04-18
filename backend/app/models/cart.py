@@ -1,8 +1,5 @@
 from __future__ import annotations
 
-# TODO: Import Column types from sqlalchemy (Integer, ForeignKey)
-# TODO: Import relationship from sqlalchemy.orm
-# TODO: Import Base from app.database
 
 from sqlalchemy import Column, Integer, String, Float, ForeignKey
 from app.database import Base

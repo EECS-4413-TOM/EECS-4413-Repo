@@ -2,12 +2,6 @@ from __future__ import annotations
 
 from sqlalchemy.orm import Session
 
-# TODO: Import Generic, TypeVar, Type from typing
-# TODO: Import Session from sqlalchemy.orm
-# TODO: Import Base from app.database
-
-# ModelType = TypeVar("ModelType", bound=Base)
-
 
 class BaseRepository:
     """
