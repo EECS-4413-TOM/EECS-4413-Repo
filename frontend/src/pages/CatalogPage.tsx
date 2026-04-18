@@ -6,7 +6,7 @@ import { Link } from "react-router-dom"
 // to get the image of the game OR go to a temp image if there's none provided:
 const FALLBACK_IMAGE = "https://placehold.co/300x400?text=No+Image"
 
-/** Loose shape for catalog / IGDB-backed items */
+/* Loose shape for catalog / IGDB-backed items */
 type CatalogItem = {
   id: number
   name?: string

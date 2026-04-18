@@ -5,13 +5,6 @@ import { checkout } from "../api/orders"
 import { useAuth } from "../hooks/useAuth"
 import { useCart } from "../hooks/useCart"
 
-/**
- * POST /api/orders/checkout body (backend CheckoutRequest):
- *   shipping_address?: string | null
- *   credit_card_number: string
- *   credit_card_expiry: string
- *   credit_card_cvv: string
- */
 export default function CheckoutPage() {
   const { user, loading: authLoading } = useAuth()
   const navigate = useNavigate()
