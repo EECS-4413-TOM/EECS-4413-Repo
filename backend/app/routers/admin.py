@@ -12,6 +12,7 @@ from app.models.item import Item
 from app.repositories.item_repository import ItemRepository
 from app.repositories.user_repository import UserRepository
 from app.services.order_service import OrderService
+from app.services.user_admin_service import delete_user_as_admin
 
 router = APIRouter()
 
@@ -105,3 +106,17 @@ def get_users(admin: User = Depends(require_admin), db: Session = Depends(get_db
     """
     repo = UserRepository(db)
     return repo.get_all()
+
+
+@router.delete("/users/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_user(
+    user_id: int,
+    admin: User = Depends(require_admin),
+    db: Session = Depends(get_db),
+):
+    """
+    DELETE /api/admin/users/{user_id}
+    Requires admin. Blocks self-delete, deleting the only admin, and users with orders.
+    Removes linked shopping cart and orphaned address row when safe.
+    """
+    delete_user_as_admin(db, admin, user_id)
