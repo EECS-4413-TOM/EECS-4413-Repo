@@ -103,7 +103,7 @@ export default function CheckoutPage() {
   }
 
   return (
-    <div className="catalog-container">
+    <div className="catalog-container checkout-container">
       <h1 className="catalog-title">Checkout</h1>
 
       <div className="product-card" style={{ maxWidth: "500px" }}>

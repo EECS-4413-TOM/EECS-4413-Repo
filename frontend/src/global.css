@@ -503,6 +503,8 @@ body {
   opacity: 0.9;
 }
 
+
+
 .continue-btn {
   width: 100%;
   margin-top: 10px;
@@ -513,6 +515,15 @@ body {
   cursor: pointer;
   border-radius: 6px;
 }
+
+.checkout-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  width: 100%;
+}
+
 
 /* catalog filters */
 .catalog-filters {
@@ -588,7 +599,7 @@ body {
   align-items: center;
 }
 
-/* override card width ONLY in profile */
+/* override card width */
 .profile-card {
   width: 100%;
   max-width: 500px;
@@ -611,7 +622,7 @@ body {
   background: #fff;
 }
 
-/* Profile buttons: avoid global .product-card button { width:100% } stacking into one black bar */
+/* profile buttons */
 .profile-card .profile-form-actions {
   display: flex;
   flex-wrap: wrap;
