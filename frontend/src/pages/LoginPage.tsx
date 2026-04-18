@@ -6,7 +6,6 @@ export default function LoginPage() {
   const { login } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   async function handleSubmit(e: React.FormEvent) {
@@ -16,8 +15,7 @@ export default function LoginPage() {
     try {
       await login({ email, password});
       navigate("/");
-    } catch (err: any) {
-      
+    } catch {
       setError("Invalid email or password");
     } finally {
       setLoading(false);
@@ -126,40 +124,7 @@ export default function LoginPage() {
               }}
             />
           </div>
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              marginBottom: "24px",
-              fontSize: "14px",
-            }}
-          >
-            <label style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-              <input
-                type="checkbox"
-                checked={rememberMe}
-                onChange={(e) => setRememberMe(e.target.checked)}
-              />
-              <span>Remember Me</span>
-            </label>
-            <button
-              type="button"
-              style={{
-                border: "none",
-                background: "transparent",
-                color: "#f44336",
-                cursor: "pointer",
-                textDecoration: "none",
-                padding: 0,
-                fontSize: "14px",
-              }}
-              // Reset pasword page when thats done
-              onClick={() => alert("Forgot password flow not implemented yet")}
-            >
-              Forgot your password?
-            </button>
-          </div>
+          
           <button
             type="submit"
             disabled={loading}
