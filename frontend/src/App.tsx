@@ -18,6 +18,10 @@ import SalesHistoryPage from "./pages/admin/SalesHistoryPage"
 import UsersPage from "./pages/admin/UsersPage"
 import Navbar from "./components/catalog/Navbar"
 
+// admin routing to protect regular users entering admin dash:
+
+import AdminRoute from "./components/admin/AdminRouting";
+
 
 // gonna make a simple landing page:
 
@@ -62,7 +66,7 @@ export default function App() {
       <Navbar />
 
       <Routes>
-
+        console.log(user);
       <Route path="/" element={<CatalogPage />} />
       <Route path="/product/:id" element={<ProductDetailPage />} />
       <Route path="/cart" element={<CartPage />} />
@@ -71,10 +75,13 @@ export default function App() {
       <Route path="/register" element={<RegisterPage />} />
       <Route path="/profile" element={<ProfilePage />} />
       <Route path="/order-confirmation" element={<OrderConfirmationPage />} />
-      <Route path="/admin" element={<DashboardPage />} />
-      <Route path="/admin/inventory" element={<InventoryPage />} />
-      <Route path="/admin/sales" element={<SalesHistoryPage />} />
-      <Route path="/admin/users" element={<UsersPage />} />
+
+
+
+      <Route path="/admin" element={<AdminRoute><DashboardPage /></AdminRoute>} />
+      <Route path="/admin/inventory" element={<AdminRoute><InventoryPage /></AdminRoute>} />
+      <Route path="/admin/sales" element={<AdminRoute><SalesHistoryPage /></AdminRoute>} />
+      <Route path="/admin/users" element={<AdminRoute><UsersPage /></AdminRoute>} />
       
       </Routes>
 

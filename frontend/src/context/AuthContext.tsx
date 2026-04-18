@@ -10,16 +10,19 @@ export type AuthContextType = {
   login: (data: { email: string; password: string }) => Promise<void>;
   logout: () => void;
   register: (data: authApi.RegisterBody) => Promise<void>;
+  loading: boolean;
 };
 
 export const AuthContext = createContext<AuthContextType | null>(null);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const token = localStorage.getItem(tokenStorageKey);
     if (!token) {
+      setLoading(false);
       return;
     }
 
@@ -36,8 +39,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (!cancelled) {
           setUser(null);
         }
+      } finally {
+        if (!cancelled) {
+          setLoading(false); 
       }
     }
+  }
 
     restoreSession();
 
@@ -72,6 +79,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         login,
         logout,
         register,
+        loading,
       }}
     >
       {children}

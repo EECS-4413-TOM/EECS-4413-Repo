@@ -127,7 +127,7 @@ export default function CatalogPage() {
   useEffect(() => {
     const t = setTimeout(() => {
       loadItems()
-    }, 300)
+    }, 700)
 
     return () => clearTimeout(t)
   }, [page, search, category, brand, sortBy, order])
