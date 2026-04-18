@@ -8,7 +8,6 @@ export interface Address {
   phone: string | null;
 }
 
-/** Body for PATCH-style address updates on PUT /users/me */
 export type AddressUpdate = {
   street?: string;
   city?: string;
@@ -25,7 +24,6 @@ export interface User {
   last_name: string;
   is_admin: boolean;
   address_id?: number | null;
-  /** Present when API embeds `addresses` row (e.g. GET /users/me). */
   address?: Address | null;
 }
 
