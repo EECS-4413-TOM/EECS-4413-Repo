@@ -39,7 +39,7 @@ export default function SalesHistoryPage() {
 
       <table border={1}>
         <thead>
-          <tr>
+          <tr style={{background: "rgb(107, 91, 231)", color: "#fff"}}>
             <th>Order id</th>
             <th>Customer id</th>
             <th>Date</th>

@@ -56,7 +56,7 @@ export default function InventoryPage() {
 
       <table border={1}>
         <thead>
-          <tr>
+          <tr style={{background: "rgb(107, 91, 231)", color: "#fff"}}>
             <th>id</th>
             <th>name</th>
             <th>genre</th>

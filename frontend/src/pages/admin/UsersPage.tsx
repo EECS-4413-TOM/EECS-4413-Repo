@@ -39,7 +39,7 @@ export default function UsersPage() {
 
       <table border={1}>
         <thead>
-          <tr>
+          <tr style={{background: "rgb(107, 91, 231)", color: "#fff"}}>
             <th>id</th>
             <th>email</th>
             <th>first name</th>
