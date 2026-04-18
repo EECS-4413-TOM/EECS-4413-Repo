@@ -45,5 +45,7 @@ def update_profile(data: UserUpdate, current_user: User = Depends(get_current_us
         user.last_name = data.last_name
     if data.email is not None:
         user.email = data.email
+    if data.address_id is not None:
+        user.address_id = data.address_id
     repo.update(user)
     return user

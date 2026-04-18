@@ -30,6 +30,7 @@ export default function RegisterPage() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [street, setStreet] = useState("");
+  const [city, setCity] = useState("");
   const [province, setProvince] = useState("");
   const [country, setCountry] = useState("");
   const [zip, setZip] = useState("");
@@ -71,11 +72,14 @@ export default function RegisterPage() {
         password,
         first_name: firstName.trim(),
         last_name: lastName.trim(),
-        street: street.trim(),
-        province: province.trim(),
-        country: country.trim(),
-        zip: postalNormalized,
-        phone: phoneDigits,
+        address: {
+          street: street.trim(),
+          city: city.trim(),
+          province: province.trim(),
+          country: country.trim(),
+          zip: postalNormalized,
+          phone: phoneDigits,
+        },
       });
       navigate("/");
     } catch (err: unknown) {
@@ -288,6 +292,34 @@ export default function RegisterPage() {
               onChange={(e) => setStreet(e.target.value)}
               required
               autoComplete="street-address"
+              style={{
+                width: "100%",
+                padding: "12px 14px",
+                borderRadius: "10px",
+                border: "1px solid #e0e0e0",
+                backgroundColor: "#fafafa",
+                outline: "none",
+                fontSize: "14px",
+              }}
+            />
+          </div>
+          <div style={{ marginBottom: "16px" }}>
+            <label
+              style={{
+                display: "block",
+                marginBottom: "6px",
+                fontSize: "14px",
+                fontWeight: 500,
+              }}
+            >
+              City
+            </label>
+            <input
+              type="text"
+              value={city}
+              onChange={(e) => setCity(e.target.value)}
+              required
+              autoComplete="address-level2"
               style={{
                 width: "100%",
                 padding: "12px 14px",

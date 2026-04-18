@@ -2,17 +2,20 @@ from __future__ import annotations
 
 from pydantic import BaseModel, EmailStr #BaseModel allows for the creation of Pydantic models. EmailStr allows for the validation of email addresses.
 
+from app.schemas.address import AddressCreate
+
 
 class UserCreate(BaseModel):
     """
     Request body for POST /api/auth/register.
-    All fields are required.
+    Creates an Address row first, then the User linked to it.
     """
 
     email: EmailStr
     password: str
     first_name: str
     last_name: str
+    address: AddressCreate
 
 
 class UserLogin(BaseModel):
@@ -30,9 +33,10 @@ class UserUpdate(BaseModel):
     All fields optional — only provided fields are updated.
     """
 
-    first_name: str | None = None 
+    first_name: str | None = None
     last_name: str | None = None
     email: EmailStr | None = None
+    address_id: int | None = None
 
 
 class UserResponse(BaseModel):
@@ -47,6 +51,7 @@ class UserResponse(BaseModel):
     first_name: str
     last_name: str
     is_admin: bool
+    address_id: int | None = None
 
     model_config = {"from_attributes": True}#This tells Pydantic to convert the SQLAlchemy model to a Pydantic model. This makes reading the attributes of the sqlalchemy model easier.
     #Pydantic can build UserResponse from ORM objects (like SQLAlchemy model instances), not just dicts.

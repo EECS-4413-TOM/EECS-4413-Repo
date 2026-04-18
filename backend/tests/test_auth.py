@@ -11,6 +11,14 @@ def test_register_success(client):
             "password": "password123",
             "first_name": "New",
             "last_name": "User",
+            "address": {
+                "street": "1 New St",
+                "city": "Toronto",
+                "province": "ON",
+                "country": "CA",
+                "zip": "M5V1A1",
+                "phone": "4165550100",
+            },
         },
     )
 
@@ -18,6 +26,7 @@ def test_register_success(client):
     data = res.json()
     assert data["email"] == "new@example.com"
     assert data["is_admin"] is False
+    assert data.get("address_id") is not None
 
 
 def test_register_duplicate_email(client, sample_user):
