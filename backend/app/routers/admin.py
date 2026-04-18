@@ -109,11 +109,7 @@ def get_users(admin: User = Depends(require_admin), db: Session = Depends(get_db
 
 
 @router.delete("/users/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_user(
-    user_id: int,
-    admin: User = Depends(require_admin),
-    db: Session = Depends(get_db),
-):
+def delete_user(user_id: int, admin: User = Depends(require_admin), db: Session = Depends(get_db)):
     """
     DELETE /api/admin/users/{user_id}
     Requires admin. Blocks self-delete, deleting the only admin, and users with orders.
