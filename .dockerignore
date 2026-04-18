@@ -1,0 +1,13 @@
+# Repo-root context for nginx/Dockerfile — keep build fast and lean
+.git
+.github
+**/.venv
+**/node_modules
+**/__pycache__
+**/*.pyc
+**/.pytest_cache
+**/dist
+**/*.db
+**/.env
+**/.env.*
+!.env.example

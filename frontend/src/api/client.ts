@@ -1,23 +1,20 @@
-// export default apiClient;
-
-// do as says above
-import axios from "axios"
+import axios from "axios";
 
 export const tokenStorageKey = "token";
 
+// Same-origin `/api`: Vite dev server proxies to localhost:8000; nginx proxies in production.
 const apiClient = axios.create({
-  baseURL: "http://localhost:8000/api",
-})
+  baseURL: import.meta.env.VITE_API_BASE_URL ?? "/api",
+});
 
-// attach JWT token if it exists
 apiClient.interceptors.request.use((config) => {
-  const token = localStorage.getItem("token")
+  const token = localStorage.getItem("token");
 
   if (token && config.headers) {
-    config.headers.Authorization = `Bearer ${token}`
+    config.headers.Authorization = `Bearer ${token}`;
   }
 
-  return config
-})
+  return config;
+});
 
-export default apiClient
+export default apiClient;

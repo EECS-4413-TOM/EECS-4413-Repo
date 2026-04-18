@@ -97,19 +97,6 @@ body {
   width: 100%;
 }
 
-/* so cards can all be same size also lmk if this breaks anything - thor */
-.catalog-page .product-card {
-  min-height: 650px;
-  max-height: 650px;
-  max-width: 300px;
-  display: flex;
-  flex-direction: column;
-}
-
-.catalog-page .product-card button {
-  margin-top: auto;
-}
-
 .product-price {
   color: #7ae759;
   font-weight: bold;
@@ -516,6 +503,8 @@ body {
   opacity: 0.9;
 }
 
+
+
 .continue-btn {
   width: 100%;
   margin-top: 10px;
@@ -526,6 +515,15 @@ body {
   cursor: pointer;
   border-radius: 6px;
 }
+
+.checkout-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  width: 100%;
+}
+
 
 /* catalog filters */
 .catalog-filters {
@@ -601,12 +599,10 @@ body {
   align-items: center;
 }
 
-/* all profile-page cards (info + order history) , i made it so they are all the same size with box sizing lmk if it breaks anything*/
-.profile-container .product-card {
+/* override card width */
+.profile-card {
   width: 100%;
   max-width: 500px;
-  box-sizing: border-box;
-  min-height: 220px;
 }
 
 .profile-card input {
@@ -626,7 +622,7 @@ body {
   background: #fff;
 }
 
-/* Profile buttons: avoid global .product-card button { width:100% } stacking into one black bar */
+/* profile buttons */
 .profile-card .profile-form-actions {
   display: flex;
   flex-wrap: wrap;
@@ -677,6 +673,7 @@ body {
   border-color: #7ae759;
   box-shadow: 0 0 0 2px rgba(122, 231, 89, 0.2);
 }
+
 
 /* orders layout */
 .profile-orders {
