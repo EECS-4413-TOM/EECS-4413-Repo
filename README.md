@@ -15,6 +15,12 @@ Or, you can download the ZIP from the Github by clicking "Code -> Download ZIP" 
 
 SQL scripts are located in the sql folder on github.
 
+OR:
+
+Use this link to directly access our website:
+
+https://www.tomagames.store/
+
 # TOMAGames:
 
 An online e-store built with React, FastAPI, PostgreSQL, and Nginx.
