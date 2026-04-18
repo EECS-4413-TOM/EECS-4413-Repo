@@ -588,10 +588,12 @@ body {
   align-items: center;
 }
 
-/* override card width ONLY in profile */
-.profile-card {
+/* all profile-page cards (info + order history) */
+.profile-container .product-card {
   width: 100%;
   max-width: 500px;
+  box-sizing: border-box;
+  min-height: 220px;
 }
 
 .profile-card input {
@@ -662,7 +664,6 @@ body {
   border-color: #7ae759;
   box-shadow: 0 0 0 2px rgba(122, 231, 89, 0.2);
 }
-
 
 /* orders layout */
 .profile-orders {
