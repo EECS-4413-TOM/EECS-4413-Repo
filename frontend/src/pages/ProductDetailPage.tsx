@@ -129,10 +129,10 @@ export default function ProductDetailPage() {
             {item.price != null ? `$ ${item.price.toFixed(2)}` : "Price not available"}
           </p>
 
-          <p><strong>⭐ Rating:</strong> {item.rating ? `${item.rating.toFixed(1)} / 100` : "N/A"}</p>
-          <p><strong>🎮 Genre:</strong> {formatGenres(item)}</p>
-          <p><strong>🏢 Company:</strong> {item.involved_companies || "Unknown"}</p>
-          <p><strong>📅 Release Date:</strong> {item.release_date
+          <p><strong>Rating:</strong> {item.rating ? `${item.rating.toFixed(1)} / 100` : "N/A"}</p>
+          <p><strong>Genre:</strong> {formatGenres(item)}</p>
+          <p><strong>Company:</strong> {item.involved_companies || "Unknown"}</p>
+          <p><strong>Release Date:</strong> {item.release_date
             ? new Date(item.release_date).toLocaleDateString()
             : "Unknown"}
           </p>
