@@ -2,28 +2,17 @@ from __future__ import annotations
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.testclient import TestClient
-from app.models.user import User
-from app.utils.security import get_current_user
 
-from fastapi.testclient import TestClient
-from app.models.user import User
-from app.utils.security import get_current_user
 from app.routers import (
+    admin,
     auth,
-    catalog,
     cart,
+    catalog,
     orders,
     users,
-    admin,
-)  # importing routers in order to use them in the app.
+)
 
 app = FastAPI(title="E-Store API", version="0.1.0")
-
-
-def test_some_protected_route():
-    response = client.get("/protected-route")
-    assert response.status_code == 200
 
 
 def configure_cors(app) -> None:
@@ -55,7 +44,7 @@ def include_routers(app) -> None:
       users   → /api/users
       admin   → /api/admin
     """
-    app.include_router(auth.router, prefix="/api/auth", tags=["auth"]) #registering routers with their /api prefix. Adding tags for the routers for better organization.
+    app.include_router(auth.router, prefix="/api/auth", tags=["auth"])
     app.include_router(catalog.router, prefix="/api/catalog", tags=["catalog"])
     app.include_router(cart.router, prefix="/api/cart", tags=["cart"])
     app.include_router(orders.router, prefix="/api/orders", tags=["orders"])
@@ -76,22 +65,3 @@ def health_check():
 
 configure_cors(app)
 include_routers(app)
-
-## TEST USER PLEASE DELETE WHEN WE DEPLOY
-
-
-"""def fake_current_user() -> User:
-    return User(
-        email="user@example.com",
-        hashed_password="haha_123",
-        id = 2,
-        first_name="string",
-        last_name="string",
-        is_admin="True"
-    )
-
-
-app.dependency_overrides[get_current_user] = fake_current_user
-
-client = TestClient(app)"""
-

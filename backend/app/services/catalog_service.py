@@ -7,7 +7,6 @@ from app.repositories.item_repository import ItemRepository
 from app.utils.igdb_client import IGDBClient
 from app.models.item import Item
 from datetime import datetime, timezone
-from app.database import SessionLocal
 
 import random
 
@@ -18,9 +17,8 @@ igdb = IGDBClient()
 
 class CatalogService:
 
-    def __init__(self, db: Session | None):
-        db = SessionLocal()
-        self.item_repo = ItemRepository(db) if db else None
+    def __init__(self, db: Session):
+        self.item_repo = ItemRepository(db)
 
     async def import_top_games(self):
         top_games = await igdb.get_top_games()
@@ -154,8 +152,6 @@ class CatalogService:
                     else None
                 ),
             )
-            saved_items.append(existing)
-
             saved_item = self.item_repo.create(item)
 
             saved_items.append(saved_item)
