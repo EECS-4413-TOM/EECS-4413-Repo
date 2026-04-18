@@ -43,6 +43,7 @@ export default function ProfilePage() {
   const [firstName, setFirstName] = useState("")
   const [lastName, setLastName] = useState("")
   const [email, setEmail] = useState("")
+  const [address, setAddress] = useState("")
 
   const [orders, setOrders] = useState<Order[]>([])
   const [editMode, setEditMode] = useState(false)
@@ -54,6 +55,7 @@ export default function ProfilePage() {
       setFirstName(user.first_name || "")
       setLastName(user.last_name || "")
       setEmail(user.email || "")
+      setAddress(user.address || "")
     }
   }, [user])
 
@@ -77,12 +79,14 @@ export default function ProfilePage() {
       const updated = await updateProfile({
         first_name: firstName,
         last_name: lastName,
-        email
+        email,
+        
       })
 
       setFirstName(updated.first_name)
       setLastName(updated.last_name)
       setEmail(updated.email)
+      setAddress(updated.address || "")
 
       // optional: sync auth context if needed
       setEditMode(false)
@@ -95,17 +99,18 @@ export default function ProfilePage() {
   if (loading) return <div className="page-state loading">Loading...</div>
 
   return (
-    <div className = "profile-container">
+    <div className="profile-container">
 
       <h2>My Profile</h2>
 
-      {/* PROFILE SECTION */}
+      {/* profile section */}
       <div className="product-card profile-card">
         {editMode ? (
           <>
             <input value={firstName} onChange={(e) => setFirstName(e.target.value)} />
             <input value={lastName} onChange={(e) => setLastName(e.target.value)} />
             <input value={email} onChange={(e) => setEmail(e.target.value)} />
+            <input value={address} onChange={(e) => setAddress(e.target.value)} />
 
             <button onClick={handleSave}>Save</button>
             <button onClick={() => setEditMode(false)}>Cancel</button>
@@ -115,6 +120,7 @@ export default function ProfilePage() {
             <p><b>First Name:</b> {firstName}</p>
             <p><b>Last Name:</b> {lastName}</p>
             <p><b>Email:</b> {email}</p>
+            <p><b>Address:</b> {address}</p>
 
             <button onClick={() => setEditMode(true)}>Edit Profile</button>
           </>
@@ -132,7 +138,7 @@ export default function ProfilePage() {
           <p><b>Total:</b> {formatCurrency(order.total)}</p>
           <p><b>Status:</b> {order.status}</p>
 
-          <div className = "profile-orders">
+          <div className="profile-orders">
             {order.items.map((item) => (
               <p key={item.id}>
                 {item.item.name} × {item.quantity} — {formatCurrency(item.price_at_purchase)}
