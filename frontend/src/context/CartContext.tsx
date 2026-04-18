@@ -48,12 +48,10 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const cartRef = useRef(cart)
   cartRef.current = cart
 
-  const wasAuthenticatedRef = useRef(false)
+  /** Previous user id (null = guest). `undefined` = never set (initial mount). */
+  const prevUserIdRef = useRef<number | null | undefined>(undefined)
 
   const refreshCart = useCallback(async (): Promise<number> => {
-    if (!user?.id) {
-      return cartRef.current.length
-    }
     try {
       const res = await cartApi.getCart()
       const mapped = mapServerCart(res)
@@ -61,110 +59,83 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       return mapped.length
     } catch (e) {
       console.error("Failed to load cart:", e)
-      return 0
+      return cartRef.current.length
     }
-  }, [user?.id])
+  }, [])
 
   useEffect(() => {
     if (authLoading) return
 
-    if (!user?.id) {
-      wasAuthenticatedRef.current = false
-      return
-    }
-
-    const justLoggedIn = !wasAuthenticatedRef.current
-    wasAuthenticatedRef.current = true
-
     ;(async () => {
+      const uid = user?.id ?? null
+      const prevUid = prevUserIdRef.current
+
+      if (uid === null) {
+        prevUserIdRef.current = null
+        try {
+          await refreshCart()
+        } catch (e) {
+          console.error("Guest cart load failed:", e)
+        }
+        return
+      }
+
+      const guestJustBecameUser =
+        prevUid !== undefined && prevUid === null && uid !== null
+
+      prevUserIdRef.current = uid
+
       try {
-        if (justLoggedIn && cartRef.current.length > 0) {
+        if (guestJustBecameUser && cartRef.current.length > 0) {
           for (const line of cartRef.current) {
             await cartApi.addToCartApi(line.id, line.quantity)
           }
         }
-        const res = await cartApi.getCart()
-        setCart(mapServerCart(res))
+        await refreshCart()
       } catch (e) {
         console.error("Cart sync failed:", e)
       }
     })()
-  }, [user?.id, authLoading])
-
-  useEffect(() => {
-    if (!authLoading && !user) {
-      setCart([])
-    }
-  }, [user, authLoading])
+  }, [user?.id, authLoading, refreshCart])
 
   async function addToCart(
     item: Omit<CartLine, "quantity">,
     quantity = 1
   ): Promise<void> {
-    if (user?.id) {
-      try {
-        await cartApi.addToCartApi(item.id, quantity)
-        const res = await cartApi.getCart()
-        setCart(mapServerCart(res))
-      } catch (e) {
-        console.error("addToCart failed:", e)
-        throw e
-      }
-      return
+    try {
+      await cartApi.addToCartApi(item.id, quantity)
+      const res = await cartApi.getCart()
+      setCart(mapServerCart(res))
+    } catch (e) {
+      console.error("addToCart failed:", e)
+      throw e
     }
-
-    setCart((prev) => {
-      const existing = prev.find((i) => i.id === item.id)
-      if (existing) {
-        return prev.map((i) =>
-          i.id === item.id
-            ? { ...i, quantity: i.quantity + quantity }
-            : i
-        )
-      }
-      return [...prev, { ...item, quantity }]
-    })
   }
 
   async function updateQuantity(itemId: number, quantity: number): Promise<void> {
-    if (user?.id) {
-      try {
-        if (quantity <= 0) {
-          await cartApi.removeFromCartApi(itemId)
-        } else {
-          await cartApi.updateCartItemApi(itemId, quantity)
-        }
-        const res = await cartApi.getCart()
-        setCart(mapServerCart(res))
-      } catch (e) {
-        console.error("updateQuantity failed:", e)
-        throw e
+    try {
+      if (quantity <= 0) {
+        await cartApi.removeFromCartApi(itemId)
+      } else {
+        await cartApi.updateCartItemApi(itemId, quantity)
       }
-      return
+      const res = await cartApi.getCart()
+      setCart(mapServerCart(res))
+    } catch (e) {
+      console.error("updateQuantity failed:", e)
+      throw e
     }
-
-    if (quantity <= 0) {
-      setCart((prev) => prev.filter((i) => i.id !== itemId))
-      return
-    }
-    setCart((prev) =>
-      prev.map((i) => (i.id === itemId ? { ...i, quantity } : i))
-    )
   }
 
   async function removeFromCart(itemId: number): Promise<void> {
-    if (user?.id) {
-      try {
-        await cartApi.removeFromCartApi(itemId)
-        const res = await cartApi.getCart()
-        setCart(mapServerCart(res))
-      } catch (e) {
-        console.error("removeFromCart failed:", e)
-        throw e
-      }
-      return
+    try {
+      await cartApi.removeFromCartApi(itemId)
+      const res = await cartApi.getCart()
+      setCart(mapServerCart(res))
+    } catch (e) {
+      console.error("removeFromCart failed:", e)
+      throw e
     }
-    setCart((prev) => prev.filter((i) => i.id !== itemId))
   }
 
   function clearCart(): void {
