@@ -1,8 +1,3 @@
-// TypeScript interfaces that mirror the backend Pydantic response schemas.
-// Keep these in sync as you implement the backend.
-
-// TODO: Define the following interfaces:
-
 export interface User {
   id: number;
   email: string;
@@ -11,48 +6,17 @@ export interface User {
   is_admin: boolean;
 }
 
-/**
- * Item
- * Mirrors ItemResponse from backend.
- */
-
-// uncomment below for catalog to work: 
 export interface Item {
   id: number
   name: string
   description: string
-  category: string
+  genre: string
   brand: string
   price: number
   quantity: number
-  image_url: string | null
+  cover_url: string | null
 }
 
-/**
- * CartItem
- * Mirrors CartItemResponse from backend.
- * Contains the full nested Item for display purposes.
- */
-// export interface CartItem {
-//   id: number;
-//   item_id: number;
-//   quantity: number;
-//   item: Item;
-// }
-
-/**
- * Cart
- * Mirrors CartResponse from backend.
- */
-// export interface Cart {
-//   id: number;
-//   items: CartItem[];
-// }
-
-/**
- * OrderItem
- * Mirrors OrderItemResponse. Stores price_at_purchase as a historical snapshot.
- */
 export interface OrderItem {
   id: number;
   item_id: number;
@@ -61,10 +25,6 @@ export interface OrderItem {
   item: Item;
 }
 
-/**
- * Order
- * Mirrors OrderResponse from backend.
- */
 export interface Order {
   id: number;
   customer_id: number;
