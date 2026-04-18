@@ -27,7 +27,7 @@ class CartService:
             cart = self.cart_repo.get_by_session_id(session_id)
 
         if cart is None:
-            cart = ShoppingCart(user_id=user_id | None, session_id=session_id | None)
+            cart = ShoppingCart(user_id=user_id, session_id=session_id)
             cart = self.cart_repo.create(cart)
         return cart;
 
