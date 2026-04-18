@@ -46,3 +46,7 @@ export async function getUsers(): Promise<User[]> {
   const res = await apiClient.get<User[]>("/admin/users");
   return res.data;
 }
+
+export async function deleteUser(id: number): Promise<void> {
+  await apiClient.delete(`/admin/users/${id}`);
+}
