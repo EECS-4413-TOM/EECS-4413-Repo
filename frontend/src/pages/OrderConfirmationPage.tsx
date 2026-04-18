@@ -21,7 +21,7 @@
  *    - Order total
  * 3. "Continue Shopping" button → navigate("/")
  */
-import { useLocation, useNavigate, Link } from "react-router-dom"
+import { useLocation, useNavigate } from "react-router-dom"
 import { formatCurrency, formatDate } from "../utils/formatters"
 import type { Order } from "../types"
 
