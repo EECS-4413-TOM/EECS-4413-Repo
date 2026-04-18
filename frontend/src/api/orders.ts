@@ -1,5 +1,3 @@
-// TODO: Import apiClient from "./client"
-// TODO: Import Order type from "../types"
 
 /**
  * checkout

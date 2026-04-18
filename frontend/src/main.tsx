@@ -1,9 +1,4 @@
 
-// TODO: Import React from "react"
-// TODO: Import ReactDOM from "react-dom/client"
-// TODO: Import App from "./App"
-// TODO: Import BrowserRouter from "react-router-dom"
-
 import { StrictMode } from "react";
 import ReactDOM from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";

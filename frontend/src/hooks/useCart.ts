@@ -1,5 +1,4 @@
-// TODO: Import useContext from "react"
-// TODO: Import CartContext from "../context/CartContext"
+
 
 import { useContext } from "react";
 

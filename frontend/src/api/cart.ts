@@ -1,6 +1,6 @@
 import apiClient from "./client"
 
-/** Matches backend CartResponse / CartItemResponse (nested item may omit cover_url). */
+/** match backend CartResponse / CartItemResponse */
 export type ApiCartItem = {
   id: number
   item_id: number

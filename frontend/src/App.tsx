@@ -57,8 +57,6 @@ import AdminRoute from "./components/admin/AdminRouting";
  * in src/components/auth/ to guard authenticated and admin-only routes.
  */
 export default function App() {
-  // TODO: Implement routing and provider tree
-
   return (
     <AuthProvider>
     <CartProvider>
