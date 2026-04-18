@@ -1,5 +1,21 @@
 # EECS 4413 E-Commerce Project
 
+## Source Code and SQL Scripts
+
+GitHub Repository: https://github.com/EECS-4413-TOM/EECS-4413-Repo
+
+To download the source code, clone the repository:
+
+in bash:
+
+git clone https://github.com/EECS-4413-TOM/EECS-4413-Repo.git
+
+
+Or, you can download the ZIP from the Github by clicking "Code -> Download ZIP" on the repository page.
+
+SQL scripts are located in the sql folder on github.
+
+TOMAGames:
 An online e-store built with React, FastAPI, PostgreSQL, and Nginx.
 
 ## Tech Stack
