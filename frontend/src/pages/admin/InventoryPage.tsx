@@ -1,30 +1,116 @@
-// TODO: Import useState, useEffect from "react"
-// TODO: Import { getInventory, addItem, updateItem } from "../../api/admin"
-// TODO: Import Item type from "../../types"
-// TODO: Import { formatCurrency } from "../../utils/formatters"
+import {useEffect, useState} from "react";
+import {Link} from "react-router-dom";
+import {getInventory, updateItem} from "../../api/admin";
+import type {Item} from "../../types";
 
-/**
- * InventoryPage
- *
- * Admin page for managing the product catalog and stock levels.
- * URL: /admin/inventory  (admin-only)
- *
- * State:
- *   items       — Item[] fetched from API
- *   showAddForm — boolean (toggle add-item form/modal)
- *   editingItem — Item | null (item currently being edited)
- *   loading     — boolean
- *
- * Steps to implement:
- * 1. useEffect: call getInventory() on mount, set items state
- * 2. Render a table: name, category, brand, price, quantity, actions (Edit)
- * 3. "Add New Item" button → toggles showAddForm
- *    AddItemForm: name, description, category, brand, price, quantity, image_url
- *    On submit: call addItem(data), refresh inventory list
- * 4. "Edit" button on a row → opens EditItemModal pre-filled with that item's data
- *    On save: call updateItem(item.id, data), refresh inventory list
- */
+// just puts lowest id first
+function sortListById(list: Item[]) {
+  let copy = list.slice();
+  copy.sort((a, b) => a.id - b.id);
+  return copy;
+}
+
 export default function InventoryPage() {
-  // TODO: Implement component
-  return null;
+  const [items, setItems] = useState<Item[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let stillHere = true;
+
+    async function loadInventory() {
+      try {
+        const fromApi = await getInventory();
+        if (stillHere) {
+          setItems(sortListById(fromApi));
+        }
+      } catch {
+        if (stillHere) {
+          setError("Could not load inventory.");
+        }
+      } finally {
+        if (stillHere) {
+          setLoading(false);
+        }
+      }
+    }
+
+    loadInventory();
+
+    return () => {
+      stillHere = false;
+    };
+  }, []);
+
+  if (loading) {
+    return <p>Loading...</p>;
+  }
+
+  return (
+    <div>
+      <h1>Inventory</h1>
+      <p>
+        <Link to="/admin">Back to admin</Link>
+      </p>
+      {error && <p>{error}</p>}
+
+      <table border={1}>
+        <thead>
+          <tr style={{background: "rgb(107, 91, 231)", color: "#fff"}}>
+            <th>id</th>
+            <th>name</th>
+            <th>genre</th>
+            <th>brand</th>
+            <th>price</th>
+            <th>quantity</th>
+          </tr>
+        </thead>
+        <tbody>
+          {items.map((item) => (
+            <tr key={item.id}>
+              <td>{item.id}</td>
+              <td>{item.name}</td>
+              <td>{item.genre}</td>
+              <td>{item.brand}</td>
+              <td>{item.price}</td>
+              <td>
+                <form
+                  onSubmit={async (e) => {
+                    e.preventDefault();
+                    const form = e.currentTarget;
+                    const fd = new FormData(form);
+                    const qty = parseInt(String(fd.get("qty")), 10);
+                    if (isNaN(qty) || qty < 0) {
+                      return;
+                    }
+                    if (qty === item.quantity) {
+                      return;
+                    }
+                    try {
+                      setError(null);
+                      await updateItem(item.id, {quantity: qty});
+                      // grab fresh list from server so we see whats actually saved
+                      const fromApi = await getInventory();
+                      setItems(sortListById(fromApi));
+                    } catch {
+                      setError("Could not update quantity.");
+                    }
+                  }}
+                >
+                  <input
+                    key={`${item.id}-${item.quantity}`}
+                    name="qty"
+                    type="number"
+                    min={0}
+                    defaultValue={item.quantity}
+                  />{" "}
+                  <button type="submit">save</button>
+                </form>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
 }

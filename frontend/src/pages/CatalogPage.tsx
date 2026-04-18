@@ -1,12 +1,28 @@
-import React, { useState, useEffect, useRef } from "react"
+import { useState, useEffect, useRef } from "react"
 import { getItems, searchItems } from "../api/catalog"
 import { useCart } from "../hooks/useCart"
-import { Link, useLocation  } from "react-router-dom"
+import { Link } from "react-router-dom"
 
 // to get the image of the game OR go to a temp image if there's none provided:
 const FALLBACK_IMAGE = "https://placehold.co/300x400?text=No+Image"
 
-function getImage(item: any) {
+/* Loose shape for catalog / IGDB-backed items */
+type CatalogItem = {
+  id: number
+  name?: string
+  price?: number
+  cover_url?: string | null
+  quantity? : number
+  cover?: { image_id?: string }
+  screenshots?: { image_id?: string }[]
+  rating?: number
+  total_rating?: number
+  genres?: unknown
+  genre?: unknown
+  involved_companies?: string
+}
+
+function getImage(item: CatalogItem) {
   if (item.cover_url) return item.cover_url
 
   if (item.cover?.image_id) {
@@ -20,8 +36,12 @@ function getImage(item: any) {
   return FALLBACK_IMAGE
 }
 
+function isOutOfStock(item: CatalogItem) {
+  return (item.quantity ?? 0) <= 0
+}
+
 // fixing rating of games:
-function formatRating(item: any) {
+function formatRating(item: CatalogItem) {
   if (item.rating) return item.rating.toFixed(1)
 
   // IGDB sometimes uses rating_count + rating
@@ -57,14 +77,13 @@ const GENRE_MAP: Record<number, string> = {
   37: "Battle Royale"
 }
 
-function formatGenres(item: any) {
+function formatGenres(item: CatalogItem) {
   const genres = item.genres || item.genre
 
   if (!genres) return "Unknown"
 
-  // turn genre string into readable format (e.g. "{12, 14}" → "RPG, Sport")
   if (typeof genres === "string") {
-    const cleaned = genres.replace(/[{}]/g, "") // remove { }
+    const cleaned = genres.replace(/[{}]/g, "")
     const ids = cleaned.split(",").map(Number)
 
     return ids
@@ -72,45 +91,46 @@ function formatGenres(item: any) {
       .join(", ")
   }
 
-  // if no genre, return "Unknown"
   return "Unknown"
 }
 
+function normalizeImage(item: any) {
+  const coverId = item.cover?.image_id
+  const coverUrl = item.cover?.url
+
+  if (item.cover_url) return item.cover_url
+  if (coverUrl) return coverUrl.startsWith("//") ? `https:${coverUrl}` : coverUrl
+  if (coverId) return `https://images.igdb.com/igdb/image/upload/t_cover_big/${coverId}.jpg`
+
+  return FALLBACK_IMAGE
+}
+
 export default function CatalogPage() {
-  const [items, setItems] = useState<any[]>([])
+  const [items, setItems] = useState<CatalogItem[]>([])
   const [loading, setLoading] = useState(false)
   const [hasMore, setHasMore] = useState(true)
-
   const [page, setPage] = useState(1)
   const [limit] = useState(12)
-
   const [category, setCategory] = useState("")
   const [brand, setBrand] = useState("")
   const [search, setSearch] = useState("")
   const [sortBy, setSortBy] = useState("")
   const [order, setOrder] = useState("asc")
-
-
-
   const { addToCart } = useCart()
-  const location = useLocation()
 
-  // fix the issue with searchbar interfering when clicking home
-useEffect(() => {
-  setSearch("")
-  setPage(1)
-  setItems([])
-  setHasMore(true)
-}, [location.key])
+  useEffect(() => {
+    setPage(1)
+    setItems([])
+    setHasMore(true)
+  }, [category, brand, sortBy, order])
 
-  // debounce API calls (prevents spam requests)
   useEffect(() => {
     const t = setTimeout(() => {
       loadItems()
-    }, 300)
+    }, 700)
 
     return () => clearTimeout(t)
-  }, [page, category, brand, search, sortBy, order])
+  }, [page, search, category, brand, sortBy, order])
 
   const lastCallRef = useRef(0)
 
@@ -130,38 +150,37 @@ useEffect(() => {
       search.trim().length === 0
     ) {
       lastCallRef.current = now
-      setPage((prev) => prev + 1)
+      setPage((prev: number) => prev + 1)
     }
   }
 
   useEffect(() => {
-  window.addEventListener("scroll", handleScroll)
+    window.addEventListener("scroll", handleScroll)
 
-  return () => {
-    window.removeEventListener("scroll", handleScroll)
-  }
-}, [loading, hasMore, search])
+    return () => {
+      window.removeEventListener("scroll", handleScroll)
+    }
+  }, [loading, hasMore, search])
 
   async function loadItems() {
-    if (loading) return   // prevent multiple simultaneous loads
+    if (loading) return
+
     try {
       setLoading(true)
 
-      let data: any[] = []
+      let data: CatalogItem[] = []
 
-      // 🔥 IF user is searching → use IGDB-powered endpoint
       if (search.trim().length > 0) {
         data = await searchItems(search)
       } else {
-        // normal catalog (DB)
         data = await getItems({
+          search,
+          limit,
+          page,
           category,
           brand,
-          search,
           sortBy,
-          order,
-          limit,
-          page
+          order
         })
       }
 
@@ -171,16 +190,14 @@ useEffect(() => {
         return
       }
 
-      // if first page → replace
       if (page === 1) {
         setItems(data)
       } else {
-        // append for infinite scroll
-        setItems((prev) => {
+        setItems((prev: CatalogItem[]) => {
           const combined = [...prev, ...data]
 
           const unique = combined.filter(
-            (item, index, self) =>
+            (item: CatalogItem, index: number, self: CatalogItem[]) =>
               index === self.findIndex((i) => i.id === item.id)
           )
 
@@ -188,14 +205,10 @@ useEffect(() => {
         })
       }
 
-      // stop when no more data
-      if (page === 1) {
-        setHasMore(true)
-      }
+      if (page === 1) setHasMore(true)
 
-      if (data.length < limit) {
-        setHasMore(false)
-      }
+      if (data.length < limit) setHasMore(false)
+
     } catch (err) {
       console.error("Failed to load catalog:", err)
     } finally {
@@ -204,62 +217,123 @@ useEffect(() => {
   }
 
   return (
-    <div>
-      {/* HERO */}
+    <div className="catalog-page">
+
       <section className="hero">
         <h2>Welcome to Our Store</h2>
       </section>
 
-      {/* SEARCH */}
       <div className="search-bar">
         <input
           placeholder="Search games..."
           value={search}
           onChange={(e) => {
             setPage(1)
-            setItems([])      // clear the old results 
-            setHasMore(true)  // reset the infinite scrolling
+            setItems([])
+            setHasMore(true)
             setSearch(e.target.value)
           }}
         />
       </div>
 
-      {/* EMPTY STATE */}
-      {!loading && items.length === 0 && (
-        <p>No games found</p>
-      )}
+      <div className="catalog-filters">
 
-      {/* PRODUCTS */}
+        <select
+          value={sortBy ? `${sortBy}-${order}` : "none"}
+          onChange={(e) => {
+            if (e.target.value === "none") {
+              setSortBy("")
+              setOrder("asc")
+              setPage(1)
+              setItems([])
+              setHasMore(true)
+              return
+            }
+
+            const [field, ord] = e.target.value.split("-")
+            setSortBy(field)
+            setOrder(ord)
+          }}
+        >
+          <option value="none">Sort By</option>
+          <option value="price-asc">Price (Low → High)</option>
+          <option value="price-desc">Price (High → Low)</option>
+          <option value="rating-desc">Rating (High → Low)</option>
+          <option value="rating-asc">Rating (Low → High)</option>
+          <option value="involved_companies-asc">Company (A–Z)</option>
+          <option value="involved_companies-desc">Company (Z–A)</option>
+        </select>
+
+        <button onClick={() => {
+          setCategory("")
+          setBrand("")
+          setSortBy("")
+          setOrder("asc")
+        }}>
+          Reset Filters
+        </button>
+
+      </div>
+
+      {!loading && items.length === 0 && <p>No games found</p>}
+
       <div className="product-grid">
-        {items.map((item) => (
+        {items.map((item: CatalogItem) => (
 
-          // make all the cards link to the product detail page for that item:
           <Link to={`/product/${item.id}`} key={item.id} style={{ textDecoration: "none", color: "inherit" }}>
-          <div className="product-card" key={item.id}>
-            <img
-              src={getImage(item)}
-              alt={item.name || "Game"}
-              onError={(e) => (e.currentTarget.src = FALLBACK_IMAGE)}
-            />
+            <div className="product-card">
 
-            <h3>{item.name || "Unnamed Game"}</h3>
+              {isOutOfStock(item) && (
+                <div className="out-of-stock-badge">Out of Stock</div>
+              )}
 
-            <p>⭐ {formatRating(item)}</p>
-            <p>{formatGenres(item)}</p>
+              <img
+                src={getImage(item)}
+                alt={item.name || "Game"}
+                onError={(e) => (e.currentTarget.src = FALLBACK_IMAGE)}
+              />
 
-            <button onClick={() => addToCart(item)}>
-              Add to Cart
-            </button>
-          </div>
+              <h3>{item.name || "Unnamed Game"}</h3>
+
+              <p><b>
+                {typeof item.price === "number"
+                  ? `$${item.price.toFixed(2)}`
+                  : `$${item.price ?? "N/A"}`}
+              </b></p>
+
+              <p>⭐ <b>{formatRating(item)} / 100</b></p>
+              <p><b>{formatGenres(item)}</b></p>
+
+              <p><b>Company:</b> {item.involved_companies || "Company is Unknown"}</p>
+
+              <button
+                type="button"
+                disabled={isOutOfStock(item)}
+                onClick={() =>
+                  void addToCart({
+                    id: item.id,
+                    title: item.name ?? "Unnamed Game",
+                    price: typeof item.price === "number" ? item.price : 0,
+                    image: normalizeImage(item),
+                  })
+                }
+              >
+                {isOutOfStock(item) ? "Out of Stock" : "Add to Cart"}
+              </button>
+
+            </div>
           </Link>
         ))}
       </div>
 
-      {loading && (
-        <p style={{ textAlign: "center", margin: "20px" }}>
-          Loading more games...
-        </p>
+      {loading && items.length === 0 && (
+        <div className="product-grid">
+          {[...Array(12)].map((_, i) => (
+            <div className="product-card skeleton" key={i}></div>
+          ))}
+        </div>
       )}
+
     </div>
   )
 }

@@ -1,59 +1,61 @@
-// TODO: Import apiClient from "./client"
-// TODO: Import Cart type from "../types"
+import apiClient from "./client"
 
-/**
- * getCart
- *
- * Sends a GET request to /cart.
- * Returns the current user's full cart with nested item details.
- * Requires authentication (token attached by interceptor).
- *
- * @returns Promise<Cart>
- */
-export async function getCart(): Promise<unknown> {
-  // TODO: return (await apiClient.get("/cart")).data
-  throw new Error("Not implemented");
+/** match backend CartResponse / CartItemResponse */
+export type ApiCartItem = {
+  id: number
+  item_id: number
+  quantity: number
+  price: number | null
+  item: {
+    id: number
+    name: string
+    description: string
+    genre: string | null
+    brand: string | null
+    price: number | null
+    quantity: number
+    cover_url?: string | null
+  }
 }
 
-/**
- * addToCart
- *
- * Sends a POST request to /cart/items to add a product to the cart.
- * If the item already exists, the backend increments the quantity.
- *
- * @param itemId   - The product's numeric ID
- * @param quantity - Number of units to add (default 1)
- * @returns Promise<Cart> — the updated cart
- */
-export async function addToCart(_itemId: number, _quantity: number = 1): Promise<unknown> {
-  // TODO: return (await apiClient.post("/cart/items", { item_id: itemId, quantity })).data
-  throw new Error("Not implemented");
+export type CartResponse = {
+  id: number
+  items: ApiCartItem[]
+  total_price: number
 }
 
-/**
- * updateCartItem
- *
- * Sends a PUT request to /cart/items/:itemId to set an exact quantity.
- * Passing quantity=0 will remove the item from the cart.
- *
- * @param itemId   - The product's numeric ID
- * @param quantity - The new quantity to set
- * @returns Promise<Cart> — the updated cart
- */
-export async function updateCartItem(_itemId: number, _quantity: number): Promise<unknown> {
-  // TODO: return (await apiClient.put(`/cart/items/${itemId}`, { quantity })).data
-  throw new Error("Not implemented");
+export async function getCart(): Promise<CartResponse> {
+  const { data } = await apiClient.get<CartResponse>("/cart/")
+  return data
 }
 
-/**
- * removeFromCart
- *
- * Sends a DELETE request to /cart/items/:itemId to remove a product entirely.
- *
- * @param itemId - The product's numeric ID
- * @returns Promise<Cart> — the updated cart
- */
-export async function removeFromCart(_itemId: number): Promise<unknown> {
-  // TODO: return (await apiClient.delete(`/cart/items/${itemId}`)).data
-  throw new Error("Not implemented");
+export async function addToCartApi(
+  itemId: number,
+  quantity = 1
+): Promise<CartResponse> {
+  const { data } = await apiClient.post<CartResponse>("/cart/items", {
+    item_id: itemId,
+    quantity,
+  })
+  return data
+}
+
+export async function updateCartItemApi(
+  itemId: number,
+  quantity: number
+): Promise<CartResponse> {
+  const { data } = await apiClient.put<CartResponse>(
+    `/cart/items/${itemId}`,
+    { quantity }
+  )
+  return data
+}
+
+export async function removeFromCartApi(
+  itemId: number
+): Promise<CartResponse> {
+  const { data } = await apiClient.delete<CartResponse>(
+    `/cart/items/${itemId}`
+  )
+  return data
 }

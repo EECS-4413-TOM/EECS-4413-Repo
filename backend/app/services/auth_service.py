@@ -3,10 +3,12 @@ from __future__ import annotations
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 
-from app.repositories.user_repository import UserRepository   
-from app.schemas.user import UserCreate, Token 
-from app.utils.security import hash_password, verify_password, create_access_token 
+from app.models.address import Address
 from app.models.user import User
+from app.repositories.address_repository import AddressRepository
+from app.repositories.user_repository import UserRepository
+from app.schemas.user import UserCreate, Token
+from app.utils.security import create_access_token, hash_password, verify_password
 
 
 class AuthService:
@@ -22,17 +24,14 @@ class AuthService:
         """
         self.user_repo = UserRepository(db)
 
-    def register(self, data):
+    def register(self, data: UserCreate):
         """
         Create a new user account.
 
         Steps:
-        1. Call self.user_repo.get_by_email(data.email)
-           — if a user already exists, raise HTTP 400 "Email already registered"
-        2. Hash the plain-text password using hash_password()
-        3. Construct a new User model instance with hashed password and other fields
-        4. Save it via self.user_repo.create(user)
-        5. Return the created User ORM object (router will serialize via UserResponse)
+        1. Reject duplicate email.
+        2. Persist Address, then User with address_id.
+        3. Return the created User (UserResponse from router).
         """
         existing_user = self.user_repo.get_by_email(data.email)
 
@@ -42,16 +41,29 @@ class AuthService:
                 detail="Email already registered"
             )
 
+        addr_repo = AddressRepository(self.user_repo.db)
+        address_row = addr_repo.create(
+            Address(
+                street=data.address.street,
+                city=data.address.city,
+                province=data.address.province,
+                country=data.address.country,
+                zip=data.address.zip,
+                phone=data.address.phone,
+            )
+        )
 
         new_user = User(
-                email = data.email,
-                hashed_password = hash_password(data.password),
-                first_name = data.first_name,
-                last_name = data.last_name,
+            email=data.email,
+            hashed_password=hash_password(data.password),
+            first_name=data.first_name,
+            last_name=data.last_name,
+            address_id=address_row.id,
+        )
 
-            )
-
-        return self.user_repo.create(new_user)
+        created = self.user_repo.create(new_user)
+        reloaded = self.user_repo.get_by_id(created.id)
+        return reloaded if reloaded is not None else created
 
     def login(self, email: str, password: str):
         """

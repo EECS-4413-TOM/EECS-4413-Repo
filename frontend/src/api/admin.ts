@@ -1,70 +1,48 @@
-// TODO: Import apiClient from "./client"
-// TODO: Import Item, Order, User types from "../types"
+import apiClient from "./client";
+import type { Item, Order, User } from "../types";
 
-/**
- * getSalesHistory
- *
- * GET /admin/sales — returns all purchase orders across all customers.
- * Requires admin auth token.
- *
- * @returns Promise<Order[]>
- */
-export async function getSalesHistory(): Promise<unknown[]> {
-  // TODO: return (await apiClient.get("/admin/sales")).data
-  throw new Error("Not implemented");
+export type ItemCreateInput = {
+  igdb_id: number;
+  name: string;
+  description: string;
+  genre: string;
+  brand: string;
+  price: number;
+  quantity: number;
+  cover_url?: string | null;
+};
+
+export type ItemUpdateInput = Partial<{
+  name: string;
+  description: string;
+  genre: string;
+  brand: string;
+  price: number;
+  quantity: number;
+  cover_url: string | null;
+}>;
+
+export async function getSalesHistory(): Promise<Order[]> {
+  const res = await apiClient.get<Order[]>("/admin/sales");
+  return res.data;
 }
 
-/**
- * getInventory
- *
- * GET /admin/inventory — returns the full product list with current quantities.
- * Requires admin auth token.
- *
- * @returns Promise<Item[]>
- */
-export async function getInventory(): Promise<unknown[]> {
-  // TODO: return (await apiClient.get("/admin/inventory")).data
-  throw new Error("Not implemented");
+export async function getInventory(): Promise<Item[]> {
+  const res = await apiClient.get<Item[]>("/admin/inventory");
+  return res.data;
 }
 
-/**
- * addItem
- *
- * POST /admin/inventory — creates a new product in the catalog.
- * Requires admin auth token.
- *
- * @param data - { name, description, category, brand, price, quantity, image_url? }
- * @returns Promise<Item>
- */
-export async function addItem(_data: unknown): Promise<unknown> {
-  // TODO: return (await apiClient.post("/admin/inventory", data)).data
-  throw new Error("Not implemented");
+export async function addItem(data: ItemCreateInput): Promise<Item> {
+  const res = await apiClient.post<Item>("/admin/inventory", data);
+  return res.data;
 }
 
-/**
- * updateItem
- *
- * PUT /admin/inventory/:id — partially updates an existing product.
- * Requires admin auth token.
- *
- * @param id   - The product's numeric ID
- * @param data - Partial item fields to update
- * @returns Promise<Item>
- */
-export async function updateItem(_id: number, _data: unknown): Promise<unknown> {
-  // TODO: return (await apiClient.put(`/admin/inventory/${id}`, data)).data
-  throw new Error("Not implemented");
+export async function updateItem(id: number, data: ItemUpdateInput): Promise<Item> {
+  const res = await apiClient.put<Item>(`/admin/inventory/${id}`, data);
+  return res.data;
 }
 
-/**
- * getUsers
- *
- * GET /admin/users — returns all registered user accounts.
- * Requires admin auth token.
- *
- * @returns Promise<User[]>
- */
-export async function getUsers(): Promise<unknown[]> {
-  // TODO: return (await apiClient.get("/admin/users")).data
-  throw new Error("Not implemented");
+export async function getUsers(): Promise<User[]> {
+  const res = await apiClient.get<User[]>("/admin/users");
+  return res.data;
 }

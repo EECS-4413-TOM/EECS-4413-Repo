@@ -10,16 +10,21 @@ export type AuthContextType = {
   login: (data: { email: string; password: string }) => Promise<void>;
   logout: () => void;
   register: (data: authApi.RegisterBody) => Promise<void>;
+  /** Re-fetch /users/me and update context (e.g. after profile save). */
+  refreshUser: () => Promise<void>;
+  loading: boolean;
 };
 
 export const AuthContext = createContext<AuthContextType | null>(null);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const token = localStorage.getItem(tokenStorageKey);
     if (!token) {
+      setLoading(false);
       return;
     }
 
@@ -36,6 +41,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (!cancelled) {
           setUser(null);
         }
+      } finally {
+        if (!cancelled) {
+          setLoading(false);
+        }
       }
     }
 
@@ -46,7 +55,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
   }, []);
 
-  async function login(data: { email: string; password: string }) {
+  async function login(data: {email: string; password: string }) {
     const token = await authApi.login(data);
     localStorage.setItem(tokenStorageKey, token.access_token);
     const me = await authApi.getProfile();
@@ -60,7 +69,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   async function register(data: authApi.RegisterBody) {
     await authApi.register(data);
-    await login({ email: data.email, password: data.password });
+    await login({email: data.email, password: data.password });
+  }
+
+  async function refreshUser() {
+    const token = localStorage.getItem(tokenStorageKey);
+    if (!token) {
+      setUser(null);
+      return;
+    }
+    try {
+      const me = await authApi.getProfile();
+      setUser(me);
+    } catch {
+      localStorage.removeItem(tokenStorageKey);
+      setUser(null);
+    }
   }
 
   return (
@@ -72,6 +96,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         login,
         logout,
         register,
+        refreshUser,
+        loading,
       }}
     >
       {children}

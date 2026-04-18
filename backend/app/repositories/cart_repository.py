@@ -1,9 +1,5 @@
 from __future__ import annotations
 
-# TODO: Import Session from sqlalchemy.orm
-# TODO: Import ShoppingCart, CartItem from app.models.cart
-# TODO: Import BaseRepository from app.repositories.base_repository
-
 
 from sqlalchemy.orm import Session
 from sqlalchemy import or_
@@ -21,6 +17,11 @@ class CartRepository(BaseRepository):
 
     def get_by_user_id(self, user_id: int):
         return self.db.query(ShoppingCart).filter(ShoppingCart.user_id == user_id).first()
+
+    def get_by_session_id(self, session_id: str):
+        return (
+            self.db.query(ShoppingCart).filter(ShoppingCart.session_id == session_id).first()
+        )
 
     def get_cart_item(self, cart_id: int, item_id: int):
         return self.db.query(CartItem).filter(CartItem.cart_id == cart_id, CartItem.item_id == item_id).first()

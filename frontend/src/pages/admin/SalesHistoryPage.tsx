@@ -1,28 +1,83 @@
-// TODO: Import useState, useEffect from "react"
-// TODO: Import { getSalesHistory } from "../../api/admin"
-// TODO: Import Order type from "../../types"
-// TODO: Import { formatCurrency, formatDate } from "../../utils/formatters"
+import {useEffect, useState} from "react";
+import {Link} from "react-router-dom";
+import {getSalesHistory} from "../../api/admin";
+import type {Order} from "../../types";
 
-/**
- * SalesHistoryPage
- *
- * Admin page for viewing all purchase orders.
- * URL: /admin/sales  (admin-only)
- *
- * State:
- *   orders      — Order[] fetched from API
- *   filterText  — string for client-side filtering by customer or product name
- *   expandedId  — number | null (which order row is expanded to show items)
- *   loading     — boolean
- *
- * Steps to implement:
- * 1. useEffect: call getSalesHistory() on mount, set orders state
- * 2. Render a filter/search input that filters the displayed orders
- * 3. Render a table: order ID, customer ID, date, total, status
- * 4. Clicking a row expands it to show OrderItems:
- *    product name, quantity, price at purchase, subtotal
- */
 export default function SalesHistoryPage() {
-  // TODO: Implement component
-  return null;
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const data = await getSalesHistory();
+        if (!cancelled) setOrders(data);
+      } catch {
+        if (!cancelled) setError("Could not load sales.");
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  if (loading) {
+    return <p>Loading...</p>;
+  }
+
+  return (
+    <div>
+      <h1>Sales history</h1>
+      <p>
+        <Link to="/admin">Back to admin</Link>
+      </p>
+      {error && <p>{error}</p>}
+
+      <table border={1}>
+        <thead>
+          <tr style={{background: "rgb(107, 91, 231)", color: "#fff"}}>
+            <th>Order id</th>
+            <th>Customer id</th>
+            <th>Date</th>
+            <th>Total</th>
+            <th>Status</th>
+            <th>Product</th>
+            <th>Qty</th>
+            <th>Line price</th>
+          </tr>
+        </thead>
+        <tbody>
+          {orders.flatMap((order) =>
+            order.items.length === 0
+              ? [
+                  <tr key={`${order.id}-empty`}>
+                    <td>{order.id}</td>
+                    <td>{order.customer_id}</td>
+                    <td>{order.created_at}</td>
+                    <td>{order.total}</td>
+                    <td>{order.status}</td>
+                    <td colSpan={3}>(no line items)</td>
+                  </tr>,
+                ]
+              : order.items.map((line) => (
+                  <tr key={`${order.id}-${line.id}`}>
+                    <td>{order.id}</td>
+                    <td>{order.customer_id}</td>
+                    <td>{order.created_at}</td>
+                    <td>{order.total}</td>
+                    <td>{order.status}</td>
+                    <td>{line.item.name}</td>
+                    <td>{line.quantity}</td>
+                    <td>{line.price_at_purchase}</td>
+                  </tr>
+                ))
+          )}
+        </tbody>
+      </table>
+    </div>
+  );
 }

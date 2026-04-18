@@ -1,3 +1,5 @@
+# Nginx image is built from repo root (nginx/Dockerfile) and includes the frontend dist/.
+# Rebuild with: docker compose build --no-cache nginx
 services:
   backend:
     env_file: .env
@@ -11,26 +13,13 @@ services:
       TWITCH_CLIENT_ID: ${TWITCH_CLIENT_ID}
       TWITCH_CLIENT_SECRET: ${TWITCH_CLIENT_SECRET}
 
-  frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
-    volumes:
-      - frontend_build:/app/dist
-
   nginx:
     build:
-      context: ./nginx
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: nginx/Dockerfile
     restart: unless-stopped
     # No host ports: Dokploy/Traefik already binds :80; route the domain to this service in Dokploy.
     expose:
       - "80"
     depends_on:
       - backend
-      - frontend
-    volumes:
-      - frontend_build:/usr/share/nginx/html:ro
-
-volumes:
-  frontend_build:

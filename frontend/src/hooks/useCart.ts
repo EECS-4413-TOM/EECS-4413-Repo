@@ -1,5 +1,4 @@
-// TODO: Import useContext from "react"
-// TODO: Import CartContext from "../context/CartContext"
+
 
 import { useContext } from "react";
 
@@ -18,9 +17,6 @@ import { CartContext } from "../context/CartContext";
  *   const { cart, addToCart, total } = useCart()
  */
 export function useCart() {
-  // TODO: const ctx = useContext(CartContext)
-  // TODO: if (!ctx) throw new Error("useCart must be used within CartProvider")
-  // TODO: return ctx
   const context = useContext(CartContext);
   if (!context) {
     throw new Error("useCart must be used within CartProvider");

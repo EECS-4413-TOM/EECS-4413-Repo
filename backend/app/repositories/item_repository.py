@@ -5,11 +5,6 @@ from sqlalchemy import or_
 from app.models.item import Item
 from app.repositories.base_repository import BaseRepository
 
-# TODO: Import Session from sqlalchemy.orm
-# TODO: Import Item from app.models.item
-# TODO: Import BaseRepository from app.repositories.base_repository
-
-
 class ItemRepository(BaseRepository):
     """
     DAO for the Item model.

@@ -7,12 +7,6 @@ from app.dependencies import get_db
 from app.schemas.item import ItemResponse
 from app.services.catalog_service import CatalogService
 
-# TODO: Import APIRouter, Depends, Query from fastapi
-# TODO: Import Session from sqlalchemy.orm
-# TODO: Import get_db from app.dependencies
-# TODO: Import ItemResponse from app.schemas.item
-# TODO: Import CatalogService from app.services.catalog_service
-
 router = APIRouter()
 
 

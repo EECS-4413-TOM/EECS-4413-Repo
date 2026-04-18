@@ -1,27 +1,64 @@
-// TODO: Import useState, useEffect from "react"
-// TODO: Import { getUsers } from "../../api/admin"
-// TODO: Import { updateProfile } from "../../api/auth"
-// TODO: Import User type from "../../types"
+import {useEffect, useState} from "react";
+import {Link} from "react-router-dom";
+import {getUsers} from "../../api/admin";
+import type {User} from "../../types";
 
-/**
- * UsersPage
- *
- * Admin page for viewing and managing customer accounts.
- * URL: /admin/users  (admin-only)
- *
- * State:
- *   users       — User[] fetched from API
- *   editingUser — User | null (user currently being edited)
- *   loading     — boolean
- *
- * Steps to implement:
- * 1. useEffect: call getUsers() on mount, set users state
- * 2. Render a table: id, name, email, is_admin, actions (Edit)
- * 3. "Edit" button opens an edit form/modal with the user's current info
- *    On save: call updateProfile(data) using an admin-scoped API call
- *    Refresh user list after saving
- */
 export default function UsersPage() {
-  // TODO: Implement component
-  return null;
+  const [users, setUsers] = useState<User[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const data = await getUsers();
+        if (!cancelled) setUsers(data);
+      } catch {
+        if (!cancelled) setError("Could not load users.");
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  if (loading) {
+    return <p>Loading...</p>;
+  }
+
+  return (
+    <div>
+      <h1>Users</h1>
+      <p>
+        <Link to="/admin">Back to admin</Link>
+      </p>
+      {error && <p>{error}</p>}
+
+      <table border={1}>
+        <thead>
+          <tr style={{background: "rgb(107, 91, 231)", color: "#fff"}}>
+            <th>id</th>
+            <th>email</th>
+            <th>first name</th>
+            <th>last name</th>
+            <th>admin</th>
+          </tr>
+        </thead>
+        <tbody>
+          {users.map((u) => (
+            <tr key={u.id}>
+              <td>{u.id}</td>
+              <td>{u.email}</td>
+              <td>{u.first_name}</td>
+              <td>{u.last_name}</td>
+              <td>{u.is_admin ? "yes" : "no"}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
 }

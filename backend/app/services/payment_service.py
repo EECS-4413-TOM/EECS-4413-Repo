@@ -7,7 +7,7 @@ class PaymentService:
     within the same server process.
     """
 
-    _request_count: int = 0  # TODO: Class-level counter shared across all instances
+    _request_count: int = 0  
 
     def process_payment(self, credit_card_number: str, amount: float) -> bool:
         """

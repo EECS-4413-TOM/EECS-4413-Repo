@@ -6,7 +6,6 @@ export default function LoginPage() {
   const { login } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   async function handleSubmit(e: React.FormEvent) {
@@ -16,8 +15,7 @@ export default function LoginPage() {
     try {
       await login({ email, password});
       navigate("/");
-    } catch (err: any) {
-      
+    } catch {
       setError("Invalid email or password");
     } finally {
       setLoading(false);
@@ -41,6 +39,8 @@ export default function LoginPage() {
           padding: "40px 32px",
           borderRadius: "16px",
           boxShadow: "0 10px 25px rgba(0,0,0,0.06)",
+          boxSizing: "border-box",
+          transform: "translateX(-8px)",
         }}
       >
         <h1
@@ -86,6 +86,7 @@ export default function LoginPage() {
               required
               style={{
                 width: "100%",
+                boxSizing: "border-box",
                 padding: "12px 14px",
                 borderRadius: "10px",
                 border: "1px solid #e0e0e0",
@@ -113,6 +114,7 @@ export default function LoginPage() {
               required
               style={{
                 width: "100%",
+                boxSizing: "border-box",
                 padding: "12px 14px",
                 borderRadius: "10px",
                 border: "1px solid #e0e0e0",
@@ -122,45 +124,13 @@ export default function LoginPage() {
               }}
             />
           </div>
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              marginBottom: "24px",
-              fontSize: "14px",
-            }}
-          >
-            <label style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-              <input
-                type="checkbox"
-                checked={rememberMe}
-                onChange={(e) => setRememberMe(e.target.checked)}
-              />
-              <span>Remember Me</span>
-            </label>
-            <button
-              type="button"
-              style={{
-                border: "none",
-                background: "transparent",
-                color: "#f44336",
-                cursor: "pointer",
-                textDecoration: "none",
-                padding: 0,
-                fontSize: "14px",
-              }}
-              // Reset pasword page when thats done
-              onClick={() => alert("Forgot password flow not implemented yet")}
-            >
-              Forgot your password?
-            </button>
-          </div>
+          
           <button
             type="submit"
             disabled={loading}
             style={{
               width: "100%",
+              boxSizing: "border-box",
               padding: "12px 0",
               borderRadius: "999px",
               border: "none",
@@ -179,6 +149,7 @@ export default function LoginPage() {
             style={{
               display: "block",
               width: "100%",
+              boxSizing: "border-box",
               textAlign: "center",
               padding: "10px 0",
               borderRadius: "999px",

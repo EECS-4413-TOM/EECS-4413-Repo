@@ -1,5 +1,3 @@
-// TODO: Import apiClient from "./client"
-// TODO: Import Item type from "../types"
 import apiClient from "./client"
 import type { Item } from "../types"
 
@@ -42,7 +40,7 @@ export async function getItems(params: GetItemsParams = {}): Promise<Item[]> {
   if (params.limit) query.append("limit", String(params.limit))
   if (params.page) query.append("page", String(params.page))
 
-  const res = await apiClient.get(`/catalog?${query.toString()}`)
+  const res = await apiClient.get(`/catalog/?${query.toString()}`)
 
   return res.data
 }
