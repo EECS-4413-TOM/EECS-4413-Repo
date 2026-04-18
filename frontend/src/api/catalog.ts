@@ -1,5 +1,3 @@
-// TODO: Import apiClient from "./client"
-// TODO: Import Item type from "../types"
 import apiClient from "./client"
 import type { Item } from "../types"
 
