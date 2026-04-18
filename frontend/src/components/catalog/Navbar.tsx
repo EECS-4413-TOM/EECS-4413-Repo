@@ -25,7 +25,6 @@ export default function Navbar() {
         {user?.is_admin && (
           <Link to="/admin">Admin</Link>
         )}
-        <Link to="/">Deals</Link>
         <Link to="/cart">Cart ({cart.length})</Link>
       </div>
     </nav>

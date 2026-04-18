@@ -114,7 +114,7 @@ export default function CatalogPage() {
   const [sortBy, setSortBy] = useState("")
   const [order, setOrder] = useState("asc")
   const { addToCart } = useCart()
-  const location = useLocation()
+ // const location = useLocation()
 
   // fix the issue with searchbar interfering when clicking home
   useEffect(() => {

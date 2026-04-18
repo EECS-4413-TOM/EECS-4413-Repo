@@ -570,3 +570,48 @@ body {
 
   justify-content: center;
 }
+
+/* profile page css */
+/* PROFILE PAGE ONLY */
+.profile-container {
+  max-width: 900px;
+  margin: auto;
+  padding: 40px 5%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* override card width ONLY in profile */
+.profile-card {
+  width: 100%;
+  max-width: 500px;
+}
+
+/* orders layout */
+.profile-orders {
+  width: 100%;
+  max-width: 900px;
+  margin-top: 30px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* loading messages */
+
+.page-state {
+  min-height: 60vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.page-state.loading {
+  color: #7ae759;
+}
