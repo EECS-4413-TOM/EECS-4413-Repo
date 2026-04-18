@@ -6,6 +6,7 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
 from passlib.context import CryptContext
+from fastapi import Request
 
 from app.config import settings
 from app.dependencies import get_db
@@ -86,6 +87,33 @@ def get_current_user(token: str = Depends(oauth2_scheme), db = Depends(get_db)):
     user = UserRepository(db).get_by_id(int(user_id))
     if user is None:
         raise credentials_exception#if the user is not found, raise the custom exception
-        
+
     return user
 
+
+def get_current_user_optional(request: Request, db=Depends(get_db)):
+    auth = request.headers.get("Authorization")
+
+    if not auth:
+        return None
+
+    try:
+        scheme, token = auth.split()
+
+        if scheme.lower() != "bearer":
+            return None
+
+        payload = jwt.decode(
+            token,
+            settings.JWT_SECRET,
+            algorithms=[settings.JWT_ALGORITHM],
+        )
+
+        user_id = payload.get("sub")
+        if not user_id:
+            return None
+
+        return UserRepository(db).get_by_id(int(user_id))
+
+    except Exception:
+        return None

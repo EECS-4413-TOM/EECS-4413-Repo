@@ -4,7 +4,7 @@ from __future__ import annotations
 # TODO: Import relationship from sqlalchemy.orm
 # TODO: Import Base from app.database
 
-from sqlalchemy import Column, Integer, String, Date, Float, ForeignKey
+from sqlalchemy import Column, Integer, String, Float, ForeignKey
 from app.database import Base
 from sqlalchemy.orm import relationship
 
@@ -14,6 +14,7 @@ class ShoppingCart(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id"), unique=True, nullable=True)
+    session_id = Column(String, unique=True, nullable=True)
     total_price = Column(Float, nullable=True)
 
     user = relationship("User", back_populates="cart")
