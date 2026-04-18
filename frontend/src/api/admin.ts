@@ -1,5 +1,5 @@
 import apiClient from "./client";
-import type { Item, Order } from "../types";
+import type { Item, Order, User } from "../types";
 
 export type ItemCreateInput = {
   igdb_id: number;
@@ -42,6 +42,7 @@ export async function updateItem(id: number, data: ItemUpdateInput): Promise<Ite
   return res.data;
 }
 
-export async function getUsers(): Promise<unknown[]> {
-  throw new Error("Not implemented");
+export async function getUsers(): Promise<User[]> {
+  const res = await apiClient.get<User[]>("/admin/users");
+  return res.data;
 }
