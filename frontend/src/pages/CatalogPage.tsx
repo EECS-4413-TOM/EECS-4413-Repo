@@ -12,6 +12,7 @@ type CatalogItem = {
   name?: string
   price?: number
   cover_url?: string | null
+  quantity? : number
   cover?: { image_id?: string }
   screenshots?: { image_id?: string }[]
   rating?: number
@@ -33,6 +34,10 @@ function getImage(item: CatalogItem) {
   }
 
   return FALLBACK_IMAGE
+}
+
+function isOutOfStock(item: CatalogItem) {
+  return (item.quantity ?? 0) <= 0
 }
 
 // fixing rating of games:
@@ -77,9 +82,8 @@ function formatGenres(item: CatalogItem) {
 
   if (!genres) return "Unknown"
 
-  // turn genre string into readable format (e.g. "{12, 14}" → "RPG, Sport")
   if (typeof genres === "string") {
-    const cleaned = genres.replace(/[{}]/g, "") // remove { }
+    const cleaned = genres.replace(/[{}]/g, "")
     const ids = cleaned.split(",").map(Number)
 
     return ids
@@ -87,7 +91,6 @@ function formatGenres(item: CatalogItem) {
       .join(", ")
   }
 
-  // if no genre, return "Unknown"
   return "Unknown"
 }
 
@@ -114,16 +117,13 @@ export default function CatalogPage() {
   const [sortBy, setSortBy] = useState("")
   const [order, setOrder] = useState("asc")
   const { addToCart } = useCart()
- // const location = useLocation()
 
-  // fix the issue with searchbar interfering when clicking home
   useEffect(() => {
     setPage(1)
     setItems([])
     setHasMore(true)
   }, [category, brand, sortBy, order])
 
-  // debounce API calls (prevents spam requests)
   useEffect(() => {
     const t = setTimeout(() => {
       loadItems()
@@ -163,17 +163,16 @@ export default function CatalogPage() {
   }, [loading, hasMore, search])
 
   async function loadItems() {
-    if (loading) return   // prevent multiple simultaneous loads
+    if (loading) return
+
     try {
       setLoading(true)
 
       let data: CatalogItem[] = []
 
-      // 🔥 IF user is searching → use IGDB-powered endpoint
       if (search.trim().length > 0) {
         data = await searchItems(search)
       } else {
-        // normal catalog (DB)
         data = await getItems({
           search,
           limit,
@@ -191,11 +190,9 @@ export default function CatalogPage() {
         return
       }
 
-      // if first page → replace
       if (page === 1) {
         setItems(data)
       } else {
-        // append for infinite scroll
         setItems((prev: CatalogItem[]) => {
           const combined = [...prev, ...data]
 
@@ -208,14 +205,10 @@ export default function CatalogPage() {
         })
       }
 
-      // stop when no more data
-      if (page === 1) {
-        setHasMore(true)
-      }
+      if (page === 1) setHasMore(true)
 
-      if (data.length < limit) {
-        setHasMore(false)
-      }
+      if (data.length < limit) setHasMore(false)
+
     } catch (err) {
       console.error("Failed to load catalog:", err)
     } finally {
@@ -225,20 +218,19 @@ export default function CatalogPage() {
 
   return (
     <div>
-      {/* HERO */}
+
       <section className="hero">
         <h2>Welcome to Our Store</h2>
       </section>
 
-      {/* SEARCH */}
       <div className="search-bar">
         <input
           placeholder="Search games..."
           value={search}
           onChange={(e) => {
             setPage(1)
-            setItems([])      // clear the old results 
-            setHasMore(true)  // reset the infinite scrolling
+            setItems([])
+            setHasMore(true)
             setSearch(e.target.value)
           }}
         />
@@ -246,7 +238,6 @@ export default function CatalogPage() {
 
       <div className="catalog-filters">
 
-        {/* CATEGORY */}
         <select
           value={sortBy ? `${sortBy}-${order}` : "none"}
           onChange={(e) => {
@@ -265,13 +256,10 @@ export default function CatalogPage() {
           }}
         >
           <option value="none">Sort By</option>
-
           <option value="price-asc">Price (Low → High)</option>
           <option value="price-desc">Price (High → Low)</option>
-
           <option value="rating-desc">Rating (High → Low)</option>
           <option value="rating-asc">Rating (Low → High)</option>
-
           <option value="involved_companies-asc">Company (A–Z)</option>
           <option value="involved_companies-desc">Company (Z–A)</option>
         </select>
@@ -287,18 +275,18 @@ export default function CatalogPage() {
 
       </div>
 
-      {/* EMPTY STATE */}
-      {!loading && items.length === 0 && (
-        <p>No games found</p>
-      )}
+      {!loading && items.length === 0 && <p>No games found</p>}
 
-      {/* PRODUCTS */}
       <div className="product-grid">
         {items.map((item: CatalogItem) => (
 
-          // make all the cards link to the product detail page for that item:
           <Link to={`/product/${item.id}`} key={item.id} style={{ textDecoration: "none", color: "inherit" }}>
-            <div className="product-card" key={item.id}>
+            <div className="product-card">
+
+              {isOutOfStock(item) && (
+                <div className="out-of-stock-badge">Out of Stock</div>
+              )}
+
               <img
                 src={getImage(item)}
                 alt={item.name || "Game"}
@@ -306,20 +294,21 @@ export default function CatalogPage() {
               />
 
               <h3>{item.name || "Unnamed Game"}</h3>
+
               <p><b>
                 {typeof item.price === "number"
                   ? `$${item.price.toFixed(2)}`
                   : `$${item.price ?? "N/A"}`}
-              </b>
-              </p>
+              </b></p>
+
               <p>⭐ <b>{formatRating(item)} / 100</b></p>
               <p><b>{formatGenres(item)}</b></p>
-              <p>
-                <b>Company:</b> {item.involved_companies || "Company is Unknown"}
-              </p>
+
+              <p><b>Company:</b> {item.involved_companies || "Company is Unknown"}</p>
 
               <button
                 type="button"
+                disabled={isOutOfStock(item)}
                 onClick={() =>
                   addToCart({
                     id: item.id,
@@ -329,8 +318,9 @@ export default function CatalogPage() {
                   })
                 }
               >
-                Add to Cart
+                {isOutOfStock(item) ? "Out of Stock" : "Add to Cart"}
               </button>
+
             </div>
           </Link>
         ))}
