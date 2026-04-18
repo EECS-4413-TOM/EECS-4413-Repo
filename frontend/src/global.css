@@ -713,3 +713,14 @@ body {
 .page-state.loading {
   color: #7ae759;
 }
+
+.out-of-stock-badge {
+  font-weight: 700;
+  color: rgb(255, 0, 0);
+  background-color: rgb(255, 255, 255);
+  padding: 5px 10px;
+  border-radius: 5px;
+  font-size: 18px;
+  text-align: center;
+  margin-bottom: 10px;
+}
