@@ -21,11 +21,21 @@ body {
   color: white;
 }
 
-.nav-links a {
+.nav-links a,
+.nav-links button {
   margin-left: 20px;
   text-decoration: none;
   color: white;
   font-weight: bold;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: inherit;
+}
+
+.nav-links a:hover,
+.nav-links button:hover {
+  text-decoration: underline;
 }
 
 /* HERO */
@@ -355,6 +365,21 @@ body {
   background: white;
   padding: 20px;
   border-radius: 10px;
+}
+
+.cart-list input {
+  width: 100%;
+  padding: 12px;
+  border-radius: 6px;
+  border: 1px solid #ddd;
+  margin-bottom: 10px;
+  font-size: 14px;
+}
+
+.cart-list input:focus {
+  border-color: #7ae759;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(122, 231, 89, 0.2);
 }
 
 /* row */

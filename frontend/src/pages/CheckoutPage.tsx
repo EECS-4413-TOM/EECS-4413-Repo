@@ -29,7 +29,49 @@
  *    c. On HTTP 402: set error = "Credit Card Authorization Failed." and show it
  *       Allow user to re-enter card info and try again
  */
+
+import { Link, Navigate, useLocation, useNavigate } from "react-router-dom";
+import { useAuth } from "../hooks/useAuth";
+import { useCart } from "../hooks/useCart";
+import { checkout } from "../api/orders";
+import { useState, useEffect } from "react";
+
 export default function CheckoutPage() {
-  // TODO: Implement component
-  return null;
+  const {user, loading: authLoading } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { cart } = useCart();
+
+  const [creditCardNumber, setCreditCardNumber] = useState("");
+  const [expiry, setExpiry] = useState("");
+  const [cvv, setCvv] = useState("");
+  const [shippingAddress, setShippingAddress] = useState("");
+
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+
+   if (authLoading) return <div>Loading Checkout</div>;
+
+   if (!user) {
+    return (
+      <div className="catalog-container">
+        <h1 className="catalog-title">Checkout</h1>
+        <p>You need an account to continue.</p>
+
+        <Link to="/login" state={{ from: "/checkout" }}>
+          Log in
+        </Link>
+
+        <Link to="/register" state={{ from: "/checkout" }}>
+          Create account
+        </Link>
+      </div>
+    )
+   }
+
+   return <div>// real checkout goes here </div>
+
+
 }
+
+// DO THIS 

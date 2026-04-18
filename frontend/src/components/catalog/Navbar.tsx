@@ -1,15 +1,27 @@
 import { Link } from "react-router-dom";
 import { useCart } from "../../hooks/useCart";
+import { useAuth } from "../../hooks/useAuth";
 
 export default function Navbar() {
   const { cart } = useCart();
+  const {user, logout } = useAuth();
 
   return (
     <nav className="navbar">
       <Link to="/" className="logo">TOMAGames</Link>
 
       <div className="nav-links">
-        <Link to="/">Account</Link>
+        {!user ? (
+          <>
+            <Link to="/login">Login</Link>
+            <Link to="/register">Register</Link>
+          </>
+        ) : (
+          <>
+            <Link to="/profile">My Account</Link>
+            <button onClick={logout}>Logout</button>
+          </>
+        )}
         <Link to="/">Deals</Link>
         <Link to="/cart">Cart ({cart.length})</Link>
       </div>
