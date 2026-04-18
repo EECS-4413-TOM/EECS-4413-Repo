@@ -68,9 +68,10 @@ export default function UsersPage() {
       </p>
       {error && <p>{error}</p>}
 
-      <table border={1}>
+      <div className="admin-table-wrap">
+        <table className="admin-table">
         <thead>
-          <tr style={{background: "rgb(107, 91, 231)", color: "#fff"}}>
+          <tr>
             <th>id</th>
             <th>email</th>
             <th>first name</th>
@@ -90,6 +91,7 @@ export default function UsersPage() {
               <td>
                 <button
                   type="button"
+                  className="admin-btn-delete"
                   disabled={deletingId === u.id}
                   onClick={() => void handleDelete(u)}
                 >
@@ -99,7 +101,8 @@ export default function UsersPage() {
             </tr>
           ))}
         </tbody>
-      </table>
+        </table>
+      </div>
     </div>
   );
 }

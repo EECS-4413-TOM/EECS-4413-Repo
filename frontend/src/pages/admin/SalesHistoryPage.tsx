@@ -37,9 +37,10 @@ export default function SalesHistoryPage() {
       </p>
       {error && <p>{error}</p>}
 
-      <table border={1}>
+      <div className="admin-table-wrap">
+        <table className="admin-table admin-table--wide">
         <thead>
-          <tr style={{background: "rgb(107, 91, 231)", color: "#fff"}}>
+          <tr>
             <th>Order id</th>
             <th>Customer id</th>
             <th>Date</th>
@@ -77,7 +78,8 @@ export default function SalesHistoryPage() {
                 ))
           )}
         </tbody>
-      </table>
+        </table>
+      </div>
     </div>
   );
 }

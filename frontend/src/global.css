@@ -192,30 +192,68 @@ body {
 }
 
 .quantity-controls {
-  display: flex;
-  align-items: center;
-  gap: 10px;
+  display: inline-flex;
+  align-items: stretch;
   margin: 20px 0;
+  border: 1px solid #e0e0e0;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #f6f6f6;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
 }
 
 .quantity-controls button {
-  width: 28px;
-  /* smaller */
-  height: 28px;
-  /* smaller */
-  font-size: 14px;
-  /* smaller text */
-  border-radius: 5px;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0 12px;
+  border: none;
+  background: #fff;
+  color: #111;
+  font-size: 1.35rem;
+  font-weight: 600;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease, transform 0.1s ease;
 }
 
 .quantity-controls button:hover {
-  background: #333;
+  background: #7ae759;
+  color: #111;
+}
+
+.quantity-controls button:active {
+  transform: scale(0.96);
+}
+
+.quantity-controls button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.quantity-controls button:disabled:hover {
+  background: #fff;
+}
+
+.quantity-controls button:focus-visible {
+  outline: 2px solid #111;
+  outline-offset: 2px;
+  z-index: 1;
 }
 
 .quantity-controls span {
-  min-width: 20px;
-  text-align: center;
-  font-weight: bold;
+  min-width: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 12px;
+  background: #fff;
+  border-left: 1px solid #e8e8e8;
+  border-right: 1px solid #e8e8e8;
+  font-weight: 700;
+  font-size: 1.1rem;
+  font-variant-numeric: tabular-nums;
+  color: #111;
 }
 
 .add-to-cart-btn {
@@ -598,6 +636,116 @@ body {
   margin: 20px auto;
 
   justify-content: center;
+}
+
+/* admin data tables — same family as quantity-controls / catalog accents */
+.admin-table-wrap {
+  overflow-x: auto;
+  margin: 24px 0;
+  max-width: 100%;
+  border: 1px solid #e0e0e0;
+  border-radius: 10px;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+.admin-table {
+  width: 100%;
+  min-width: 640px;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+
+.admin-table--wide {
+  min-width: 960px;
+}
+
+.admin-table thead th {
+  text-align: left;
+  padding: 14px 16px;
+  background: #111;
+  color: #fff;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  border-bottom: 3px solid #7ae759;
+}
+
+.admin-table tbody td {
+  padding: 12px 16px;
+  border-bottom: 1px solid #eee;
+  color: #222;
+  vertical-align: middle;
+}
+
+.admin-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.admin-table tbody tr:hover {
+  background: #f8fdf6;
+}
+
+.admin-table button {
+  padding: 8px 14px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  background: #fff;
+  color: #111;
+  font-weight: 600;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.admin-table button:hover:not(:disabled) {
+  background: #7ae759;
+  border-color: #7ae759;
+}
+
+.admin-table button:focus-visible {
+  outline: 2px solid #111;
+  outline-offset: 2px;
+}
+
+.admin-table button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.admin-table button:disabled:hover {
+  background: #fff;
+  border-color: #e0e0e0;
+}
+
+.admin-table button.admin-btn-delete:hover:not(:disabled) {
+  background: #dc2626;
+  border-color: #dc2626;
+  color: #fff;
+}
+
+.admin-table button.admin-btn-delete:focus-visible {
+  outline-color: #dc2626;
+}
+
+.admin-table input[type="number"] {
+  width: 5rem;
+  padding: 8px 10px;
+  border: 2px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.admin-table input[type="number"]:focus {
+  border-color: #7ae759;
+}
+
+.admin-table form {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
 }
 
 /* profile page css */

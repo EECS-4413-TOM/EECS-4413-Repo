@@ -54,9 +54,10 @@ export default function InventoryPage() {
       </p>
       {error && <p>{error}</p>}
 
-      <table border={1}>
+      <div className="admin-table-wrap">
+        <table className="admin-table">
         <thead>
-          <tr style={{background: "rgb(107, 91, 231)", color: "#fff"}}>
+          <tr>
             <th>id</th>
             <th>name</th>
             <th>genre</th>
@@ -110,7 +111,8 @@ export default function InventoryPage() {
             </tr>
           ))}
         </tbody>
-      </table>
+        </table>
+      </div>
     </div>
   );
 }
