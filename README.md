@@ -15,7 +15,7 @@ Or, you can download the ZIP from the Github by clicking "Code -> Download ZIP" 
 
 SQL scripts are located in the sql folder on github.
 
-#TOMAGames:
+# TOMAGames:
 
 An online e-store built with React, FastAPI, PostgreSQL, and Nginx.
 
