@@ -41,6 +41,8 @@ export default function LoginPage() {
           padding: "40px 32px",
           borderRadius: "16px",
           boxShadow: "0 10px 25px rgba(0,0,0,0.06)",
+          boxSizing: "border-box",
+          transform: "translateX(-8px)",
         }}
       >
         <h1
@@ -86,6 +88,7 @@ export default function LoginPage() {
               required
               style={{
                 width: "100%",
+                boxSizing: "border-box",
                 padding: "12px 14px",
                 borderRadius: "10px",
                 border: "1px solid #e0e0e0",
@@ -113,6 +116,7 @@ export default function LoginPage() {
               required
               style={{
                 width: "100%",
+                boxSizing: "border-box",
                 padding: "12px 14px",
                 borderRadius: "10px",
                 border: "1px solid #e0e0e0",
@@ -161,6 +165,7 @@ export default function LoginPage() {
             disabled={loading}
             style={{
               width: "100%",
+              boxSizing: "border-box",
               padding: "12px 0",
               borderRadius: "999px",
               border: "none",
@@ -179,6 +184,7 @@ export default function LoginPage() {
             style={{
               display: "block",
               width: "100%",
+              boxSizing: "border-box",
               textAlign: "center",
               padding: "10px 0",
               borderRadius: "999px",

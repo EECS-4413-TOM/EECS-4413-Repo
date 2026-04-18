@@ -107,6 +107,8 @@ export default function RegisterPage() {
           padding: "40px 32px",
           borderRadius: "16px",
           boxShadow: "0 10px 25px rgba(0,0,0,0.06)",
+          boxSizing: "border-box",
+          transform: "translateX(-8px)",
         }}
       >
         <h1
@@ -153,6 +155,7 @@ export default function RegisterPage() {
               autoComplete="given-name"
               style={{
                 width: "100%",
+                boxSizing: "border-box",
                 padding: "12px 14px",
                 borderRadius: "10px",
                 border: "1px solid #e0e0e0",
@@ -181,6 +184,7 @@ export default function RegisterPage() {
               autoComplete="family-name"
               style={{
                 width: "100%",
+                boxSizing: "border-box",
                 padding: "12px 14px",
                 borderRadius: "10px",
                 border: "1px solid #e0e0e0",
@@ -209,6 +213,7 @@ export default function RegisterPage() {
               autoComplete="email"
               style={{
                 width: "100%",
+                boxSizing: "border-box",
                 padding: "12px 14px",
                 borderRadius: "10px",
                 border: "1px solid #e0e0e0",
@@ -238,6 +243,7 @@ export default function RegisterPage() {
               minLength={1}
               style={{
                 width: "100%",
+                boxSizing: "border-box",
                 padding: "12px 14px",
                 borderRadius: "10px",
                 border: "1px solid #e0e0e0",
@@ -266,6 +272,7 @@ export default function RegisterPage() {
               autoComplete="new-password"
               style={{
                 width: "100%",
+                boxSizing: "border-box",
                 padding: "12px 14px",
                 borderRadius: "10px",
                 border: "1px solid #e0e0e0",
@@ -294,6 +301,7 @@ export default function RegisterPage() {
               autoComplete="street-address"
               style={{
                 width: "100%",
+                boxSizing: "border-box",
                 padding: "12px 14px",
                 borderRadius: "10px",
                 border: "1px solid #e0e0e0",
@@ -322,6 +330,7 @@ export default function RegisterPage() {
               autoComplete="address-level2"
               style={{
                 width: "100%",
+                boxSizing: "border-box",
                 padding: "12px 14px",
                 borderRadius: "10px",
                 border: "1px solid #e0e0e0",
@@ -350,6 +359,7 @@ export default function RegisterPage() {
               autoComplete="address-level1"
               style={{
                 width: "100%",
+                boxSizing: "border-box",
                 padding: "12px 14px",
                 borderRadius: "10px",
                 border: "1px solid #e0e0e0",
@@ -378,6 +388,7 @@ export default function RegisterPage() {
               autoComplete="country-name"
               style={{
                 width: "100%",
+                boxSizing: "border-box",
                 padding: "12px 14px",
                 borderRadius: "10px",
                 border: "1px solid #e0e0e0",
@@ -406,6 +417,7 @@ export default function RegisterPage() {
               autoComplete="postal-code"
               style={{
                 width: "100%",
+                boxSizing: "border-box",
                 padding: "12px 14px",
                 borderRadius: "10px",
                 border: "1px solid #e0e0e0",
@@ -434,6 +446,7 @@ export default function RegisterPage() {
               autoComplete="tel"
               style={{
                 width: "100%",
+                boxSizing: "border-box",
                 padding: "12px 14px",
                 borderRadius: "10px",
                 border: "1px solid #e0e0e0",
@@ -448,6 +461,7 @@ export default function RegisterPage() {
             disabled={loading}
             style={{
               width: "100%",
+              boxSizing: "border-box",
               padding: "12px 0",
               borderRadius: "999px",
               border: "none",
@@ -466,6 +480,7 @@ export default function RegisterPage() {
             style={{
               display: "block",
               width: "100%",
+              boxSizing: "border-box",
               textAlign: "center",
               padding: "10px 0",
               borderRadius: "999px",

@@ -588,7 +588,7 @@ body {
   align-items: center;
 }
 
-/* all profile-page cards (info + order history) */
+/* all profile-page cards (info + order history) , i made it so they are all the same size with box sizing lmk if it breaks anything*/
 .profile-container .product-card {
   width: 100%;
   max-width: 500px;
