@@ -66,7 +66,6 @@ export default function App() {
       <Navbar />
 
       <Routes>
-        console.log(user);
       <Route path="/" element={<CatalogPage />} />
       <Route path="/product/:id" element={<ProductDetailPage />} />
       <Route path="/cart" element={<CartPage />} />
