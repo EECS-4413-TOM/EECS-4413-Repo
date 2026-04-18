@@ -51,7 +51,14 @@ def sample_user():
         "password": "password123",
         "first_name": "Test",
         "last_name": "User",
-        "is_admin": False
+        "address": {
+            "street": "123 Test St",
+            "city": "Toronto",
+            "province": "ON",
+            "country": "CA",
+            "zip": "M5V1A1",
+            "phone": "4165550100",
+        },
     }
 
 
