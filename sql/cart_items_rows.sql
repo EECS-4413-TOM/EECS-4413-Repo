@@ -1,0 +1,1 @@
+INSERT INTO "public"."cart_items" ("id", "cart_id", "item_id", "quantity", "created_at", "price") VALUES (14, 8, 854, 1, '2026-04-18 03:57:39.938982+00', 24.99), (24, 12, 871, 1, '2026-04-18 05:41:57.09801+00', 27.99);
