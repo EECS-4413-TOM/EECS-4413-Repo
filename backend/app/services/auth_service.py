@@ -61,7 +61,9 @@ class AuthService:
             address_id=address_row.id,
         )
 
-        return self.user_repo.create(new_user)
+        created = self.user_repo.create(new_user)
+        reloaded = self.user_repo.get_by_id(created.id)
+        return reloaded if reloaded is not None else created
 
     def login(self, email: str, password: str):
         """

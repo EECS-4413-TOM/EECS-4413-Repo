@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from app.models.user import User
 from app.repositories.base_repository import BaseRepository
 
@@ -16,6 +16,15 @@ class UserRepository (BaseRepository):
         Call super().__init__(User, db) to bind model and session.
         """
         super().__init__(User, db)
+
+    def get_by_id(self, id: int):
+        """Load user with nested address for API responses (e.g. /users/me)."""
+        return (
+            self.db.query(User)
+            .options(joinedload(User.address))
+            .filter(User.id == id)
+            .first()
+        )
 
     def get_by_email(self, email: str):
         """

@@ -10,6 +10,8 @@ export type AuthContextType = {
   login: (data: { email: string; password: string }) => Promise<void>;
   logout: () => void;
   register: (data: authApi.RegisterBody) => Promise<void>;
+  /** Re-fetch /users/me and update context (e.g. after profile save). */
+  refreshUser: () => Promise<void>;
   loading: boolean;
 };
 
@@ -41,10 +43,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
       } finally {
         if (!cancelled) {
-          setLoading(false); 
+          setLoading(false);
+        }
       }
     }
-  }
 
     restoreSession();
 
@@ -70,6 +72,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     await login({email: data.email, password: data.password });
   }
 
+  async function refreshUser() {
+    const token = localStorage.getItem(tokenStorageKey);
+    if (!token) {
+      setUser(null);
+      return;
+    }
+    try {
+      const me = await authApi.getProfile();
+      setUser(me);
+    } catch {
+      localStorage.removeItem(tokenStorageKey);
+      setUser(null);
+    }
+  }
+
   return (
     <AuthContext.Provider
       value={{
@@ -79,6 +96,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         login,
         logout,
         register,
+        refreshUser,
         loading,
       }}
     >

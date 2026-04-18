@@ -611,9 +611,51 @@ body {
   background: #fff;
 }
 
-.profile-card button:hover {
+/* Profile buttons: avoid global .product-card button { width:100% } stacking into one black bar */
+.profile-card .profile-form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 16px;
+  width: 100%;
+}
+
+.profile-card .profile-btn {
+  width: auto;
+  min-width: 120px;
+  flex: 1;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  border: 2px solid transparent;
+}
+
+.profile-card .profile-btn-primary {
+  background: #111;
+  color: #fff;
+}
+
+.profile-card .profile-btn-primary:hover {
   background: #7ae759;
-  color: black;
+  color: #111;
+}
+
+.profile-card .profile-btn-secondary {
+  background: #fff;
+  color: #111;
+  border-color: #ccc;
+}
+
+.profile-card .profile-btn-secondary:hover {
+  border-color: #7ae759;
+  background: #f8fff4;
+}
+
+.profile-card .profile-btn-edit {
+  margin-top: 12px;
+  width: 100%;
+  max-width: 100%;
 }
 
 .profile-card input:focus {

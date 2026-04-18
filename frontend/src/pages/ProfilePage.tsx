@@ -1,152 +1,314 @@
-// TODO: Import useState, useEffect from "react"
-// TODO: Import { useAuth } from "../hooks/useAuth"
-// TODO: Import { updateProfile } from "../api/auth"
-// TODO: Import { getOrders } from "../api/orders"
-// TODO: Import { formatCurrency, formatDate } from "../utils/formatters"
-// TODO: Import Order type from "../types"
-
-/**
- * ProfilePage
- *
- * Displays and allows editing of the logged-in user's profile.
- * Also shows full purchase history.
- * URL: /profile  (protected — redirect to /login if not authenticated)
- *
- * State:
- *   firstName — string (editable, pre-filled from user)
- *   lastName  — string (editable, pre-filled from user)
- *   email     — string (editable, pre-filled from user)
- *   orders    — Order[] (purchase history)
- *   editMode  — boolean (toggle between view and edit)
- *   loading   — boolean
- *
- * Steps to implement:
- * 1. Pre-fill form fields from useAuth().user on mount
- * 2. useEffect: call getOrders() to load purchase history
- * 3. "Edit" button toggles editMode — shows save/cancel buttons in edit mode
- * 4. On save: call updateProfile({ first_name, last_name, email })
- *    Update user in AuthContext on success
- * 5. Render a list of past orders with: date, total, status, list of items purchased
- */
-
-
 import { useEffect, useState } from "react"
 import { useAuth } from "../hooks/useAuth"
 import { updateProfile } from "../api/auth"
 import { getOrders } from "../api/orders"
-import type { Order } from "../types"
+import type { Address, Order } from "../types"
 import { formatCurrency, formatDate } from "../utils/formatters"
 
+function formatAddressLines(a: Address): string {
+  const line1 = a.street
+  const line2 = [a.city, a.province, a.zip].filter(Boolean).join(", ")
+  const line3 = a.country
+  const phone =
+    a.phone && a.phone.length > 0 ? `Phone: ${a.phone}` : null
+  return [line1, line2, line3, phone].filter(Boolean).join("\n")
+}
+
 export default function ProfilePage() {
-  const { user } = useAuth()
+  const { user, loading: authLoading, refreshUser } = useAuth()
 
   const [firstName, setFirstName] = useState("")
   const [lastName, setLastName] = useState("")
   const [email, setEmail] = useState("")
-  const [address, setAddress] = useState("")
+
+  const [street, setStreet] = useState("")
+  const [city, setCity] = useState("")
+  const [province, setProvince] = useState("")
+  const [country, setCountry] = useState("")
+  const [zip, setZip] = useState("")
+  const [phone, setPhone] = useState("")
 
   const [orders, setOrders] = useState<Order[]>([])
+  const [ordersLoading, setOrdersLoading] = useState(false)
   const [editMode, setEditMode] = useState(false)
-  const [loading, setLoading] = useState(true)
+  const [saveError, setSaveError] = useState<string | null>(null)
 
-  // 1. preload user info
   useEffect(() => {
-    if (user) {
-      setFirstName(user.first_name || "")
-      setLastName(user.last_name || "")
-      setEmail(user.email || "")
-      setAddress(user.address || "")
-    }
+    if (!user) return
+    setFirstName(user.first_name ?? "")
+    setLastName(user.last_name ?? "")
+    setEmail(user.email ?? "")
+    const a = user.address
+    setStreet(a?.street ?? "")
+    setCity(a?.city ?? "")
+    setProvince(a?.province ?? "")
+    setCountry(a?.country ?? "")
+    setZip(a?.zip ?? "")
+    setPhone(a?.phone ?? "")
   }, [user])
 
-  // 2. load orders
   useEffect(() => {
-    async function loadOrders() {
-      try {
-        const data = await getOrders()
-        setOrders(data)
-      } finally {
-        setLoading(false)
-      }
+    if (!user?.id) {
+      setOrders([])
+      return
     }
 
-    loadOrders()
-  }, [])
+    let cancelled = false
+    setOrdersLoading(true)
 
-  // 3. save profile
+    ;(async () => {
+      try {
+        const data = await getOrders()
+        if (!cancelled) setOrders(data)
+      } catch (e) {
+        console.error("Failed to load orders:", e)
+        if (!cancelled) setOrders([])
+      } finally {
+        if (!cancelled) setOrdersLoading(false)
+      }
+    })()
+
+    return () => {
+      cancelled = true
+    }
+  }, [user?.id])
+
   async function handleSave() {
+    if (!user) return
+    setSaveError(null)
     try {
-      const updated = await updateProfile({
+      const patch: Parameters<typeof updateProfile>[0] = {
         first_name: firstName,
         last_name: lastName,
         email,
-        
-      })
+      }
 
-      setFirstName(updated.first_name)
-      setLastName(updated.last_name)
-      setEmail(updated.email)
-      setAddress(updated.address || "")
+      const addr = {
+        street: street.trim(),
+        city: city.trim(),
+        province: province.trim(),
+        country: country.trim(),
+        zip: zip.trim(),
+        phone: phone.trim() ? phone.trim() : null,
+      }
+      const hasAnyAddress =
+        !!addr.street ||
+        !!addr.city ||
+        !!addr.province ||
+        !!addr.country ||
+        !!addr.zip ||
+        !!addr.phone
 
-      // optional: sync auth context if needed
+      if (user.address || hasAnyAddress) {
+        patch.address = addr
+      }
+
+      await updateProfile(patch)
+      await refreshUser()
       setEditMode(false)
-    } catch (err) {
-      console.error("Failed to update profile:", err)
+    } catch (err: unknown) {
+      const detail = (err as { response?: { data?: { detail?: unknown } } })?.response
+        ?.data?.detail
+      setSaveError(
+        typeof detail === "string"
+          ? detail
+          : "Could not save profile. Please try again."
+      )
     }
   }
 
-  if (!user) return <div className="page-state">Please log in</div>
-  if (loading) return <div className="page-state loading">Loading...</div>
+  if (authLoading) {
+    return <div className="page-state loading">Loading…</div>
+  }
+
+  if (!user) {
+    return <div className="page-state">Please log in to view your profile.</div>
+  }
 
   return (
     <div className="profile-container">
-
       <h2>My Profile</h2>
 
-      {/* profile section */}
       <div className="product-card profile-card">
         {editMode ? (
           <>
-            <input value={firstName} onChange={(e) => setFirstName(e.target.value)} />
-            <input value={lastName} onChange={(e) => setLastName(e.target.value)} />
-            <input value={email} onChange={(e) => setEmail(e.target.value)} />
-            <input value={address} onChange={(e) => setAddress(e.target.value)} />
-
-            <button onClick={handleSave}>Save</button>
-            <button onClick={() => setEditMode(false)}>Cancel</button>
+            <label className="profile-label">
+              First name
+              <input
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+              />
+            </label>
+            <label className="profile-label">
+              Last name
+              <input
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
+              />
+            </label>
+            <label className="profile-label">
+              Email
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+            </label>
+            <p style={{ fontWeight: 600, marginTop: 12, marginBottom: 4 }}>
+              Address
+            </p>
+            {!user.address && (
+              <p style={{ fontSize: 13, color: "#666", marginBottom: 8 }}>
+                Add your full address (street through zip) if you don&apos;t have
+                one yet.
+              </p>
+            )}
+            <label className="profile-label">
+              Street
+              <input value={street} onChange={(e) => setStreet(e.target.value)} />
+            </label>
+            <label className="profile-label">
+              City
+              <input value={city} onChange={(e) => setCity(e.target.value)} />
+            </label>
+            <label className="profile-label">
+              Province
+              <input
+                value={province}
+                onChange={(e) => setProvince(e.target.value)}
+              />
+            </label>
+            <label className="profile-label">
+              Country
+              <input
+                value={country}
+                onChange={(e) => setCountry(e.target.value)}
+              />
+            </label>
+            <label className="profile-label">
+              Postal / ZIP code
+              <input value={zip} onChange={(e) => setZip(e.target.value)} />
+            </label>
+            <label className="profile-label">
+              Phone
+              <input
+                type="tel"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+              />
+            </label>
+            {saveError && (
+              <p style={{ color: "#b30000", marginTop: 8 }}>{saveError}</p>
+            )}
+            <div className="profile-form-actions">
+              <button
+                type="button"
+                className="profile-btn profile-btn-primary"
+                onClick={handleSave}
+              >
+                Save
+              </button>
+              <button
+                type="button"
+                className="profile-btn profile-btn-secondary"
+                onClick={() => {
+                  setSaveError(null)
+                  setEditMode(false)
+                  if (user) {
+                    setFirstName(user.first_name ?? "")
+                    setLastName(user.last_name ?? "")
+                    setEmail(user.email ?? "")
+                    const a = user.address
+                    setStreet(a?.street ?? "")
+                    setCity(a?.city ?? "")
+                    setProvince(a?.province ?? "")
+                    setCountry(a?.country ?? "")
+                    setZip(a?.zip ?? "")
+                    setPhone(a?.phone ?? "")
+                  }
+                }}
+              >
+                Cancel
+              </button>
+            </div>
           </>
         ) : (
           <>
-            <p><b>First Name:</b> {firstName}</p>
-            <p><b>Last Name:</b> {lastName}</p>
-            <p><b>Email:</b> {email}</p>
-            <p><b>Address:</b> {address}</p>
-
-            <button onClick={() => setEditMode(true)}>Edit Profile</button>
+            <p>
+              <b>First name:</b> {firstName}
+            </p>
+            <p>
+              <b>Last name:</b> {lastName}
+            </p>
+            <p>
+              <b>Email:</b> {email}
+            </p>
+            <p>
+              <b>Address:</b>
+              {user.address ? (
+                <span
+                  style={{
+                    display: "block",
+                    marginTop: 6,
+                    whiteSpace: "pre-line",
+                    fontWeight: 400,
+                  }}
+                >
+                  {formatAddressLines(user.address)}
+                </span>
+              ) : (
+                <span> —</span>
+              )}
+            </p>
+            <button
+              type="button"
+              className="profile-btn profile-btn-primary profile-btn-edit"
+              onClick={() => setEditMode(true)}
+            >
+              Edit profile
+            </button>
           </>
         )}
       </div>
 
-      {/* ORDERS SECTION */}
-      <h3 style={{ marginTop: "40px" }}>Order History</h3>
+      <h3 style={{ marginTop: "40px" }}>Order history</h3>
 
-      {orders.length === 0 && <p>No orders yet.</p>}
-
-      {orders.map((order) => (
-        <div key={order.id} className="product-card" style={{ marginBottom: "10px" }}>
-          <p><b>Date:</b> {formatDate(order.created_at)}</p>
-          <p><b>Total:</b> {formatCurrency(order.total)}</p>
-          <p><b>Status:</b> {order.status}</p>
-
-          <div className="profile-orders">
-            {order.items.map((item) => (
-              <p key={item.id}>
-                {item.item.name} × {item.quantity} — {formatCurrency(item.price_at_purchase)}
+      {ordersLoading ? (
+        <p>Loading orders…</p>
+      ) : orders.length === 0 ? (
+        <p>No orders yet.</p>
+      ) : (
+        orders.map((order) => (
+          <div
+            key={order.id}
+            className="product-card"
+            style={{ marginBottom: "10px" }}
+          >
+            <p>
+              <b>Date:</b> {formatDate(order.created_at)}
+            </p>
+            <p>
+              <b>Total:</b> {formatCurrency(order.total)}
+            </p>
+            <p>
+              <b>Status:</b> {order.status}
+            </p>
+            {order.shipping_address && (
+              <p>
+                <b>Ship to:</b> {order.shipping_address}
               </p>
-            ))}
+            )}
+            <div className="profile-orders">
+              {order.items.map((line) => (
+                <p key={line.id}>
+                  {line.item.name} × {line.quantity} —{" "}
+                  {formatCurrency(line.price_at_purchase)}
+                </p>
+              ))}
+            </div>
           </div>
-        </div>
-      ))}
+        ))
+      )}
     </div>
   )
 }

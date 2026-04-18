@@ -1,5 +1,5 @@
 import apiClient from "./client";
-import type { User, Token } from "../types";
+import type { AddressUpdate, User, Token } from "../types";
 
 export type RegisterBody = {
   email: string;
@@ -37,7 +37,9 @@ export async function getProfile(): Promise<User> {
 export async function updateProfile(
   patch: Partial<
     Pick<User, "email" | "first_name" | "last_name" | "address_id">
-  >
+  > & {
+    address?: AddressUpdate;
+  }
 ): Promise<User> {
   const { data: user } = await apiClient.put<User>("/users/me", patch);
   return user;
