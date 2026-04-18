@@ -61,12 +61,11 @@ def add_to_cart(
     request: Request,
     response: Response,
     data: CartItemAdd,
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_current_user_optional),
     db: Session = Depends(get_db),
 ):
     service = CartService(db)
 
-    # Add the item to the user's cart
     if current_user:
         user_id = current_user.id
         session_id = None
@@ -81,15 +80,12 @@ def add_to_cart(
         quantity=data.quantity,
     )
 
-    # Filter out cart items that have no linked Item
     valid_items = [ci for ci in cart.items if ci.item.price is not None]
 
-    # Optional debug prints
     for ci in valid_items:
         print("CartItem price:", ci.price)
         print("Item price:", ci.item.price)
 
-    # Safely calculate total price
     total_price = sum((ci.quantity or 0) * (ci.item.price or 0) for ci in valid_items)
 
     # Prepare items for Pydantic response
@@ -121,7 +117,7 @@ def update_cart_item(
     response: Response,
     item_id: int,
     data: CartItemUpdate,
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_current_user_optional),
     db: Session = Depends(get_db),
 ):
     service = CartService(db)
@@ -133,7 +129,6 @@ def update_cart_item(
         session_id = get_or_create_session_id(request, response)
         user_id = None
 
-    # Add the item to the user's cart
     cart = service.update_item(
         user_id=user_id,
         session_id=session_id,
@@ -141,18 +136,14 @@ def update_cart_item(
         quantity=data.quantity,
     )
 
-    # Filter out cart items that have no linked Item
     valid_items = [ci for ci in cart.items if ci.item.price is not None]
 
-    # Optional debug prints
     for ci in valid_items:
         print("CartItem price:", ci.price)
         print("Item price:", ci.item.price)
 
-    # Safely calculate total price
     total_price = sum((ci.quantity or 0) * (ci.item.price or 0) for ci in valid_items)
 
-    # Prepare items for Pydantic response
     items_response = [
         CartItemResponse(
             id=ci.id,
@@ -180,7 +171,7 @@ def remove_from_cart(
     request: Request,
     response: Response,
     item_id: int,
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_current_user_optional),
     db: Session = Depends(get_db),
 ):
     service = CartService(db)
