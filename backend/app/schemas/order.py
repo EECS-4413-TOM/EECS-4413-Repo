@@ -8,10 +8,10 @@ from app.schemas.item import ItemResponse
 class CheckoutRequest(BaseModel):
     """
     Request body for POST /api/orders/checkout.
-    Credit card fields are passed to PaymentService (mock).
+    All fields are validated here; OrderService passes only ``credit_card_number``
+    and the computed total into ``PaymentService.process_payment`` (mock).
+    Expiry and CVV are accepted for a realistic form but not used by the mock.
     """
-
-
 
     shipping_address: str | None = None
     credit_card_number: str

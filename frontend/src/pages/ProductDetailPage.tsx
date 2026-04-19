@@ -108,7 +108,7 @@ export default function ProductDetailPage() {
   return (
     <div className="catalog-container">
        {/* BREADCRUMB */}
-  <p style={{ marginBottom: "20px", color: "#777" }}>
+  <p style={{ marginBottom: "20px", color: "#a8a8a8" }}>
     Home / Catalog / {item.name}
   </p>
       <div className="product-detail">

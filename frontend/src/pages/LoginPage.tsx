@@ -23,22 +23,24 @@ export default function LoginPage() {
   }
   return (
     <div
+      className="auth-page"
       style={{
         minHeight: "100vh",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        backgroundColor: "#f5f5f5",
+        backgroundColor: "#181818",
       }}
     >
       <div
         style={{
           width: "100%",
           maxWidth: "400px",
-          backgroundColor: "#ffffff",
+          backgroundColor: "#2a2a2a",
+          border: "1px solid #3a3a3a",
           padding: "40px 32px",
           borderRadius: "16px",
-          boxShadow: "0 10px 25px rgba(0,0,0,0.06)",
+          boxShadow: "0 16px 40px rgba(0,0,0,0.5)",
           boxSizing: "border-box",
           transform: "translateX(-8px)",
         }}
@@ -49,6 +51,7 @@ export default function LoginPage() {
             marginBottom: "32px",
             fontSize: "28px",
             fontWeight: 700,
+            color: "#e8e8e8",
           }}
         >
           Login
@@ -59,8 +62,9 @@ export default function LoginPage() {
               marginBottom: "16px",
               padding: "10px 12px",
               borderRadius: "8px",
-              backgroundColor: "#ffe6e6",
-              color: "#b30000",
+              backgroundColor: "rgba(220, 38, 38, 0.15)",
+              color: "#f87171",
+              border: "1px solid rgba(248, 113, 113, 0.4)",
               fontSize: "14px",
             }}
           >
@@ -75,6 +79,7 @@ export default function LoginPage() {
                 marginBottom: "6px",
                 fontSize: "14px",
                 fontWeight: 500,
+                color: "#b8b8b8",
               }}
             >
               Email
@@ -89,8 +94,9 @@ export default function LoginPage() {
                 boxSizing: "border-box",
                 padding: "12px 14px",
                 borderRadius: "10px",
-                border: "1px solid #e0e0e0",
-                backgroundColor: "#fafafa",
+                border: "1px solid #3a3a3a",
+                backgroundColor: "#1e1e1e",
+                color: "#e8e8e8",
                 outline: "none",
                 fontSize: "14px",
               }}
@@ -103,6 +109,7 @@ export default function LoginPage() {
                 marginBottom: "6px",
                 fontSize: "14px",
                 fontWeight: 500,
+                color: "#b8b8b8",
               }}
             >
               Password
@@ -117,8 +124,9 @@ export default function LoginPage() {
                 boxSizing: "border-box",
                 padding: "12px 14px",
                 borderRadius: "10px",
-                border: "1px solid #e0e0e0",
-                backgroundColor: "#fafafa",
+                border: "1px solid #3a3a3a",
+                backgroundColor: "#1e1e1e",
+                color: "#e8e8e8",
                 outline: "none",
                 fontSize: "14px",
               }}
@@ -134,8 +142,8 @@ export default function LoginPage() {
               padding: "12px 0",
               borderRadius: "999px",
               border: "none",
-              backgroundColor: "#f44336",
-              color: "#ffffff",
+              backgroundColor: "#7ae759",
+              color: "#111111",
               fontWeight: 600,
               fontSize: "16px",
               cursor: loading ? "not-allowed" : "pointer",
@@ -153,9 +161,9 @@ export default function LoginPage() {
               textAlign: "center",
               padding: "10px 0",
               borderRadius: "999px",
-              border: "1px solid #e0e0e0",
-              backgroundColor: "#ffffff",
-              color: "#333333",
+              border: "1px solid #3a3a3a",
+              backgroundColor: "#242424",
+              color: "#e8e8e8",
               fontWeight: 600,
               fontSize: "15px",
               textDecoration: "none",

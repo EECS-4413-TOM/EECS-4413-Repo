@@ -64,7 +64,9 @@ export default function UsersPage() {
     <div>
       <h1>Users</h1>
       <p>
-        <Link to="/admin">Back to admin</Link>
+        <Link to="/admin" className="admin-back-btn">
+          ← Back to admin
+        </Link>
       </p>
       {error && <p>{error}</p>}
 

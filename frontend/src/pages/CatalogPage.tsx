@@ -118,6 +118,33 @@ export default function CatalogPage() {
   const [order, setOrder] = useState("asc")
   const { addToCart } = useCart()
 
+  const [heroGames, setHeroGames] = useState<CatalogItem[]>([])
+  const [heroReady, setHeroReady] = useState(false)
+
+  useEffect(() => {
+    let cancelled = false
+    ;(async () => {
+      try {
+        const data = await getItems({
+          sortBy: "rating",
+          order: "desc",
+          limit: 14,
+          page: 1,
+        })
+        if (!cancelled && Array.isArray(data)) {
+          setHeroGames(data.slice(0, 14))
+        }
+      } catch (e) {
+        console.error("Failed to load featured games:", e)
+      } finally {
+        if (!cancelled) setHeroReady(true)
+      }
+    })()
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
   useEffect(() => {
     setPage(1)
     setItems([])
@@ -216,29 +243,83 @@ export default function CatalogPage() {
     }
   }
 
+  const heroTrack =
+    heroGames.length > 0 ? [...heroGames, ...heroGames] : []
+
   return (
     <div className="catalog-page">
 
-      <section className="hero">
-        <h2>Welcome to Our Store</h2>
+      <section className="catalog-hero" aria-label="Highest rated games">
+        {!heroReady ? (
+          <div className="catalog-hero-loading" aria-hidden="true" />
+        ) : heroGames.length === 0 ? (
+          <div className="catalog-hero-fallback">
+            <h2 className="catalog-hero-fallback-title">Welcome to TOMAGames</h2>
+          </div>
+        ) : (
+          <>
+            <p className="catalog-hero-eyebrow">Highest rated</p>
+            <div className="catalog-hero-marquee">
+              <div className="catalog-hero-track">
+                {heroTrack.map((item, idx) => (
+                  <Link
+                    key={`hero-${item.id}-${idx}`}
+                    to={`/product/${item.id}`}
+                    className="catalog-hero-slide"
+                  >
+                    <div className="catalog-hero-slide-image-wrap">
+                      <img
+                        src={getImage(item)}
+                        alt={item.name || "Game cover"}
+                        className="catalog-hero-slide-img"
+                        onError={(e) => {
+                          e.currentTarget.src = FALLBACK_IMAGE
+                        }}
+                      />
+                    </div>
+                    <span className="catalog-hero-slide-name">
+                      {item.name || "Game"}
+                    </span>
+                    <span className="catalog-hero-slide-rating">
+                      ★ {formatRating(item)}
+                    </span>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          </>
+        )}
       </section>
 
-      <div className="search-bar">
-        <input
-          placeholder="Search games..."
-          value={search}
-          onChange={(e) => {
-            setPage(1)
-            setItems([])
-            setHasMore(true)
-            setSearch(e.target.value)
-          }}
-        />
-      </div>
+      <section className="catalog-intro">
+        <h1 className="catalog-intro-title">Find your next game</h1>
+        <p className="catalog-intro-text">
+          TOMAGames is our course store: search and sort the catalog, open a
+          game for details, add it to your cart, and check out when you are
+          logged in.
+        </p>
+      </section>
 
-      <div className="catalog-filters">
+      <div className="catalog-toolbar">
+        <div className="search-bar">
+          <input
+            type="search"
+            className="catalog-search-input"
+            placeholder="Search games…"
+            value={search}
+            aria-label="Search games"
+            onChange={(e) => {
+              setPage(1)
+              setItems([])
+              setHasMore(true)
+              setSearch(e.target.value)
+            }}
+          />
+        </div>
 
+        <div className="catalog-filters">
         <select
+          className="catalog-sort-select"
           value={sortBy ? `${sortBy}-${order}` : "none"}
           onChange={(e) => {
             if (e.target.value === "none") {
@@ -264,15 +345,19 @@ export default function CatalogPage() {
           <option value="involved_companies-desc">Company (Z–A)</option>
         </select>
 
-        <button onClick={() => {
-          setCategory("")
-          setBrand("")
-          setSortBy("")
-          setOrder("asc")
-        }}>
-          Reset Filters
+        <button
+          type="button"
+          className="catalog-reset-filters"
+          onClick={() => {
+            setCategory("")
+            setBrand("")
+            setSortBy("")
+            setOrder("asc")
+          }}
+        >
+          Reset filters
         </button>
-
+        </div>
       </div>
 
       {!loading && items.length === 0 && <p>No games found</p>}

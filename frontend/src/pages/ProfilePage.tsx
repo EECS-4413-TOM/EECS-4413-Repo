@@ -158,7 +158,7 @@ export default function ProfilePage() {
               Address
             </p>
             {!user.address && (
-              <p style={{ fontSize: 13, color: "#666", marginBottom: 8 }}>
+              <p style={{ fontSize: 13, color: "#a0a0a0", marginBottom: 8 }}>
                 Add your full address (street through zip) if you don&apos;t have
                 one yet.
               </p>
@@ -198,7 +198,7 @@ export default function ProfilePage() {
               />
             </label>
             {saveError && (
-              <p style={{ color: "#b30000", marginTop: 8 }}>{saveError}</p>
+              <p style={{ color: "#f87171", marginTop: 8 }}>{saveError}</p>
             )}
             <div className="profile-form-actions">
               <button

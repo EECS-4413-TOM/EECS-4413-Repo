@@ -33,7 +33,9 @@ export default function SalesHistoryPage() {
     <div>
       <h1>Sales history</h1>
       <p>
-        <Link to="/admin">Back to admin</Link>
+        <Link to="/admin" className="admin-back-btn">
+          ← Back to admin
+        </Link>
       </p>
       {error && <p>{error}</p>}
 

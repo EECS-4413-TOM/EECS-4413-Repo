@@ -74,7 +74,7 @@ export default function DashboardPage() {
               />
 
               <h3>{card.title}</h3>
-              <p style={{ fontSize: "14px", color: "#555" }}>
+              <p style={{ fontSize: "14px", color: "#b8b8b8" }}>
                 {card.description}
               </p>
 
